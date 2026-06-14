@@ -8,7 +8,7 @@ import {
   Plus, Trash2, ShieldCheck, Pencil, Copy, ClipboardList, Clock, User, Inbox,
   Layers, ArrowLeftRight, Check, Save, Unlock,
   ShoppingCart, FileText, Truck, Percent, TicketPercent,
-  Lightbulb, ArrowDown, ChevronUp, Menu
+  Lightbulb, ArrowDown, ChevronUp, Menu, Home
 } from "lucide-react";
 
 const CENTROS = {"2003": "Pronto Pargua", "2549": "Pronto Rosario Norte", "2626": "Pronto Metro Quilicura", "2004": "Pronto Sierra Gorda", "2005": "Pronto Laguna Chicureo", "2006": "Pronto Manuel Rodriguez", "2615": "Pronto UAI Peñalolen", "2766": "Pronto Metro Pedro de Valdivia", "2778": "Pronto Carretera Longitudinal Austral", "2788": "Pronto Vicuña Mackenna", "2783": "Pronto Baquedano", "2100": "Pronto Antonio Rendic", "2101": "Pronto Pedro Aguirre Cerda", "2582": "Pronto Chañaral", "2102": "Pronto Diego Portales", "2796": "Pronto Ruta 27", "2103": "Punto Teniente Merino", "2510": "Pronto Antofagasta", "2722": "Punto Francisco Bilbao", "2105": "Pronto Vivar", "2106": "Pronto Ruta A-16", "2009": "Pronto Pozo Al Monte", "2107": "Punto Arturo Merino Correa", "2502": "Pronto Perez Zujovic", "2108": "Punto Granaderos", "2109": "Punto Panamericana Sur", "2110": "Pronto Luis Valente Rossi", "2111": "Pronto Angamos", "2112": "ProntoRuta 5 Norte", "2113": "Pronto Av Argentina I", "2758": "ProntoAntonio Rendic Esq.", "2114": "Pronto Barrio Industrial", "2115": "Pronto Pedro Prado", "2116": "Punto Abaroa", "2581": "Pronto Av Argentina II", "2118": "Punto 11 de Septiembre", "2119": "Pronto 18 de Septiembre", "2120": "Pronto Alto Hospicio", "2121": "Pronto Edmundo Perez Zujovic", "2122": "Punto Balmaceda", "2777": "Punto Diego Portales II", "2779": "Punto 27 de Abril", "2770": "Punto República de Croacia", "2514": "Pronto Iquique", "2123": "Pronto Santiago Arata", "2720": "Punto Anibal Pinto", "2124": "Punto Ruta 5 Sur", "2125": "Pronto Sotomayor", "2013": "Pronto San Rafael", "2012": "Pronto San Carlos", "2017": "Pronto Cosmito", "2540": "Pronto Paicaví", "2544": "Pronto Pedro De Valdivia", "2128": "Punto Rudecindo Ortega", "2737": "Punto Condell", "2053": "Pronto San José De La Mariquina", "2129": "Pronto Calle 8 Oriente", "2803": "Punto Camino Alerce", "2713": "Punto O'Higgins Chiguayante", "2131": "Punto Salvador Allende II", "2132": "Pronto Prat San Martin", "2133": "Punto Los Notros", "2134": "Punto Almirante La Torre", "2797": "Punto Pedro Aguirre Cerda II", "2135": "Pronto Vicente Mendez", "2056": "Pronto Puerto Varas", "2052": "Pronto Parral", "2055": "Pronto Trafun Poniente", "2059": "Pronto Victoria", "2063": "Pronto San Javier", "2136": "Pronto Futaleufu", "2705": "Pronto Rio Tranquilo", "2786": "Punto Maipu San Martin", "2137": "Pronto Ecuador O'Higgins", "2749": "Pronto Colin", "2138": "Punto Cardonal", "2757": "Punto Galvarino Riveros", "2139": "Pronto Prat II", "2140": "Pronto Kurt Moller", "2743": "Punto Lastarria", "2043": "Pronto Los Angeles Centro", "2721": "Punto O'Higgins III", "2142": "Punto Walker Martinez", "2143": "Punto Fresia Brasil", "2593": "Punto Rudecindo Ortega II", "2144": "Pronto Valdivia", "2145": "Punto San Martin Benavente", "2146": "Punto Av Mackenna", "2773": "Punto Arturo Alessandri", "2594": "Punto M. Rozas", "2719": "Pronto Sargento Aldea", "2148": "Pronto Balmaceda II", "2712": "Punto Bernardo O'Higgins", "2015": "Pronto Puerto Montt", "2794": "Pronto 2 Sur", "2150": "Punto Libertad", "2151": "Punto Picarte", "2152": "Punto Comercio", "2014": "Punto Jose Puchi", "2723": "Pronto Balmaceda", "2155": "Punto Mac-Iver", "2156": "Punto Caupolican", "2537": "Pronto Los Carrera", "2157": "Pronto Cristobal Colon", "2064": "Pronto Palomares", "2811": "Pronto Ladrilleros", "2159": "Punto Republica Victoria", "2048": "Pronto Chillán Oriente", "2160": "Pronto Presidente Frei", "2161": "Punto Geronimo De Alderete", "2162": "Punto Panamericana", "2163": "Pronto Manuel Rodriguez Chigu", "2164": "Pronto Pedro Aguirre Cerda", "2726": "Pronto 21 de Mayo", "2517": "Pronto Michimalonco", "2166": "Pronto 2 Norte", "2167": "Punto Picarte Simpson", "2168": "Punto Camino A Coñaripe", "2731": "Punto Los Carreras", "2590": "Punto Andres Bello", "2724": "Pronto Juan Antonio Rios", "2170": "Pronto Calle 5 Norte", "2171": "Punto Balmaceda III", "2065": "Pronto Cabrero", "2733": "Pronto Gabriela Mistral", "2173": "Punto Panamericana Sur II", "2030": "Pronto Horcones", "2706": "Pronto Alemania", "2175": "Pronto Lircay", "2176": "Punto Rene Soriano", "2177": "Pronto Vicuña Mackenna II", "2178": "Pronto Maraton", "2179": "Pronto Ruta S-30", "2180": "Pronto Camino Internacional", "2747": "Pronto La Junta", "2181": "Pronto Camino Internacional II", "2774": "Pronto Daniel Vera", "2182": "Pronto Av Argentina III", "2183": "Punto Vicente Perez Rosales", "2021": "Pronto Trafún Oriente", "2023": "Pronto Freire", "2020": "Pronto Loncoche", "2022": "Pronto Los Angeles Poniente", "2184": "Punto O'Higgins IV", "2185": "Punto Bulnes", "2186": "Punto Bulnes II", "2187": "Punto Bulnes III", "2188": "Punto Don Bosco", "2189": "Punto Ruta 5 Sur II", "2190": "Punto Los Rios", "2024": "Pronto Lautaro", "2191": "Pronto Los Carrera Lautaro", "2709": "Punto Castellon", "2018": "Pronto Eusebio Ibar", "2802": "Pronto Ogana", "2542": "Pronto Av Alemania", "2193": "Pronto Latorre", "2554": "Pronto Carlos Schorr", "2522": "Pronto Talcahuano", "2050": "Pronto Los Angeles Oriente", "2194": "Pronto Camino Coronel", "2195": "Punto O'Higgins Alemania", "2031": "Pronto Penco", "2800": "Punto Sargento Candelaria", "2196": "Punto Anibal Pinto II", "2197": "Punto Presidente Ibañez", "2730": "Punto Maipu 895", "2199": "Pronto Americo Vespucio", "2200": "Punto San Martin Uruguay", "2201": "Pronto Ercilla", "2202": "Punto Abate Molina", "2047": "Pronto Chillán Poniente", "2028": "Pronto Maule", "2203": "Punto Prat", "2204": "Pronto Calle B-20", "2205": "Pronto Los Carrera II", "2206": "Pronto Libertad", "2207": "Pronto Ruta 60-C", "2208": "Pronto Ruta F-30-E", "2209": "Pronto Lauro Barros", "2210": "Pronto Normandie", "2587": "Pronto Portales", "2211": "Pronto Colo Colo", "2051": "Pronto Hijuelas", "2784": "Punto Los Loros", "2212": "Pronto Sta. Teresita Peñablanca", "2213": "Pronto Agua Santa", "2214": "Pronto Valparaiso", "2543": "Pronto Bosques de Montemar", "2215": "Pronto Bernardo O'Higgins II", "2742": "Pronto Esmeralda Santa Teresa", "2217": "Pronto Humeres", "2058": "Pronto Palo Colorado", "2218": "Punto O'Higgins V", "2219": "Pronto Palmira Romano Norte", "2060": "Pronto Marbella", "2220": "Pronto Marga Marga", "2221": "Pronto Teniente Cruz Martinez", "2519": "Pronto Las Salinas", "2746": "Pronto Carretera Panamericana Norte", "2222": "Pronto Freire Echeverria", "2223": "Pronto Freire Gomez Carreño", "2703": "Pronto Jose Joaquin Perez", "2225": "Pronto Constitucion", "2069": "Pronto Placilla", "2226": "Punto Panamericana Norte II", "2567": "Punto Brasil I", "2228": "Punto Ignacio De La Carrera", "2229": "Punto Panamericana Norte Fco. Aguirre", "2230": "Pronto Balmaceda IV", "2231": "Punto Ariztia", "2057": "Pronto Socos", "2232": "Pronto El Peral", "2233": "Pronto Lusitania", "2234": "Pronto Los Carrera III", "2235": "Pronto Irarrazaval O'Higgins", "2236": "Pronto Borgoño", "2237": "Pronto Playa Ancha", "2577": "Pronto Alessandri", "2239": "Pronto Irarrazaval", "2240": "Pronto Las Delicias Sargento Aldea", "2241": "Pronto Balmaceda Paradero", "2242": "Pronto Vicuña Mackenna III", "2243": "Pronto Chacabuco General Cruz", "2244": "Punto Alessandri Norte", "2245": "Pronto San Martin 2510", "2246": "Pronto El Arrayan", "2044": "Pronto Los Vilos", "2247": "Pronto Marga Marga II", "2716": "Pronto Camino Internacional Oriente", "2805": "Pronto Rafael Ariztia", "2249": "Pronto Matta Cerro Placeres", "2250": "Pronto Colo Colo", "2251": "Pronto Circunvalacion Ariztia", "2252": "Pronto Tocornal", "2253": "Pronto Adolfo Eastman", "2254": "Punto Merino Jarpa", "2255": "Pronto La Cantera I", "2256": "Pronto Ruta F30", "2257": "Pronto Camino Troncal", "2258": "Pronto Curauma Sur", "2259": "Pronto Isidoro Dubournais", "2260": "Pronto Jose M. Balmaceda", "2708": "Pronto Emilio Valle", "2262": "Pronto Juan Rusque", "2263": "Pronto Palmira Romano Sur", "2771": "Pronto Gabriel Gonzalez Videla", "2732": "Pronto Av Argentina , Las Juntas", "2025": "Pronto Los Vilos Oriente", "2265": "Pronto La Cantera II", "2266": "Pronto Calle Larga", "2267": "Punto Socos Victoria", "2268": "Pronto Tarcicio Valderrama", "2269": "Pronto Januario Ovalle", "2270": "Punto Carretera Panamericana III", "2096": "Pronto Copiapo Km 811", "2271": "Punto Copayapu", "2089": "Pronto Copiapo Km 838", "2272": "Pronto El Islon", "2273": "Pronto Alessandri II", "2595": "Pronto 4 Esquinas", "2534": "Pronto Parcela 20", "2275": "Pronto Ambrosio Ohiggins", "2045": "Pronto Coquimbo", "2276": "Pronto Camino Internacional II", "2277": "Pronto Los Carrera N° 01050", "2810": "Pronto Nicaragua", "2041": "Pronto Llay Llay", "2278": "Punto Camino Tuqui", "2040": "Pronto La Serena", "2046": "Pronto Tabolango", "2545": "Pronto Troncal Sur", "2279": "Pronto Los Copihues", "2280": "Pronto Juan Bautista Alberdi", "2011": "Pronto Puente Ruta 78", "2536": "Pronto Isidora", "2612": "Pronto Plaza Peru", "2614": "Pronto UDD Concepción", "2616": "Pronto UAI Viña Del Mar", "2618": "Pronto Metro Vicuña Mackenna", "2619": "Pronto USS Cede Los Leones", "2621": "Pronto Casino UNAB", "2622": "Pronto Casino UAI Peñalolen", "2624": "Pronto DUOC Vina Del Mar", "2775": "Pronto Lyon", "2761": "Pronto Plaza Sucre", "2763": "Pronto Plaza de Armas Temuco", "2764": "Pronto Mall Plaza El Trebol", "2765": "Pronto Metro Cal Y Canto", "2767": "Pronto Valparaiso", "2768": "Pronto Bellavista Pio Nono", "2780": "Pronto Luis Thayer Ojeda", "2789": "Pronto UAI Viña Del Mar Casino", "2790": "Pronto UAI Peñalolén Casino Edif. A", "2791": "Pronto UAI Peñalolén Casino Edif. E", "2792": "Pronto UAI Peñaloles Cafetería Edif. C", "3014": "Pronto CIUC Piso 1", "2762": "Pronto Huérfanos 815", "8201": "Pronto Metro U De Chile", "2500": "Pronto Pedro Fontova", "2532": "Pronto Chamisero", "2010": "Pronto Nos", "2281": "Pronto Balmaceda Malloco", "2282": "Pronto General San Martin", "2283": "Pronto Alcalde Lopez", "2617": "Pronto Macul", "2782": "Pronto Americo Vespucio II", "2284": "Punto Errazuriz", "2285": "Pronto Pedro Aguirre Cerda II", "2062": "Pronto Ruta 78 Poniente", "2061": "Pronto Ruta 78 Oriente", "2287": "Pronto Bilbao", "2288": "Pronto Vitacura", "2289": "Pronto Macul", "2290": "Punto San Martin N° 401", "2291": "Pronto Ecuador", "2292": "Pronto General Prieto", "2293": "Pronto Balmaceda II", "2509": "Pronto Vitacura 5579", "2511": "Pronto Av La Florida", "2294": "Pronto Blanco Encalada", "2531": "Pronto Cantagallo", "2296": "Pronto Pedro Aguirre Cerda III", "2812": "Pronto Ruta G16 Arco Iris", "2298": "Pronto Irarrazaval II", "2299": "Punto Chicureo", "2801": "Pronto Panamericana Norte", "2300": "Pronto San Ramon", "2539": "Pronto Pajaritos 5200", "2301": "Pronto Irarrazaval III", "2054": "Pronto San Fernando", "2302": "Pronto San Pablo Bismark", "2541": "Pronto Costanera E0", "2303": "Pronto Bernardo O'Higgins I", "2578": "Pronto Camino Melipilla II", "2305": "Pronto Camino Nos", "2306": "Pronto Eliodoro Yañez", "2307": "Pronto Concha Y Toro I", "2308": "Pronto Oriental", "2813": "Pronto El Rosal", "2310": "Pronto Salvador", "2311": "Pronto Membrillar", "2312": "Pronto Lota", "2513": "Pronto Portal La Dehesa", "2019": "Pronto Nos Km 27", "2313": "Pronto Vicuña Mackenna IV", "2717": "Pronto Colon", "2754": "Pronto Pedro De Valdivia", "2315": "Pronto Ossa", "2515": "Pronto Principe De Gales", "2704": "Pronto Santa Rosa II", "2317": "Punto Gran Avenida", "2318": "Pronto San Pablo II", "2586": "Pronto Mapocho Brasil", "2320": "Punto Jose Miguel Carrera", "2321": "Pronto Americo Vespucio III", "2707": "Pronto General San Martin", "2323": "Pronto Departamental", "2324": "Pronto Av San Juan", "2325": "Pronto España", "2326": "Pronto O'Higgins Lote B-5A", "2327": "Pronto Arturo Pratt", "2002": "Pronto Sagrada Familia", "2328": "Pronto Circunvalacion Norte", "2714": "Pronto Alberto Llona", "2330": "Pronto Concha Y Toro II", "2331": "Pronto Recoleta", "2769": "Pronto San Pablo Brasil", "2575": "Pronto Lia Aguirre", "2333": "Pronto Bernardo O'Higgins III", "2334": "Punto Salvador Gutierrez", "2335": "Pronto Longitudinal Sur", "2336": "Punto Carrascal", "2337": "Pronto El Valle", "2338": "Punto Mapocho", "2339": "Pronto Manso De Velasco", "2340": "Pronto Carretera El Cobre", "2772": "Punto Irarrazabal II", "2341": "Pronto Recoleta", "2342": "Pronto Vespucio", "2343": "Pronto 18 De Septiembre", "2344": "Pronto 5 De Abril", "2345": "Pronto Libertador Bernardo O'Higgins", "2346": "Pronto Walker Martinez", "2793": "Pronto Tobalaba", "2347": "Pronto Bernardo O'Higgins II", "2503": "Pronto Pajaritos 3333", "2049": "Pronto Ruta 68", "2348": "Pronto Alameda", "2349": "Pronto Riesgo", "2566": "Pronto Ignacio Carrera Pinto", "2351": "Punto Orlandi", "2088": "Pronto Chimbarongo", "2352": "Pronto Longitudinal Sur II", "2715": "Pronto Carmen Camilo Henriquez", "2745": "Pronto Independencia", "2354": "Pronto Longitudinal Sur III", "2355": "Punto Argomedo", "2356": "Pronto Viel", "2785": "Pronto Bustamante", "2357": "Pronto Freire II", "2358": "Pronto Camino Melipilla II", "2359": "Punto San Martin M. Solis", "2360": "Pronto Bascuñan Guerrero", "2807": "Pronto Manuel Montt", "2361": "Pronto Cachapoal", "2565": "Pronto Manquehue", "2362": "Pronto Departamental II", "2363": "Pronto Las Condes", "2729": "Pronto Vicuña Mackenna V", "2365": "Pronto Los Leones", "2727": "Pronto Carmen", "2367": "Pronto Consistorial", "2368": "Pronto Calera De Tango", "2711": "Pronto Arturo Prat II", "2370": "Punto San Eugenio", "2806": "Pronto Camino Lo Sierra", "2371": "Punto Jose Pedro Alessandri", "2372": "Pronto Francisco Bilbao II", "2804": "Pronto Diagonal Oriente", "2373": "Punto Alberto Edwards", "2718": "Pronto Camino El Alba", "2776": "Pronto Ortuzar", "2374": "Pronto Trinidad", "2728": "Pronto Providencia", "2026": "Pronto San Fco Mostazal Poniente", "2027": "Pronto San Fco Mostazal Oriente", "2376": "Pronto San Jose", "2548": "Pronto Trapenses", "2377": "Pronto Camino Lonquen", "2505": "Pronto Lord Cochrane", "2378": "Pronto Americo Vespucio", "2787": "Pronto Virginia Subercaseaux", "2379": "Punto Jose Joaquin Perez II", "2556": "Pronto Vitacura 4207", "2530": "Pronto Vicuña Mackenna 1990", "2380": "Pronto Bascuñan Guerrero II", "2381": "Pronto Camino Lo Ovalle", "2576": "Pronto Apoquindo", "2504": "Pronto Vicuña Mackenna 5700", "2506": "Pronto La Dehesa", "2016": "Pronto Lampa", "2525": "Pronto Costanera E1", "2526": "Pronto Costanera E2", "2029": "Pronto Costanera E6", "2507": "Pronto San Pablo", "2568": "Pronto Carmen III", "2512": "Pronto Santa Maria", "2086": "Pronto Requinoa", "2087": "Pronto Romeral", "2384": "Pronto 21 De Mayo", "2385": "Pronto Mexico El Peñon", "2508": "Pronto Las Condes 10912", "2599": "Pronto Americo Vespucio IV", "2387": "Pronto Recreo", "2589": "Pronto Gabriela", "2518": "Pronto C Henriquez", "2521": "Pronto Los Libertadores", "2388": "Pronto Leonardo Murialdo", "2781": "Pronto Comercio", "2389": "Pronto Concha Y Toro III", "2390": "Pronto Santa Rosa III", "2538": "Pronto Tobalaba", "2795": "Pronto Austral", "2391": "Punto Henriquez", "2392": "Pronto Manzano", "2799": "Pronto Ruta 215", "2798": "Pronto Matta III", "2007": "Pronto Panamericana Norte II", "2633": "Pronto Irarrazaval Brown Sur", "2637": "Pronto Antonio Bellet", "2394": "Pronto General Velasquez", "2630": "Pronto Colo Colo", "2808": "Pronto Padre Las Casas", "2809": "Pronto Tijerales", "2638": "Pronto San Carlos de Apoquindo", "2396": "Pronto Mejillones", "2634": "Pronto Holanda", "2648": "Pronto Mall Plaza Alameda", "2631": "Pronto Agustinas San Antonio", "2397": "Pronto Quillon", "2641": "Pronto Antofagasta Arauco Express", "2645": "Pronto Agustinas Morande", "2405": "Pronto San Diego", "2643": "Pronto Padre Mariano", "2104": "Pronto Tinuche", "2639": "Pronto La Florida El Membrillar", "2651": "Sbarro Mall Plaza Norte", "2650": "Sbarro Mall Plaza Egaña", "2635": "Pronto Bulnes-Portales Temuco", "2652": "Sbarro Mall Costanera Center", "2552": "Pronto Quilin", "2066": "Pronto Monterilla", "2036": "Pronto Vallenar", "2130": "Pronto Villarrica", "2141": "Pronto Colegio Ingles talca", "2147": "Pronto Huamachuco", "2117": "Pronto Los Carrera", "2149": "Pronto Lorca", "2127": "Pronto San Carlos Sur", "2814": "Pronto Pichilemu Comercio", "2153": "Pronto Laura Pizarro", "7002": "Juan Valdez Providencia", "7003": "Juan Valdez M Pza Dominicos", "7004": "Juan Valdez MUT", "7005": "Juan Valdez M Plaza La Serena", "7006": "Juan Valdez M Plaza Los Ríos", "7007": "Juan Valdez Clínica Las Condes", "7008": "Juan Valdez M Plaza Trebol", "7009": "Juan Valdez M Portal Osorno", "7010": "Juan Valdez M Costanera PM", "7011": "Juan Valdez Aires Vespucio", "7012": "Juan Valdez M Arauco Maipu", "7013": "Juan Valdez M Pza Egana Corn", "7014": "Juan Valdez Rosario Norte", "7015": "Juan Valdez M Marina Arauco", "7016": "Juan Valdez Catedral", "7017": "Juan Valdez M Independencia", "7018": "Juan Valdez Open Kennedy", "7019": "Juan Valdez Apto Espigon C", "7020": "Juan Valdez Apto Espigon E", "7021": "Juan Valdez M P Arauco Corn", "7022": "Juan Valdez M Parque Arauco", "7023": "Juan Valdez M Costanera Ctr", "7024": "Juan Valdez M Plaza Egana", "7025": "Juan Valdez Open Pza Rancagua", "7026": "Juan Valdez M Alto Las Condes", "7027": "Juan Valdez M Pza Antofagasta", "7028": "Juan Valdez M Plaza Tobalaba", "7029": "Juan Valdez Lider Puente Nuevo", "9005": "Juan Valdez Darkstore Wallmart", "9008": "Juan Valdez Darkstore Justo", "9003": "Centro Distribucion Bluex", "9002": "Centro Distribucion 3PL"};
@@ -681,7 +681,7 @@ const fmtFecha = iso => {
 export default function PortalSAP() {
   const [session, setSession] = useState(undefined); // undefined = cargando
   const [perfil, setPerfil] = useState(null);
-  const [vista, setVista] = useState("nueva"); // 'nueva' | 'solicitudes' | 'clusters'
+  const [vista, setVista] = useState("inicio"); // 'inicio' | 'nueva' | 'solicitudes' | 'clusters'
   const [solicitante, setSolicitante] = useState("");
   const [clusters, setClusters] = useState({});
   const [seleccion, setSeleccion] = useState([]);
@@ -933,6 +933,7 @@ export default function PortalSAP() {
   }
 
   /* ---------- VISTAS SECUNDARIAS ---------- */
+  if (vista === "inicio")      return <AppShell vista={vista} setVista={setVista} perfil={perfil}><VistaInicio perfil={perfil} setVista={setVista} /></AppShell>;
   if (vista === "maestros")    return <AppShell vista={vista} setVista={setVista} perfil={perfil}><VistaMaestros /></AppShell>;
   if (vista === "admin")       return <AppShell vista={vista} setVista={setVista} perfil={perfil}><VistaAdmin /></AppShell>;
   if (vista === "solicitudes") return <AppShell vista={vista} setVista={setVista} perfil={perfil}><VistaSolicitudes /></AppShell>;
@@ -1227,6 +1228,69 @@ function GuiaSolicitudes({ onAplicar }) {
         </div>
       )}
     </div>
+  );
+}
+
+/* ============================================================
+   VISTA INICIO — landing/home
+   ============================================================ */
+function VistaInicio({ perfil, setVista }) {
+  const MODULOS = [
+    { id: "nueva",       label: "Nueva Solicitud",            desc: "Crea solicitudes de cambio en datos maestros SAP: precios, bloqueos, registros info y más.", icon: Plus,         color: "#5b8dee" },
+    { id: "solicitudes", label: "Bandeja de Solicitudes",     desc: "Revisa el estado de tus solicitudes enviadas y descarga los archivos procesados.",             icon: Inbox,        color: "#34c759" },
+    { id: "clusters",    label: "Gestor de Locales",          desc: "Organiza centros en clusters para agilizar la carga masiva de solicitudes.",                   icon: Boxes,        color: "#ff9500" },
+    { id: "cvp",         label: "Ciclo de Vida del Producto", desc: "Procesos estandarizados de alta, modificación y baja de SKUs con matriz RACI y pasos.",        icon: Layers,       color: "#af52de" },
+    { id: "ayuda",       label: "Centro de Ayuda",            desc: "Guías de solicitud, catálogo de planillas y ejemplos de cada módulo disponible.",              icon: Lightbulb,    color: "#ff6b35" },
+  ];
+
+  const nombre = perfil?.nombre?.split(" ")[0];
+
+  return (
+    <main className="sol-wrap inicio-wrap">
+      {/* ── Hero oscuro split ── */}
+      <div className="inicio-hero">
+        {/* Lado izquierdo: visual abstracto */}
+        <div className="inicio-hero-visual">
+          <div className="inicio-planet-fire" />
+          <div className="inicio-planet-earth" />
+          <div className="inicio-stars" />
+        </div>
+
+        {/* Lado derecho: texto */}
+        <div className="inicio-hero-text">
+          <div className="inicio-logomark">N ·</div>
+          <h1 className="inicio-title">
+            El programa Nexus se concibe como una iniciativa estratégica destinada a transformar y optimizar la gestión de datos maestros dentro de Arcoprime
+          </h1>
+          <p className="inicio-desc-blue">
+            Su objetivo principal es establecer un marco de trabajo cohesivo y eficiente que garantice la integridad, precisión y accesibilidad de los datos esenciales para la operación y toma de decisiones en la compañía.
+          </p>
+          <p className="inicio-desc-orange">
+            Este portal es la plataforma para la carga y el control de modificaciones de datos maestros SAP{nombre ? `. Bienvenido, ${nombre}.` : "."}
+          </p>
+        </div>
+      </div>
+
+      {/* ── Módulos ── */}
+      <h2 className="inicio-section-title">Acceso rápido</h2>
+      <div className="inicio-modules">
+        {MODULOS.map(m => {
+          const Icon = m.icon;
+          return (
+            <button key={m.id} className="inicio-card" onClick={() => setVista(m.id)}>
+              <div className="inicio-card-icon" style={{ background: m.color + "18", color: m.color }}>
+                <Icon size={22} strokeWidth={1.8} />
+              </div>
+              <div className="inicio-card-body">
+                <strong>{m.label}</strong>
+                <span>{m.desc}</span>
+              </div>
+              <ChevronRight size={16} className="inicio-card-arrow" />
+            </button>
+          );
+        })}
+      </div>
+    </main>
   );
 }
 
@@ -2951,6 +3015,7 @@ function Sidebar({ vista, setVista, perfil }) {
   const esDDMM = perfil?.rol === "datos_maestros";
 
   const TABS = [
+    { id: "inicio",      label: "Inicio",            icon: Home },
     { id: "nueva",       label: "Nueva solicitud",  icon: Plus },
     { id: "solicitudes", label: "Solicitudes",       icon: Inbox },
     { id: "clusters",    label: "Gestor de locales", icon: Boxes },
@@ -3836,6 +3901,34 @@ function Estilos() {
         .cvp2-sec-body { padding: 16px; }
         .cvp2-actores-grid { grid-template-columns: 1fr; }
         .cvp2-alcance-grid { grid-template-columns: 1fr; }
+      }
+
+      /* ── VISTA INICIO ── */
+      .inicio-wrap { padding-top: 0 !important; }
+      .inicio-hero { display: grid; grid-template-columns: 1fr 1fr; border-radius: 20px; overflow: hidden; background: #0c0c14; margin-bottom: 28px; min-height: 400px; }
+      .inicio-hero-visual { position: relative; overflow: hidden; background: radial-gradient(ellipse at 60% 80%, #1a0800 0%, #0c0c14 70%); }
+      .inicio-planet-fire { position: absolute; width: 180px; height: 180px; border-radius: 50%; background: radial-gradient(circle at 38% 38%, #ff6b2b 0%, #c0392b 40%, #7f0000 70%, #1a0000 100%); bottom: 14%; left: 50%; transform: translateX(-50%); box-shadow: 0 0 80px rgba(220,60,0,0.35), inset -12px -8px 30px rgba(0,0,0,0.6); }
+      .inicio-planet-earth { position: absolute; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle at 32% 28%, #1a3a5c 0%, #0d2137 55%, #04101e 100%); top: -90px; right: -70px; box-shadow: 0 0 100px rgba(20,60,130,0.25), inset -20px -12px 50px rgba(0,0,0,0.5); }
+      .inicio-stars { position: absolute; inset: 0; background-image: radial-gradient(circle, rgba(255,255,255,0.7) 1px, transparent 1px); background-size: 40px 40px; opacity: 0.18; }
+      .inicio-hero-text { padding: 44px 40px; display: flex; flex-direction: column; justify-content: center; gap: 22px; }
+      .inicio-logomark { font-size: 18px; font-weight: 800; color: rgba(255,255,255,0.35); letter-spacing: 0.1em; }
+      .inicio-title { font-size: 21px; font-weight: 700; color: #ffffff; line-height: 1.45; letter-spacing: -0.01em; margin: 0; }
+      .inicio-desc-blue { font-size: 14px; color: #6fa8f5; line-height: 1.7; margin: 0; font-weight: 500; }
+      .inicio-desc-orange { font-size: 14px; color: #ffb347; line-height: 1.7; margin: 0; font-weight: 500; }
+      .inicio-section-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #86868b; margin-bottom: 12px; }
+      .inicio-modules { display: flex; flex-direction: column; gap: 10px; }
+      .inicio-card { display: flex; align-items: center; gap: 16px; padding: 18px 20px; background: #fff; border: 1px solid rgba(0,0,0,0.07); border-radius: 16px; cursor: pointer; font: inherit; text-align: left; transition: all .18s; box-shadow: 0 2px 8px rgba(0,0,0,0.04); width: 100%; }
+      .inicio-card:hover { transform: translateX(4px); box-shadow: 0 4px 20px rgba(0,0,0,0.09); border-color: rgba(0,0,0,0.13); }
+      .inicio-card-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+      .inicio-card-body { flex: 1; }
+      .inicio-card-body strong { display: block; font-size: 14.5px; font-weight: 600; color: #1d1d1f; margin-bottom: 3px; }
+      .inicio-card-body span { font-size: 13px; color: #86868b; line-height: 1.4; }
+      .inicio-card-arrow { color: #c7c7cc; flex-shrink: 0; }
+      @media (max-width: 700px) {
+        .inicio-hero { grid-template-columns: 1fr; }
+        .inicio-hero-visual { min-height: 180px; }
+        .inicio-hero-text { padding: 28px 22px; gap: 16px; }
+        .inicio-title { font-size: 18px; }
       }
 
       /* ADMIN */
