@@ -849,7 +849,7 @@ export default function PortalSAP() {
   if (enviado) {
     return (
       <div className="portal">
-        <Estilos /><NavBar info={maestrosInfo} vista={vista} setVista={v => { reiniciar(); setVista(v); }} />
+        <Estilos /><NavBar info={maestrosInfo} vista={vista} setVista={v => { reiniciar(); setVista(v); }} perfil={perfil} />
         <main className="success-wrap">
           <div className="success-check"><CheckCircle2 size={64} strokeWidth={1.3} /></div>
           <h1 className="success-title">Solicitud enviada.</h1>
@@ -907,7 +907,7 @@ export default function PortalSAP() {
   if (vista === "clusters") {
     return (
       <div className="portal">
-        <Estilos /><NavBar info={maestrosInfo} vista={vista} setVista={setVista} />
+        <Estilos /><NavBar info={maestrosInfo} vista={vista} setVista={setVista} perfil={perfil} />
         <VistaClusters clusters={clusters} onChange={actualizarClusters} />
       </div>
     );
@@ -934,7 +934,7 @@ export default function PortalSAP() {
 
   return (
     <div className="portal">
-      <Estilos /><NavBar info={maestrosInfo} vista={vista} setVista={setVista} />
+      <Estilos /><NavBar info={maestrosInfo} vista={vista} setVista={setVista} perfil={perfil} />
 
       <header className="hero">
         <div className="hero-eyebrow"><Sparkles size={14} /> Solicitudes de Datos Maestros · SAP</div>
