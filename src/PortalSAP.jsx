@@ -671,11 +671,26 @@ export default function PortalSAP() {
   const [solicitante, setSolicitante] = useState("");
   const [clusters, setClusters] = useState({});
   const [seleccion, setSeleccion] = useState([]);
+  const [authFlow, setAuthFlow] = useState(null); // null | 'set-password'
 
   // Auth: verificar sesión inicial y escuchar cambios
   useEffect(() => {
+    const hash = window.location.hash;
+    const esInvitacion = hash.includes("type=invite");
+
     supabase.auth.getSession().then(({ data: { session } }) => setSession(session));
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => setSession(session));
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY") {
+        setAuthFlow("set-password");
+        setSession(session);
+      } else if (event === "SIGNED_IN" && esInvitacion && session) {
+        setAuthFlow("set-password");
+        setSession(session);
+      } else {
+        setSession(session);
+      }
+    });
     return () => subscription.unsubscribe();
   }, []);
 
@@ -881,6 +896,9 @@ export default function PortalSAP() {
   }
   if (!session) {
     return <div className="portal"><Estilos /><VistaLogin /></div>;
+  }
+  if (authFlow === "set-password") {
+    return <div className="portal"><Estilos /><VistaCrearContrasena onDone={() => setAuthFlow(null)} /></div>;
   }
 
   /* ---------- VISTA ADMIN ---------- */
@@ -2611,35 +2629,128 @@ function VistaLogin() {
   const [pass, setPass] = useState("");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [modo, setModo] = useState("login"); // 'login' | 'recovery'
+  const [recoveryEnviado, setRecoveryEnviado] = useState(false);
 
   const login = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError(null);
+    setLoading(true); setError(null);
     const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
     if (error) { setError("Correo o contraseña incorrectos."); setLoading(false); }
+  };
+
+  const enviarRecovery = async (e) => {
+    e.preventDefault();
+    setLoading(true); setError(null);
+    const redirectTo = window.location.origin + window.location.pathname;
+    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
+    setLoading(false);
+    if (error) { setError("No se pudo enviar el correo. Verifica el email."); }
+    else { setRecoveryEnviado(true); }
   };
 
   return (
     <div className="login-wrap">
       <div className="login-box">
         <div className="login-logo">◆ Maestros SAP</div>
-        <h1 className="login-title">Iniciar sesión</h1>
-        <p className="login-sub">Portal de Solicitudes de Datos Maestros · Arcoprime</p>
-        <form onSubmit={login} className="login-form">
-          <div className="login-field">
-            <label>Correo electrónico</label>
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="nombre@arcoprime.cl" required autoFocus />
-          </div>
-          <div className="login-field">
-            <label>Contraseña</label>
-            <input type="password" value={pass} onChange={e => setPass(e.target.value)} placeholder="••••••••" required />
-          </div>
-          {error && <p className="login-error"><AlertTriangle size={14} /> {error}</p>}
-          <button type="submit" className="btn-primary" disabled={loading} style={{ marginTop: 4 }}>
-            {loading ? "Ingresando…" : "Ingresar"}
-          </button>
-        </form>
+
+        {modo === "login" ? (
+          <>
+            <h1 className="login-title">Iniciar sesión</h1>
+            <p className="login-sub">Portal de Solicitudes de Datos Maestros · Arcoprime</p>
+            <form onSubmit={login} className="login-form">
+              <div className="login-field">
+                <label>Correo electrónico</label>
+                <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="nombre@arcoprime.cl" required autoFocus />
+              </div>
+              <div className="login-field">
+                <label>Contraseña</label>
+                <input type="password" value={pass} onChange={e => setPass(e.target.value)} placeholder="••••••••" required />
+              </div>
+              {error && <p className="login-error"><AlertTriangle size={14} /> {error}</p>}
+              <button type="submit" className="btn-primary" disabled={loading} style={{ marginTop: 4 }}>
+                {loading ? "Ingresando…" : "Ingresar"}
+              </button>
+            </form>
+            <button className="login-link" onClick={() => { setModo("recovery"); setError(null); }}>
+              ¿Olvidaste tu contraseña?
+            </button>
+          </>
+        ) : recoveryEnviado ? (
+          <>
+            <h1 className="login-title">Correo enviado</h1>
+            <p className="login-sub">Revisa tu bandeja de entrada en <strong>{email}</strong>. El link expira en 1 hora.</p>
+            <button className="login-link" onClick={() => { setModo("login"); setRecoveryEnviado(false); }}>
+              ← Volver al inicio de sesión
+            </button>
+          </>
+        ) : (
+          <>
+            <h1 className="login-title">Recuperar contraseña</h1>
+            <p className="login-sub">Te enviaremos un link para crear una nueva contraseña.</p>
+            <form onSubmit={enviarRecovery} className="login-form">
+              <div className="login-field">
+                <label>Correo electrónico</label>
+                <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="nombre@arcoprime.cl" required autoFocus />
+              </div>
+              {error && <p className="login-error"><AlertTriangle size={14} /> {error}</p>}
+              <button type="submit" className="btn-primary" disabled={loading} style={{ marginTop: 4 }}>
+                {loading ? "Enviando…" : "Enviar link de recuperación"}
+              </button>
+            </form>
+            <button className="login-link" onClick={() => { setModo("login"); setError(null); }}>
+              ← Volver al inicio de sesión
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function VistaCrearContrasena({ onDone }) {
+  const [pass, setPass] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [listo, setListo] = useState(false);
+
+  const guardar = async (e) => {
+    e.preventDefault();
+    setError(null);
+    if (pass.length < 6) { setError("La contraseña debe tener al menos 6 caracteres."); return; }
+    if (pass !== confirm) { setError("Las contraseñas no coinciden."); return; }
+    setLoading(true);
+    const { error } = await supabase.auth.updateUser({ password: pass });
+    if (error) { setError("No se pudo guardar. Intenta de nuevo."); setLoading(false); return; }
+    setListo(true);
+    setTimeout(onDone, 1800);
+  };
+
+  return (
+    <div className="login-wrap">
+      <div className="login-box">
+        <div className="login-logo">◆ Maestros SAP</div>
+        <h1 className="login-title">Crear contraseña</h1>
+        <p className="login-sub">Bienvenido/a al portal. Elige una contraseña para tu cuenta.</p>
+        {listo ? (
+          <p className="login-ok"><CheckCircle2 size={16} /> Contraseña guardada. Ingresando…</p>
+        ) : (
+          <form onSubmit={guardar} className="login-form">
+            <div className="login-field">
+              <label>Nueva contraseña</label>
+              <input type="password" value={pass} onChange={e => setPass(e.target.value)} placeholder="Mínimo 6 caracteres" required autoFocus />
+            </div>
+            <div className="login-field">
+              <label>Confirmar contraseña</label>
+              <input type="password" value={confirm} onChange={e => setConfirm(e.target.value)} placeholder="Repite tu contraseña" required />
+            </div>
+            {error && <p className="login-error"><AlertTriangle size={14} /> {error}</p>}
+            <button type="submit" className="btn-primary" disabled={loading} style={{ marginTop: 4 }}>
+              {loading ? "Guardando…" : "Crear contraseña"}
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );
@@ -3304,6 +3415,9 @@ function Estilos() {
       .login-loading { display: flex; align-items: center; justify-content: center; min-height: 100vh; font-size: 15px; color: #86868b; }
       .nav-logout { border: 1px solid rgba(0,0,0,0.1); background: none; cursor: pointer; font: inherit; font-size: 12px; font-weight: 500; color: #515154; padding: 5px 12px; border-radius: 980px; transition: all .2s; }
       .nav-logout:hover { background: rgba(255,59,48,0.07); color: #ff3b30; border-color: rgba(255,59,48,0.2); }
+      .login-link { background: none; border: none; cursor: pointer; font: inherit; font-size: 13px; color: #0071e3; padding: 0; margin-top: 16px; display: block; text-align: center; width: 100%; }
+      .login-link:hover { text-decoration: underline; }
+      .login-ok { font-size: 14px; color: #34c759; display: flex; align-items: center; gap: 8px; margin-top: 8px; }
 
       .pie { text-align: center; color: #86868b; font-size: 12.5px; padding: 30px 22px 50px; }
       .dz-clear { border: none; cursor: pointer; width: 26px; height: 26px; border-radius: 50%;
