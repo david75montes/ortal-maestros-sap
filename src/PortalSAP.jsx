@@ -1467,8 +1467,592 @@ function VistaAyuda() {
 
 
 /* ============================================================
-   DATOS CVP
+   DATOS CVP  — Sub-procesos v2.0
    ============================================================ */
+const CVP_SUBPROCESOS = [
+  /* ── Mapa To Be ─────────────────────────────────────────── */
+  {
+    id: "mapa", nombre: "Mapa To Be · Alta de SKU", color: "verde", version: "2.0", estado: "En Revisión",
+    proposito: "Flujo principal del CVP: creación y habilitación completa de un nuevo SKU en SAP y SCKUBA, desde la evaluación comercial hasta la sincronización con todos los sistemas de tiendas.",
+    alcance_inicio: "Identificación comercial de un producto nuevo.",
+    alcance_fin: "SKU completamente habilitado en SAP, SCKUBA y tiendas.",
+    contexto_preceden: "Ninguno (punto de entrada del CVP).",
+    contexto_suceden: "Planogramación · Gestión y Modificación · Salida.",
+    actores: [
+      { rol: "Encargado Comercial (PM)", area: "Comercial", resp: "Evalúa viabilidad, define navegación, completa planilla de solicitud y genera ticket a DDMM." },
+      { rol: "Analista Datos Maestros", area: "DDMM", resp: "Control de calidad de solicitud, creación de SKU en SAP, carga de condiciones y sincronización en SCKUBA." },
+      { rol: "Focal de Abastecimiento", area: "Supply Chain", resp: "Coordinación de condiciones logísticas, flujo de abastecimiento y reposición automática." },
+      { rol: "Focal de Planograma", area: "Planograma", resp: "Validación de planograma y cubicación del producto." },
+      { rol: "Marketing", area: "Marketing", resp: "Provisión de imagen obligatoria cuando aplica navegación digital." },
+      { rol: "Compras Corporativas", area: "Compras Corporativas", resp: "Lidera la validación de proveedores nuevos: audita documentos, aprueba y notifica." },
+    ],
+    raci: {
+      cols: ["Comercial", "DDMM", "Supply Chain", "Planograma", "Marketing"],
+      filas: [
+        { act: "Evaluar viabilidad del producto", vals: ["R", "I", "C", "C", "C"] },
+        { act: "Completar planilla técnica", vals: ["R", "I", "I", "I", "I"] },
+        { act: "Creación básica SKU en SAP", vals: ["I", "R", "I", "I", "I"] },
+        { act: "Carga de condiciones (Venta/Compra/Abast./Surtido)", vals: ["I", "R", "C", "I", "I"] },
+        { act: "Sincronización SAP → SCKUBA", vals: ["I", "R", "I", "I", "I"] },
+        { act: "Provisión de imagen (si aplica navegación)", vals: ["C", "I", "I", "I", "R"] },
+        { act: "Validación de planograma", vals: ["A", "I", "I", "R", "I"] },
+      ],
+    },
+    fases: [
+      { nombre: "Evaluación comercial e ideación", pasos: [
+        { n: 1, act: "Ideación de Producto", desc: "Se evalúa si es conveniente incorporar el producto analizando márgenes, costos y factibilidad logística.", resp: "Encargado Comercial" },
+        { n: 2, act: "¿Producto nuevo?", desc: "Si ya existe → flujo de modificaciones o bajas. Si es nuevo → continúa.", resp: "Encargado Comercial", decision: true },
+        { n: 3, act: "¿Existe proveedor?", desc: "Si ya está registrado → define alcance del SKU. Si no → gestionar registro del proveedor.", resp: "Encargado Comercial", decision: true },
+      ]},
+      { nombre: "Gestión de Proveedor (si aplica)", pasos: [
+        { n: 4, act: "Solicitar creación de proveedor", desc: "Comercial recopila documentación comercial, tributaria y legal del nuevo proveedor.", resp: "Encargado Comercial" },
+        { n: 5, act: "Enviar a validación", desc: "Envío formal del expediente a Compras Corporativas para auditoría y aprobación.", resp: "Encargado Comercial" },
+        { n: 6, act: "Evaluación y Gestión de Proveedor", desc: "Compras Corporativas audita y aprueba (o rechaza con notificación).", resp: "Compras Corporativas", decision: true },
+        { n: 7, act: "Notificar Encargado Comercial", desc: "Confirmación de que el código del proveedor está activo en los sistemas.", resp: "Compras Corporativas" },
+      ]},
+      { nombre: "Definición y envío de solicitud", pasos: [
+        { n: 8, act: "¿Requiere solo código de SKU?", desc: "Parcial: para importaciones o compras anticipadas. Total: para venta directa en tienda.", resp: "Encargado Comercial", decision: true },
+        { n: 9, act: "Creación Parcial (solo código SKU)", desc: "Datos mínimos (identidad, marca, jerarquía) para emitir código de barras de forma ágil.", resp: "Encargado Comercial" },
+        { n: 10, act: "Gran Planilla (SKU Total)", desc: "Planilla completa: dimensiones, empaque, logística, precios, costos y flujos de transporte.", resp: "Encargado Comercial" },
+        { n: 12, act: "Enviar solicitud a DDMM", desc: "Despacho formal del requerimiento (planilla técnica o ticket) hacia la mesa de Datos Maestros.", resp: "Encargado Comercial / Franquiciado" },
+      ]},
+      { nombre: "Procesamiento en SAP por DDMM", pasos: [
+        { n: 13, act: "Recepción y control de calidad", desc: "Ingreso en Ticketera DDMM: revisión de consistencia, duplicados y campos vacíos.", resp: "DDMM" },
+        { n: 14, act: "¿Información completa?", desc: "Si hay inconsistencias → notifica al solicitante para corregir. Si OK → carga de datos.", resp: "DDMM", decision: true },
+        { n: 15, act: "Carga información básica SKU en SAP", desc: "Descripción técnica, clasificación y dimensiones de empaque.", resp: "DDMM" },
+        { n: 16, act: "Cargar condiciones de venta", desc: "PVP, esquemas de impuestos y asignación por clústeres de tiendas.", resp: "DDMM" },
+        { n: 17, act: "Cargar condiciones de compra", desc: "Registro Info en SAP: proveedor, costo neto unitario y lead times.", resp: "DDMM" },
+        { n: 18, act: "Cargar condiciones de abastecimiento", desc: "Libro Pedido en SAP: flujo (Directo/Centralizado/Mixto) y parámetros de reposición automática.", resp: "DDMM" },
+        { n: 19, act: "Cargar condiciones de surtido", desc: "Catalogación del SKU en la matriz de tiendas autorizadas y bloqueos por sucursal.", resp: "DDMM" },
+      ]},
+      { nombre: "Sincronización y cierre", pasos: [
+        { n: 20, act: "Sincronización SAP → SCKUBA", desc: "El sistema propaga automáticamente la información a SCKUBA y terminales de tiendas.", resp: "DDMM" },
+        { n: 21, act: "Informar a solicitante + célula de cierre", desc: "Cierre del ticket y alerta confirmando que el SKU está 100% activo y transaccional.", resp: "DDMM" },
+        { n: 22, act: "¿Requiere planograma?", desc: "Si necesita ordenamiento en góndola → sub-proceso Planogramación. Si no → complementación final.", resp: "Encargado Comercial", decision: true },
+        { n: 23, act: "Sub-proceso Planogramación", desc: "Análisis de cubicaje, dimensiones y layout. Entrega del Product List con ubicación física y digital.", resp: "Focal de Planograma" },
+        { n: 24, act: "Completar configuración SKU", desc: "Carga final de atributos comerciales pendientes y reinyección al ciclo operativo.", resp: "Encargado Comercial" },
+      ]},
+    ],
+  },
+
+  /* ── Sub-proceso 1: Ideación ─────────────────────────────── */
+  {
+    id: "ideacion", numero: 1, nombre: "Ideación del Producto", color: "azul", version: "2.0", estado: "En Revisión",
+    proposito: "Validar comercialmente la viabilidad de incorporar un producto nuevo al portafolio, asegurando coherencia entre indicadores de mercado, abastecimiento y estrategia comercial antes de solicitar su creación formal.",
+    alcance_inicio: "Evaluación de indicadores comerciales por el Encargado Comercial.",
+    alcance_fin: "Carga de datos básicos y condiciones del nuevo SKU por DDMM.",
+    contexto_preceden: "Ninguno (punto de inicio del CVP).",
+    contexto_suceden: "Alta de SKU · Gestión y Modificación.",
+    actores: [
+      { rol: "Encargado Comercial (PM)", area: "Comercial", resp: "Revisa indicadores, evalúa condiciones logísticas, solicita ficha al proveedor y define el tipo de SKU a crear." },
+      { rol: "Analista Datos Maestros", area: "DDMM", resp: "Valida completitud del expediente del proveedor y ejecuta la carga en el maestro." },
+      { rol: "Compras Corporativas", area: "Compras Corporativas", resp: "Registra y evalúa legal y financieramente al proveedor cuando es nuevo." },
+      { rol: "I+D / Calidad", area: "I+D / Calidad", resp: "Gestiona auditoría técnica y revisa estándares sanitarios para productos Food." },
+      { rol: "Marketing", area: "Marketing", resp: "Produce fotografía técnica en alta definición para navegación digital." },
+    ],
+    raci: {
+      cols: ["Comercial PM", "Comercial Analista", "DDMM", "Compras Corp.", "I+D", "Calidad", "Marketing"],
+      filas: [
+        { act: "Revisar indicadores (comercial, abastecimiento, mercado)", vals: ["A", "R", "", "", "", "", ""] },
+        { act: "Solicitar ficha de producto a proveedor", vals: ["A", "R", "", "", "", "", ""] },
+        { act: "Gestión y Habilitación Corporativa (proveedor nuevo)", vals: ["", "", "C", "R", "", "", ""] },
+        { act: "Validación de Consistencia DDMM", vals: ["", "", "R", "", "", "", ""] },
+        { act: "Notificación de Registro Exitoso", vals: ["I", "", "I", "R", "", "", ""] },
+        { act: "Auditoría Técnica y Calidad (Food)", vals: ["", "", "", "", "R", "R", ""] },
+        { act: "Producción de Fotografía Digital", vals: ["", "", "", "", "", "", "R"] },
+        { act: "Carga de Datos Básicos y Condiciones", vals: ["", "", "R", "", "", "", ""] },
+      ],
+    },
+    fases: [
+      { nombre: "Evaluación comercial", pasos: [
+        { n: 1, act: "Revisar Indicadores Comerciales", desc: "Evaluación del desempeño comercial de la categoría y metas del portafolio.", resp: "Encargado Comercial" },
+        { n: 2, act: "Revisar Indicadores Abastecimiento", desc: "Análisis de quiebres de stock y flujos de inventario actuales.", resp: "Encargado Comercial" },
+        { n: 3, act: "Revisar Indicadores Mercado", desc: "Tendencias externas, comportamiento de competidores y oportunidades.", resp: "Encargado Comercial" },
+        { n: 4, act: "Revisar Inclusiones con Proveedores", desc: "Posibilidad de incorporar el producto bajo acuerdos vigentes.", resp: "Encargado Comercial" },
+        { n: 5, act: "Revisar condiciones Full", desc: "Viabilidad logística y almacenamiento bajo modalidad centralizada (Full).", resp: "Encargado Comercial" },
+        { n: 6, act: "Revisar condiciones TCT", desc: "Flujo de distribución bajo el esquema de Transbordo Cruzado (TCT).", resp: "Encargado Comercial" },
+        { n: 7, act: "Solicitar Ficha de producto a proveedor", desc: "Requerimiento de especificaciones técnicas directamente al proveedor.", resp: "Encargado Comercial" },
+      ]},
+      { nombre: "Gestión de proveedor", pasos: [
+        { n: 8, act: "¿Existe proveedor?", desc: "Si SÍ → validación de categoría Food. Si NO → habilitación corporativa.", resp: "Encargado Comercial", decision: true },
+        { n: 9, act: "Gestión y Habilitación Corporativa", desc: "Compras Corporativas registra y evalúa legal y financieramente al proveedor.", resp: "Compras Corporativas" },
+        { n: 10, act: "Validación de Consistencia (DDMM)", desc: "DDMM revisa completitud del expediente y ejecuta carga en maestro de proveedores.", resp: "Datos Maestros" },
+        { n: 11, act: "Notificación de Registro Exitoso", desc: "Tras emitirse el código en Espacio Proveedor, se notifica al área comercial.", resp: "Compras Corporativas / DDMM" },
+      ]},
+      { nombre: "Evaluación Food y navegación", pasos: [
+        { n: 12, act: "¿Corresponde a Food?", desc: "Si SÍ → evalúa desarrollo técnico. Si NO → pasos de navegación digital.", resp: "Encargado Comercial", decision: true },
+        { n: 13, act: "Auditoría Técnica y Calidad", desc: "I+D gestiona auditoría externa y Calidad evalúa estándares sanitarios.", resp: "I+D / Calidad" },
+        { n: 14, act: "Revisión y Recepción del Desarrollo", desc: "I+D valida técnicamente y entrega documentación final al comercial.", resp: "I+D / Encargado Comercial" },
+        { n: 15, act: "¿Aplica navegación?", desc: "Si SÍ → solicita fotografía. Si NO → definición de tipo de SKU.", resp: "Encargado Comercial", decision: true },
+        { n: 16, act: "Producción de Fotografía Digital", desc: "Marketing produce la fotografía técnica en alta definición.", resp: "Marketing" },
+        { n: 17, act: "Alineación Omnicanal", desc: "El comercial coordina la estrategia de navegación en plataforma digital.", resp: "Encargado Comercial" },
+      ]},
+      { nombre: "Creación del SKU", pasos: [
+        { n: 18, act: "Definición de Tipo de SKU", desc: "SKU Parcial (planograma/importación directa) o SKU Total (venta directa).", resp: "Encargado Comercial", decision: true },
+        { n: 19, act: "Carga de Datos en Maestro de Artículos", desc: "DDMM unifica la planilla técnica y ejecuta carga masiva de datos básicos y condiciones.", resp: "Datos Maestros" },
+      ]},
+    ],
+  },
+
+  /* ── Sub-proceso 2: Gestión y Modificación ──────────────── */
+  {
+    id: "gestion", numero: 2, nombre: "Gestión y Modificación de Producto", color: "naranja", version: "2.0", estado: "En Revisión",
+    proposito: "Gestionar los cambios necesarios sobre productos activos del portafolio, asegurando que las modificaciones en condiciones comerciales, datos básicos, condiciones de abastecimiento y surtido sean ejecutadas correctamente en SAP.",
+    alcance_inicio: "Identificación de una necesidad de modificación sobre un producto activo.",
+    alcance_fin: "Cierre del proceso en sistema y notificación al proveedor.",
+    contexto_preceden: "Alta de SKU · Ideación del Producto.",
+    contexto_suceden: "Condiciones de Abastecimiento · Condiciones de Surtido · Salida de un Producto.",
+    actores: [
+      { rol: "Encargado Comercial (PM)", area: "Comercial", resp: "Identifica la modificación, completa la planilla correspondiente, envía la solicitud formal y gestiona escalamientos." },
+      { rol: "Analista Datos Maestros", area: "DDMM", resp: "Recepciona la solicitud, evalúa el tipo de acción, aplica bloqueos SAP (Z1/Z2/Z3), carga condiciones, configura y cierra el proceso." },
+      { rol: "Inventario / Finanzas", area: "Inventario / Finanzas", resp: "Recibe notificación de los cambios y confirma la notificación al proveedor." },
+      { rol: "Focal de Abastecimiento", area: "Abastecimiento", resp: "Participa como Informado en las etapas clave del flujo." },
+    ],
+    raci: {
+      cols: ["Comercial Solicitante", "PM Validador", "DDMM", "Inventario", "Abastecimiento"],
+      filas: [
+        { act: "Identificar necesidad de cambio", vals: ["R", "A", "I", "I", "I"] },
+        { act: "Completar planilla de modificación", vals: ["R", "A", "C", "I", "I"] },
+        { act: "Validar y enviar solicitud formal", vals: ["R", "A", "I", "I", "I"] },
+        { act: "Evaluación técnica (Base/Actualización)", vals: ["C", "C", "R", "I", "I"] },
+        { act: "Aplicación de Bloqueos SAP (Z1, Z2, Z3)", vals: ["A", "I", "R", "I", "I"] },
+        { act: "Carga de datos de pedido y condiciones", vals: ["I", "I", "R", "I", "I"] },
+        { act: "Configuración y catalogación en SAP", vals: ["I", "I", "R", "I", "I"] },
+        { act: "Cierre de proceso en sistema", vals: ["I", "I", "R", "I", "I"] },
+        { act: "Notificación al Proveedor", vals: ["I", "A", "I", "R", "I"] },
+      ],
+    },
+    fases: [
+      { nombre: "Solicitud de modificación", pasos: [
+        { n: 1, act: "Identificar necesidad de modificación", desc: "El comercial detecta la necesidad: condiciones comerciales, datos básicos, abastecimiento o surtido.", resp: "Encargado Comercial" },
+        { n: 2, act: "Solicitar modificación y definir tipo de cambio", desc: "Se selecciona el tipo de cambio y se bifurca el flujo hacia la planilla correspondiente.", resp: "Encargado Comercial" },
+        { n: "3a", act: "Condiciones de venta → Precio venta", desc: "Completa planilla de cambio de precio venta.", resp: "Encargado Comercial" },
+        { n: "3b", act: "Fuerza de compra → Precio compra", desc: "Completa planilla de cambio de precio compra.", resp: "Encargado Comercial" },
+        { n: "3c", act: "Descuentos → Planilla descuento", desc: "Completa planilla de cambio de descuento.", resp: "Encargado Comercial" },
+        { n: "3d", act: "Impuestos → Planilla impuesto", desc: "Completa planilla de cambio de impuesto.", resp: "Encargado Comercial" },
+        { n: "3e", act: "Recargos → Planilla recargo", desc: "Completa planilla de cambio de recargo.", resp: "Encargado Comercial" },
+        { n: "3f", act: "Datos Básicos → Dimensiones / Módulos / Fotografía", desc: "Actualiza información de dimensiones, módulos y/o fotografía del producto.", resp: "Encargado Comercial" },
+        { n: "3g", act: "Condiciones de abastecimiento → Dato de pedido", desc: "Completa planilla del dato de pedido con sub-proceso correspondiente.", resp: "Encargado Comercial" },
+        { n: "3h", act: "Condiciones de surtido → Sub-proceso surtido", desc: "Gestiona sub-proceso de Condiciones de Surtido.", resp: "Encargado Comercial" },
+        { n: 4, act: "Enviar solicitud de modificación", desc: "Envío formal de la planilla completada hacia Datos Maestros para ejecución.", resp: "Encargado Comercial" },
+      ]},
+      { nombre: "Ejecución en SAP", pasos: [
+        { n: 5, act: "Recepción y evaluación del tipo de acción", desc: "DDMM recepciona y determina si es bloqueo o habilitación.", resp: "Datos Maestros", decision: true },
+        { n: "6a", act: "Bloquear productos (si aplica)", desc: "Bloqueo previo a realizar los cambios, según el tipo de modificación.", resp: "Datos Maestros" },
+        { n: "6b", act: "Habilitar productos (si aplica)", desc: "Habilitación cuando el tipo de modificación lo requiere.", resp: "Datos Maestros" },
+        { n: 7, act: "Seleccionar canal y aplicar bloqueos SAP", desc: "(a) Centralizado → Z1  (b) Portal Abastecimiento → Z2  (c) Tienda → Z3", resp: "Datos Maestros" },
+        { n: 8, act: "Cargar datos de pedido en SAP", desc: "Carga de la información correspondiente al tipo de modificación.", resp: "Datos Maestros" },
+        { n: 9, act: "Habilitar productos / Catalogación", desc: "Habilitación y/o catalogación en SAP según el tipo de cambio.", resp: "Datos Maestros" },
+        { n: 10, act: "Cargar condiciones de venta / abastecimiento", desc: "Carga de condiciones actualizadas según tipo de modificación.", resp: "Datos Maestros" },
+        { n: 11, act: "Configurar condiciones", desc: "Configuración de condiciones resultantes (incluye configuración de promociones si aplica).", resp: "Datos Maestros" },
+        { n: 12, act: "Cargar condiciones de Abastecimiento finales", desc: "Carga de condiciones de abastecimiento finales.", resp: "Datos Maestros" },
+        { n: 13, act: "Cerrar proceso en sistema", desc: "Cierre del proceso en el sistema (Cerrar Israel).", resp: "Datos Maestros" },
+        { n: 14, act: "Informar cambios al Encargado Comercial", desc: "Comunicación de que los cambios han sido aplicados exitosamente.", resp: "Datos Maestros" },
+        { n: 15, act: "Proveedor notificado (Inventario / Finanzas)", desc: "Inventario / Finanzas confirma que el proveedor fue notificado.", resp: "Inventario / Finanzas" },
+      ]},
+    ],
+  },
+
+  /* ── Sub-proceso 3: Salida ───────────────────────────────── */
+  {
+    id: "salida", numero: 3, nombre: "Salida del Producto", color: "rojo", version: "2.0", estado: "En Revisión",
+    proposito: "Gestionar de forma coordinada y controlada la baja de un SKU del portafolio activo, asegurando que todos los sistemas, canales y áreas involucradas ejecuten las acciones de cierre de forma sincronizada.",
+    alcance_inicio: "Identificación de un SKU local que debe salir del portafolio activo.",
+    alcance_fin: "Envío de comunicación formal de salida y agotamiento de stock en tiendas.",
+    contexto_preceden: "Gestión y Modificación de Producto.",
+    contexto_suceden: "—",
+    actores: [
+      { rol: "Encargado Comercial", area: "Comercial", resp: "Lidera el proceso: identifica el SKU, evalúa la salida, coordina restricciones, gestiona stock remanente y envía comunicaciones corporativas." },
+      { rol: "Marketing", area: "Marketing", resp: "Revisa vigencia de campañas visuales y autoriza/confirma eliminación del SKU en Menu Boards." },
+      { rol: "Datos Maestros", area: "DDMM", resp: "Procesa la des-catalogación en el ERP central (Subproceso Condiciones de Surtido)." },
+      { rol: "Abastecimiento", area: "Supply Chain", resp: "Anula parámetros logísticos automáticos y cierra órdenes de compra abiertas con proveedores." },
+      { rol: "Omnicanalidad / e-Commerce", area: "Operaciones", resp: "Ejecuta la baja técnica del SKU en portales web, aplicaciones móviles y catálogos virtuales." },
+      { rol: "Inventario / Total Loss", area: "Tiendas", resp: "Realiza seguimiento de stock remanente, ejecuta ajustes a cero y puede aprobar Bloqueo Total Z2 excepcional." },
+      { rol: "Planograma", area: "Planograma", resp: "Actualiza los layouts físicos de tiendas, removiendo el producto de los planogramas de exhibición." },
+    ],
+    raci: {
+      cols: ["Comercial", "Marketing", "Abast.", "e-Commerce", "Inv./TL", "Operac.", "DDMM", "Planograma"],
+      filas: [
+        { act: "Identificar SKU Local", vals: ["R", "I", "", "", "", "", "", ""] },
+        { act: "¿Aplica salida de Menú Board?", vals: ["R", "A", "", "", "", "", "", "I"] },
+        { act: "Notificar a Marketing", vals: ["R", "A", "", "I", "", "", "", ""] },
+        { act: "Confirmar fecha eliminación menu board", vals: ["I", "R", "", "", "", "", "", ""] },
+        { act: "Solicitar bloqueo de compra Z1", vals: ["R", "A", "I", "", "I", "", "", ""] },
+        { act: "Cascada de Estrategias (Liquidación/Devolución/Donación)", vals: ["R", "A", "", "", "C", "", "", ""] },
+        { act: "Generar Planilla de Bloqueo y enviar a DDMM", vals: ["R", "A", "", "", "I", "", "I", ""] },
+        { act: "Subproceso Condiciones de Surtido", vals: ["I", "", "", "", "", "", "R", ""] },
+        { act: "Informar Salida de Producto (Hito Corporativo)", vals: ["R", "A", "I", "I", "I", "I", "I", "I"] },
+      ],
+    },
+    fases: [
+      { nombre: "Fase I: Evaluación Inicial y Control de Menú Board", pasos: [
+        { n: 1, act: "Identificar SKU Local", desc: "Identificación del código de producto local que debe iniciar el proceso de baja del portafolio.", resp: "Encargado Comercial" },
+        { n: 2, act: "¿Aplica salida de Menú Board?", desc: "Si SÍ → notificar Marketing. Si NO → fase de evaluación de stock.", resp: "Encargado Comercial", decision: true },
+        { n: 3, act: "Notificar a Marketing la salida de producto", desc: "Notificación formal a Marketing para medir el impacto promocional.", resp: "Encargado Comercial" },
+        { n: 4, act: "Confirmar fecha de eliminación de menu board", desc: "Marketing revisa vigencia y confirma la fecha exacta de eliminación.", resp: "Marketing" },
+        { n: 5, act: "Notificar a solicitante", desc: "Marketing formaliza y comunica la fecha límite de retiro al comercial.", resp: "Marketing" },
+        { n: 6, act: "Recepcionar respuesta de marketing", desc: "El comercial procesa la confirmación de fechas y cierra el ramal promocional.", resp: "Encargado Comercial" },
+      ]},
+      { nombre: "Fase II: Evaluación de Inventario y Estrategias de Salida", pasos: [
+        { n: 7, act: "¿Stock en 0?", desc: "Si NO → evaluar bloqueo de compra. Si SÍ → ir a Fase III.", resp: "Encargado Comercial", decision: true },
+        { n: 8, act: "¿Tiene bloqueo de compra?", desc: "Si SÍ → evaluar estrategia de liquidación. Si NO → solicitar bloqueo Z1.", resp: "Encargado Comercial", decision: true },
+        { n: 9, act: "Solicitar bloqueo de compra Z1", desc: "Restricción técnica Z1 en SAP para detener órdenes de compra futuras.", resp: "Encargado Comercial" },
+        { n: 10, act: "Cascada de Estrategias (liquidación / devolución / donación)", desc: "El comercial evalúa secuencialmente las alternativas para evacuar el stock remanente.", resp: "Encargado Comercial" },
+        { n: 11, act: "Ajustar stock a cero", desc: "Ajuste de inventario administrativo en el sistema maestro.", resp: "Encargado Comercial" },
+        { n: 12, act: "Aplicar estrategia elegida", desc: "Salida física del stock remanente de las tiendas (regresa al paso 7).", resp: "Encargado Comercial" },
+        { n: 13, act: "Ruta Excepcional de Stock", desc: "Si ninguna estrategia funciona → Bloqueo Total Z2 excepcional. DDMM revisa e Inventario aprueba.", resp: "Comercial / DDMM" },
+      ]},
+      { nombre: "Fase III: Clasificación Técnica y Gestión de Dependencias", pasos: [
+        { n: 14, act: "Informar a áreas de inminente salida", desc: "Alerta técnica hacia equipos operativos para anticipar la desactivación total.", resp: "Encargado Comercial" },
+        { n: 15, act: "¿SKU aplica Stock?", desc: "Si SÍ → evaluar combo. Si NO → tratamiento No Stock (combo/servicio).", resp: "Encargado Comercial", decision: true },
+        { n: 16, act: "¿Es el único componente del combo?", desc: "Si SÍ → evaluar si bloquear el combo completo o Modificar Combo.", resp: "Encargado Comercial", decision: true },
+        { n: 17, act: "¿Es componente Receta? / Modificación", desc: "Si SÍ → Revisar Receta para Modificar Receta o aplicar Bloqueo Total.", resp: "Encargado Comercial", decision: true },
+        { n: 18, act: "Tratamiento de No Stock: ¿Es combo o servicio?", desc: "Si servicio en Ciclo Full/Tienda → esperar fin de ciclo. Si no → Bloqueo de Venta Z2.", resp: "Encargado Comercial" },
+        { n: 19, act: "Tratamiento de Recetas Directas", desc: "Para recetas puras: validar surtido, exclusividad de insumos y Solicitar Eliminar en Navegación.", resp: "Encargado Comercial" },
+      ]},
+      { nombre: "Fase IV: Cierre Comercial y Ejecución Operativa en Paralelo", pasos: [
+        { n: 20, act: "Generar Planilla de Bloqueo", desc: "El comercial consolida los bloqueos del SKU, combos y recetas en la planilla maestra oficial.", resp: "Encargado Comercial" },
+        { n: 21, act: "Enviar solicitud a DDMM", desc: "Envío formal de planillas de modificación y bloqueo hacia DDMM.", resp: "Encargado Comercial" },
+        { n: 22, act: "Subproceso Condiciones de Surtido", desc: "DDMM procesa la des-catalogación y restricciones técnicas en el maestro ERP.", resp: "Datos Maestros" },
+        { n: 23, act: "Recepcionar Información DDMM", desc: "El comercial recibe confirmación técnica y ticket cerrado para auditoría.", resp: "Encargado Comercial" },
+        { n: 24, act: "¿Ticket DDMM rechazado?", desc: "Si hay errores → solicitar corrección y volver a Fase I. Si OK → cierre definitivo.", resp: "Encargado Comercial", decision: true },
+        { n: 25, act: "Informar Salida de Producto (Hito Corporativo)", desc: "Comunicación formal de baja definitiva del SKU a toda la organización.", resp: "Encargado Comercial" },
+        { n: "26A", act: "Recepcionar información de salida — Abastecimiento", desc: "Cancelación definitiva de parámetros de reposición y órdenes logísticas abiertas.", resp: "Abastecimiento" },
+        { n: "26B", act: "Recepcionar información de salida — Omnicanalidad", desc: "Baja técnica inmediata del SKU en canales de e-commerce y aplicaciones móviles.", resp: "Omnicanalidad / e-Commerce" },
+        { n: "26C", act: "Recepcionar información — Inventario / Total Loss", desc: "Monitoreo de stock residual en tiendas y ajuste final a cero.", resp: "Inventario / Total Loss" },
+        { n: "26D", act: "Recepcionar información y baja — Operaciones", desc: "Operaciones coordina con tiendas la salida definitiva del producto.", resp: "Operaciones" },
+      ]},
+    ],
+  },
+
+  /* ── Sub-proceso 4: Proveedor ────────────────────────────── */
+  {
+    id: "proveedor", numero: 4, nombre: "Evaluación y Creación de Proveedor", color: "morado", version: "2.0", estado: "En Revisión",
+    proposito: "Habilitar formalmente a un nuevo proveedor dentro de los sistemas de la organización, asegurando que cumpla los requisitos comerciales, económicos y legales antes de ser aprobado.",
+    alcance_inicio: "Recepción de solicitud de creación de proveedor por Compras Corporativas (originada desde Mi Viaje).",
+    alcance_fin: "Notificación al solicitante del nuevo código de proveedor generado.",
+    contexto_preceden: "Ideación de Producto.",
+    contexto_suceden: "Alta de proveedor en SAP por parte de DDMM.",
+    actores: [
+      { rol: "Compras Corporativas", area: "Compras Corporativas", resp: "Lidera el proceso completo: recepciona, audita documentos, evalúa impedimentos, aprueba y notifica a DDMM y al solicitante." },
+      { rol: "Jefe de Compras", area: "Compras Corporativas", resp: "Autoriza o rechaza la habilitación cuando se detecta un impedimento económico." },
+      { rol: "Ética y Cumplimiento", area: "Ética y Cumplimiento", resp: "Recepciona y audita la solicitud ante impedimentos legales; aprueba o rechaza bajo criterios normativos." },
+      { rol: "DDMM", area: "Datos Maestros", resp: "Recibe notificación de aprobación y procede con la alta del proveedor en SAP." },
+      { rol: "Encargado Comercial", area: "Comercial", resp: "Origina la solicitud en Mi Viaje y es receptor final de la notificación de resultado." },
+    ],
+    raci: {
+      cols: ["Enc. Comercial", "Compras Corp.", "Jefe Compras", "Ética/Cumpl.", "DDMM", "Abastecimiento"],
+      filas: [
+        { act: "Origen de la necesidad (Trigger en Mi Viaje)", vals: ["R", "I", "I", "I", "I", "I"] },
+        { act: "Recepcionar y revisar formulario de solicitud", vals: ["I", "R", "A", "I", "I", "I"] },
+        { act: "Revisar completitud de documentos legales", vals: ["I", "R", "A", "I", "I", "I"] },
+        { act: "Evaluar impedimento económico", vals: ["I", "R", "A", "I", "I", "I"] },
+        { act: "Revisar solicitud y autorizar (Jefe Compras)", vals: ["I", "I", "R", "I", "I", "I"] },
+        { act: "Evaluar impedimento legal", vals: ["I", "R", "A", "I", "I", "I"] },
+        { act: "Revisar y aprobar (Ética y Cumplimiento)", vals: ["I", "I", "I", "R", "I", "I"] },
+        { act: "Aprobar Proveedor", vals: ["I", "R", "A", "C", "I", "I"] },
+        { act: "Notificar a DDMM", vals: ["I", "R", "A", "I", "I", "I"] },
+        { act: "Crear proveedor (alta en SAP)", vals: ["I", "I", "I", "I", "R", "I"] },
+        { act: "Notificar al solicitante (cierre del proceso)", vals: ["I", "R", "A", "I", "I", "I"] },
+      ],
+    },
+    fases: [
+      { nombre: "Revisión de solicitud y documentos", pasos: [
+        { n: 1, act: "Recepcionar solicitud de creación de proveedor", desc: "El flujo se detona al ingresar un requerimiento en Mi Viaje.", resp: "Compras Corporativas" },
+        { n: 2, act: "Revisar completitud de formulario", desc: "Auditoría visual y validación de datos obligatorios en Mi Viaje.", resp: "Compras Corporativas" },
+        { n: 3, act: "Revisar completitud de documentos legales", desc: "Verificación de documentación técnica, tributaria y legal adjunta.", resp: "Compras Corporativas" },
+      ]},
+      { nombre: "Evaluación de impedimentos", pasos: [
+        { n: 4, act: "¿Existe Impedimento Económico?", desc: "Si NO → evaluar impedimentos legales. Si SÍ → enviar a Jefe de Compras.", resp: "Compras Corporativas", decision: true },
+        { n: 5, act: "Enviar a Jefe de Compras", desc: "Transferencia formal del ticket por impedimento financiero detectado.", resp: "Compras Corporativas" },
+        { n: 6, act: "Revisar solicitud (Jefe de Compras)", desc: "Análisis comercial y financiero de los antecedentes de riesgo.", resp: "Jefe de Compras" },
+        { n: 7, act: "¿Autoriza la creación?", desc: "Si NO → rechazar y notificar al solicitante. Si SÍ → retorna al camino principal.", resp: "Jefe de Compras", decision: true },
+        { n: 8, act: "¿Existe Impedimento Legal?", desc: "Si NO → aprobación final. Si SÍ → enviar a Ética y Cumplimiento.", resp: "Compras Corporativas", decision: true },
+        { n: 9, act: "Enviar a Ética y Cumplimiento", desc: "Escalamiento formal hacia la auditoría normativa.", resp: "Compras Corporativas" },
+        { n: 10, act: "Revisar solicitud (Ética y Cumplimiento)", desc: "Análisis exhaustivo del perfil del tercero bajo marcos legales.", resp: "Ética y Cumplimiento" },
+        { n: 11, act: "¿Aprueba la solicitud?", desc: "Si NO → rechazar. Si SÍ → retorna al camino principal para aprobación.", resp: "Ética y Cumplimiento", decision: true },
+      ]},
+      { nombre: "Aprobación y alta en SAP", pasos: [
+        { n: 12, act: "Aprobar Proveedor", desc: "Validación y adjudicación definitiva del tercero en Mi Viaje.", resp: "Compras Corporativas" },
+        { n: 13, act: "Notificar a DDMM", desc: "Instrucción técnica formal hacia DDMM para aprovisionar en sistemas maestros.", resp: "Compras Corporativas" },
+        { n: 14, act: "Crear proveedor (alta en SAP)", desc: "Alta en SAP: estructuras bancarias, de compras e impositivas. Generación de código único.", resp: "DDMM" },
+        { n: 15, act: "Recepcionar Nuevo Código de Proveedor", desc: "Toma de conocimiento del identificador oficial emitido para futuras transacciones.", resp: "Compras Corporativas" },
+        { n: 16, act: "Notificar al Solicitante (cierre)", desc: "Confirmación formal de proveedor 100% operativo en la cadena.", resp: "Compras Corporativas" },
+      ]},
+    ],
+  },
+
+  /* ── Sub-proceso 5: Planogramación ──────────────────────── */
+  {
+    id: "planograma", numero: 5, nombre: "Planogramación", color: "verde", version: "2.0", estado: "En Revisión",
+    proposito: "Describir el flujo para la recepción de planillas comerciales, la elaboración técnica de planogramas y su posterior carga en sistemas de datos maestros, asegurando que la exhibición de productos responda a la estrategia comercial definida.",
+    alcance_inicio: "Entrega de planilla por parte del Encargado Comercial.",
+    alcance_fin: "Implementación del planograma en tiendas.",
+    contexto_preceden: "Definición Comercial · Ideación de Producto.",
+    contexto_suceden: "Creación de Datos Maestros · Alta de SKU en sistema.",
+    actores: [
+      { rol: "Encargado Comercial (PM)", area: "Comercial", resp: "Entrega planilla comercial inicial y valida ajustes de diseño." },
+      { rol: "Focal Planograma", area: "Planograma", resp: "Recepción, revisión y elaboración técnica de planograma y Product List." },
+      { rol: "Analista Datos Maestros", area: "Datos Maestros", resp: "Carga de la planilla de planograma en los sistemas centrales." },
+      { rol: "Focal Supply Chain", area: "Abastecimiento", resp: "Gestión del envío y flujo de productos hacia tiendas." },
+      { rol: "Equipo de Tiendas", area: "Tiendas", resp: "Recepción e implementación física del planograma en sala." },
+    ],
+    raci: {
+      cols: ["Comercial Analista", "Comercial PM", "Focal Planograma", "Datos Maestros", "Focal Abastec.", "Tiendas"],
+      filas: [
+        { act: "Entrega de Surtido (Hito de Inicio)", vals: ["R", "A", "I", "", "", ""] },
+        { act: "Recepcionar solicitud planograma", vals: ["", "", "R", "", "", ""] },
+        { act: "Planogramar productos según surtido y mix", vals: ["C", "", "R", "", "", ""] },
+        { act: "Generar propuesta de Product List", vals: ["", "", "R", "", "", ""] },
+        { act: "¿Aprueba Validación Planograma?", vals: ["R", "A", "C", "", "", ""] },
+        { act: "Carga del Surtido en Sistemas", vals: ["", "", "", "R", "", ""] },
+        { act: "Confirmación de Carga completa y notificación", vals: ["", "", "", "R", "", ""] },
+        { act: "Ejecución del Subproceso de Abastecimiento", vals: ["", "", "", "", "R", ""] },
+        { act: "Implementación de Planogramas en Tienda", vals: ["", "", "", "", "", "R"] },
+      ],
+    },
+    fases: [
+      { nombre: "Recepción y elaboración de planograma", pasos: [
+        { n: 1, act: "Entrega de Surtido (Hito de Inicio)", desc: "El área comercial entrega oficialmente la planilla inicial y define el mix estratégico de productos.", resp: "Encargado Comercial" },
+        { n: 2, act: "Recepcionar solicitud planograma", desc: "Planograma ingresa formalmente la planilla y la solicitud de surtido.", resp: "Focal Planograma" },
+        { n: 3, act: "¿Falta Información inicial?", desc: "Si SÍ → devolver solicitud. Si NO → planogramar.", resp: "Focal Planograma", decision: true },
+        { n: 4, act: "REPROCESO: Devolver solicitud (falta de info)", desc: "Se rechaza y devuelve la solicitud al comercial para completar información.", resp: "Focal Planograma" },
+        { n: 5, act: "Planogramar productos según surtido y mix", desc: "Análisis de espacio, cubicación de SKUs y diseño gráfico de la exhibición en góndola.", resp: "Focal Planograma" },
+        { n: 6, act: "Generar propuesta de Product List", desc: "Listado técnico definitivo de artículos con sus ubicaciones exactas en el mueble.", resp: "Focal Planograma" },
+        { n: 7, act: "¿Aprueba Validación Planograma?", desc: "Si NO → corrección de diseño. Si SÍ → generar planilla de carga.", resp: "Encargado Comercial", decision: true },
+        { n: 8, act: "REPROCESO: Corrección de diseño por rechazo", desc: "El diseño es devuelto a planogramación para corregir la distribución.", resp: "Focal Planograma" },
+        { n: 9, act: "Generar planilla de carga", desc: "Con validación comercial conforme, se genera la planilla técnica definitiva de carga.", resp: "Encargado Comercial" },
+      ]},
+      { nombre: "Carga en sistemas y ejecución en tienda", pasos: [
+        { n: 10, act: "Carga del Surtido en Sistemas", desc: "Ingreso técnico de la planilla en los sistemas centrales de datos maestros.", resp: "Analista Datos Maestros" },
+        { n: 11, act: "¿SKU con información completa?", desc: "Si NO → solicita información por SKU incompleto. Si SÍ → confirmación de carga.", resp: "Analista Datos Maestros", decision: true },
+        { n: 14, act: "Confirmación de Carga completa y notificación", desc: "Ratificación de que el 100% de la carga está firme y emisión de cierre técnico.", resp: "Analista Datos Maestros" },
+        { n: 15, act: "Ejecución del Subproceso de Abastecimiento", desc: "Se coordina envío de inventarios iniciales y órdenes de compra automáticas.", resp: "Focal Supply Chain" },
+        { n: 16, act: "¿Corresponde a Salidas de Producto?", desc: "Si SÍ → Sub-proceso Salida y Sub-proceso Modificación Abastecimiento.", resp: "Encargado Comercial", decision: true },
+        { n: 17, act: "Informar a las Tiendas", desc: "Emisión del comunicado oficial corporativo con directrices e inicio de la nueva carga.", resp: "Encargado Comercial" },
+        { n: 18, act: "Subir diseños de planogramas a GOAP", desc: "Carga definitiva de layouts gráficos en la Guía Operativa de Actualización de Productos (GOAP).", resp: "Focal Planograma" },
+        { n: 19, act: "Implementación de Planogramas en Tienda", desc: "El personal de los locales ejecuta el acomodo físico de las mercaderías en la góndola.", resp: "Equipo de Tiendas" },
+        { n: 20, act: "¿Falla en implementación? (Quiebre/Error)", desc: "Si NO → fin exitoso. Si SÍ → ruta de reproceso por falla en tienda.", resp: "Equipo de Tiendas", decision: true },
+      ]},
+    ],
+  },
+
+  /* ── Sub-proceso 7: Condiciones de Surtido ──────────────── */
+  {
+    id: "surtido", numero: 7, nombre: "Condiciones de Surtido", color: "azul", version: "2.0", estado: "En Revisión",
+    proposito: "Gestionar las modificaciones relacionadas con la condición de surtido de SKUs activos, incluyendo la salida formal de un producto del catálogo cuando se cumplen las condiciones requeridas. El proceso es ejecutado íntegramente por DDMM.",
+    alcance_inicio: "Recepción de un ticket de solicitud de modificación de condición de surtido.",
+    alcance_fin: "Cierre del ticket una vez aplicados todos los cambios y notificadas las partes. También termina si el ticket es rechazado.",
+    contexto_preceden: "Gestión y Modificación de Producto.",
+    contexto_suceden: "Término del proceso de Datos Maestros.",
+    actores: [
+      { rol: "Analista Datos Maestros", area: "DDMM", resp: "Ejecuta la totalidad del subproceso: recepciona, valida, aplica cambios en SAP y plataforma de navegación, notifica y cierra el ticket." },
+      { rol: "Encargado Comercial", area: "Comercial", resp: "Origina la solicitud mediante un ticket. Recibe notificación de salida o rechazo según el resultado." },
+    ],
+    raci: {
+      cols: ["DDMM Analista", "DDMM Jefe", "Encargado Comercial"],
+      filas: [
+        { act: "Recepcionar solicitud ticket", vals: ["R", "A", "I"] },
+        { act: "Revisar antecedentes del ticket", vals: ["R", "A", ""] },
+        { act: "Verificar completitud y datos correctos", vals: ["R", "A", ""] },
+        { act: "Rechazar ticket con comentario (datos incompletos)", vals: ["R", "A", "I"] },
+        { act: "Verificar si es modificación para salida de producto", vals: ["R", "A", ""] },
+        { act: "Carga de información (si no es salida)", vals: ["R", "A", ""] },
+        { act: "Verificar si corresponde a bloqueo de venta", vals: ["R", "A", ""] },
+        { act: "Verificar si stock es 0", vals: ["R", "A", ""] },
+        { act: "Rechazar ticket (stock no es 0)", vals: ["R", "A", "I"] },
+        { act: "Aplicar bloqueo Z2 en SAP", vals: ["R", "A", ""] },
+        { act: "Eliminar visibilidad en navegación", vals: ["R", "A", ""] },
+        { act: "Quitar vigencia del producto", vals: ["R", "A", ""] },
+        { act: "Quitar SKU de catálogo", vals: ["R", "A", ""] },
+        { act: "Notificar salida y cerrar ticket", vals: ["R", "A", "I"] },
+      ],
+    },
+    fases: [
+      { nombre: "Recepción y validación", pasos: [
+        { n: 1, act: "Recepcionar solicitud ticket", desc: "DDMM recepciona el ticket de solicitud de modificación de condición de surtido.", resp: "Datos Maestros" },
+        { n: 2, act: "Revisar antecedentes", desc: "Revisión del historial del SKU, tipo de solicitud y contexto de la modificación.", resp: "Datos Maestros" },
+        { n: 3, act: "Verificar completitud y datos correctos", desc: "Si NO → rechazar ticket con comentario. Si SÍ → continuar.", resp: "Datos Maestros", decision: true },
+        { n: "3a", act: "Rechazo Ticket + Comentario (datos incompletos)", desc: "Se rechaza el ticket dejando un comentario explicativo. El proceso termina aquí.", resp: "Datos Maestros" },
+      ]},
+      { nombre: "Evaluación del tipo de cambio", pasos: [
+        { n: 4, act: "Verificar si es modificación para salida de producto", desc: "Si NO → carga de información. Si SÍ → verificar bloqueo de venta.", resp: "Datos Maestros", decision: true },
+        { n: "4a", act: "Carga de información (si no es salida de producto)", desc: "DDMM realiza la carga de información correspondiente.", resp: "Datos Maestros" },
+        { n: 5, act: "Verificar si corresponde a bloqueo de venta", desc: "Si NO → carga de información. Si SÍ → verificar stock.", resp: "Datos Maestros", decision: true },
+        { n: "5a", act: "Cargar bloqueo", desc: "Carga del bloqueo de venta correspondiente en sistema.", resp: "Datos Maestros" },
+        { n: 6, act: "Verificar si stock es 0", desc: "Si SÍ → flujo de salida. Si NO → ¿tiene ajuste excepcional de inventario? Si no tiene → rechazo.", resp: "Datos Maestros", decision: true },
+        { n: "6a", act: "Rechazo Ticket + Comentario (stock no es 0)", desc: "Si no hay ajuste excepcional de Inventario, se rechaza el ticket. El proceso termina.", resp: "Datos Maestros" },
+      ]},
+      { nombre: "Salida del producto", pasos: [
+        { n: 7, act: "Aplicar bloqueo Z2 en SAP", desc: "Con stock en 0 confirmado, se aplica el bloqueo Z2 impidiendo nuevas transacciones de venta.", resp: "Datos Maestros" },
+        { n: 8, act: "Eliminar visibilidad en navegación", desc: "Se elimina la visibilidad del SKU en la plataforma de navegación y catálogo digital.", resp: "Datos Maestros" },
+        { n: 9, act: "Quitar vigencia del producto", desc: "El SKU queda marcado como producto no activo en el sistema.", resp: "Datos Maestros" },
+        { n: 10, act: "Quitar SKU de catálogo", desc: "El SKU se retira del catálogo activo de productos.", resp: "Datos Maestros" },
+        { n: 11, act: "Notificar salida", desc: "Notificación de salida formal al Encargado Comercial.", resp: "Datos Maestros" },
+        { n: 12, act: "Cerrar ticket (cierre del proceso)", desc: "Cierre formal del ticket en el sistema. Evento de cierre del subproceso.", resp: "Datos Maestros" },
+      ]},
+    ],
+  },
+
+  /* ── Sub-proceso 8: Full (Campañas) ─────────────────────── */
+  {
+    id: "full", numero: 8, nombre: "Campañas Full Copec", color: "azul", version: "2.0", estado: "En Revisión",
+    proposito: "Gestionar la solicitud, revisión y aprobación de campañas promocionales del programa Full Copec, garantizando que pasen por las instancias de validación comercial, operacional, técnica y contable antes de ser comunicadas a los canales.",
+    alcance_inicio: "Identificación de una necesidad comercial de incluir un producto en la planilla Full.",
+    alcance_fin: "Emisión del comunicado de campaña aprobada a Administración Propia y/o Franquicias, o rechazo formal en cualquier etapa.",
+    contexto_preceden: "Ideación del Producto.",
+    contexto_suceden: "Ciclo de Vida del Producto.",
+    actores: [
+      { rol: "Representante Comercial (PM)", area: "Comercial", resp: "Inicia el proceso. Evalúa si el producto requiere planilla Full y solicita campaña si aplica." },
+      { rol: "Comité Fidelidad", area: "DDMM", resp: "Revisa la solicitud, verifica cumplimiento de indicadores y aprueba o rechaza." },
+      { rol: "Analista / Ejecutivo DDMM", area: "DDMM", resp: "Verifica funcionamiento mecánico del SKU y habilita para QA." },
+      { rol: "Responsable FULL Copec", area: "FULL Copec", resp: "Revisa la solicitud en su totalidad y carga QA para prueba." },
+      { rol: "Responsable TI", area: "TI", resp: "Realiza revisión técnica y confirma pruebas aprobadas en sistema QA." },
+      { rol: "Responsable Contabilidad", area: "Contabilidad", resp: "Revisa ajuste contable y verifica cuadratura de apuntes contables." },
+      { rol: "Franquicias", area: "Franquicias", resp: "Recibe comunicado de campaña aprobada al cierre del proceso." },
+    ],
+    raci: {
+      cols: ["Comercial", "Comité Fidelidad", "DDMM", "FULL Copec", "TI", "Contabilidad", "Franquicias"],
+      filas: [
+        { act: "Evaluar necesidad de campaña (¿Solicita?)", vals: ["R", "A", "I", "C", "I", "I", ""] },
+        { act: "Rellenar Formulario Workflow", vals: ["R", "A", "I", "", "", "", "I"] },
+        { act: "Revisar completitud de campaña e indicadores", vals: ["C", "I", "R", "", "", "", ""] },
+        { act: "Validación SKU e Habilitación en QA", vals: ["C", "I", "I", "R", "", "", ""] },
+        { act: "Gestión operativa y carga de fidelizador", vals: ["I", "I", "C", "C", "R", "", ""] },
+        { act: "Revisión técnica y pruebas en sistema QA", vals: ["I", "I", "I", "C", "C", "R", ""] },
+        { act: "Ajustes contables y conciliación financiera", vals: ["I", "I", "I", "I", "C", "C", "R"] },
+        { act: "Verificar aprobación y selección de canal", vals: ["I", "I", "R", "", "", "", ""] },
+        { act: "Emisión de Comunicado GOAP (Adm. Propia)", vals: ["R", "A", "I", "C", "", "", ""] },
+        { act: "Emisión de Comunicado Franquicias", vals: ["I", "I", "A", "", "", "", "R"] },
+      ],
+    },
+    fases: [
+      { nombre: "Evaluación y solicitud", pasos: [
+        { n: 1, act: "¿Solicita Campaña?", desc: "Si NO → fin temprano. Si SÍ → rellenar formulario en Workflow.", resp: "Encargado Comercial", decision: true },
+        { n: 2, act: "Rellenar Formulario Workflow", desc: "Registro formal de todos los datos de la campaña en la plataforma de Workflow.", resp: "Encargado Comercial" },
+      ]},
+      { nombre: "Revisiones y validaciones", pasos: [
+        { n: 3, act: "Revisión Comité / ¿Completitud campaña?", desc: "Si incompleta → rechazar en Workflow. Si OK → carril de DDMM.", resp: "Comité Fidelidad", decision: true },
+        { n: 4, act: "Validación SKU de DDMM e Habilitación para QA", desc: "Si NO habilitado → rechazar. Si SÍ → gestión operativa FULL Copec.", resp: "DDMM", decision: true },
+        { n: 5, act: "Gestión Full Copec / ¿Cargado fidelizador?", desc: "Si NO → rechazar en Workflow. Si SÍ → revisión técnica TI.", resp: "FULL Copec", decision: true },
+        { n: 6, act: "Revisión TI: Sistema QA / ¿Pruebas exitosas?", desc: "Si NO → adjuntar evidencia de error y rechazar. Si SÍ → revisión contable.", resp: "TI", decision: true },
+        { n: 7, act: "Ajustes y Conciliación Financiera (Contabilidad)", desc: "Si NO cuadran los apuntes → rechazar. Si SÍ → aprobación definitiva.", resp: "Contabilidad", decision: true },
+      ]},
+      { nombre: "Comunicación a canales", pasos: [
+        { n: 8, act: "Verifica aprobación y Selección de Canal", desc: "Comité Fidelidad ratifica vigencia y define estrategia: Adm. Propia o Franquicias.", resp: "Comité Fidelidad" },
+        { n: "9A", act: "Comunicado GOAP (Administración Propia)", desc: "Si aplica para locales Adm. Propia: el comercial emite el masivo interno GOAP.", resp: "Encargado Comercial / Comité Fidelidad" },
+        { n: "9B", act: "Gestión y Difusión en Franquicias", desc: "Si involucra Franquicias: Comité completa formulario y Franquicias emite comunicado.", resp: "Comité Fidelidad / Franquicias" },
+      ]},
+    ],
+  },
+
+  /* ── Sub-proceso 9: TCT ──────────────────────────────────── */
+  {
+    id: "tct", numero: 9, nombre: "TCT – Tabla de Contenido de Tiendas", color: "naranja", version: "2.0", estado: "En Revisión",
+    proposito: "Actualizar y mantener la Tabla de Contenido de Tiendas (TCT) con la información de SKUs que conforman el surtido, asegurando que los datos estén correctamente cargados y validados antes de su comunicación formal a las tiendas vía GOAP.",
+    alcance_inicio: "Identificación de un SKU que requiere ser incorporado o actualizado en la TCT.",
+    alcance_fin: "Envío del GOAP a tiendas por parte del Equipo Comercial, una vez verificada la información cargada.",
+    contexto_preceden: "Ideación del Producto.",
+    contexto_suceden: "Cambios y modificaciones SKU.",
+    actores: [
+      { rol: "Equipo Comercial", area: "Comercial / DDMM", resp: "Identifica el SKU, define categorías, completa y envía la Planilla TCT, verifica la información cargada y envía el GOAP a tiendas." },
+      { rol: "Focal TCT Copec", area: "Por definir", resp: "Recepciona la información enviada por el Equipo Comercial, carga en el sistema TCT y realiza la validación técnica." },
+    ],
+    raci: {
+      cols: ["Comercial Analista", "Comercial Jefe", "TCT Analista", "TCT Jefe"],
+      filas: [
+        { act: "Identificar SKU", vals: ["R", "A", "I", ""] },
+        { act: "Definir categorías del SKU", vals: ["R", "A", "C", ""] },
+        { act: "Completar Planilla TCT", vals: ["R", "A", "", ""] },
+        { act: "Enviar Planilla al Focal TCT Copec", vals: ["R", "A", "I", ""] },
+        { act: "Recepcionar información (Planilla TCT)", vals: ["I", "", "R", "A"] },
+        { act: "Cargar información en sistema", vals: ["", "", "R", "A"] },
+        { act: "Validación técnica de información cargada", vals: ["I", "", "R", "A"] },
+        { act: "Verificación de información cargada (Comercial)", vals: ["R", "A", "C", ""] },
+        { act: "Envío GOAP a tiendas", vals: ["R", "A", "", ""] },
+      ],
+    },
+    fases: [
+      { nombre: "Identificación y preparación", pasos: [
+        { n: 1, act: "Identificar SKU", desc: "El Equipo Comercial identifica el SKU a incorporar o actualizar en la TCT.", resp: "Equipo Comercial" },
+        { n: 2, act: "Definir categorías", desc: "Definición de las categorías correspondientes al SKU identificado.", resp: "Equipo Comercial" },
+        { n: 3, act: "Completar y enviar Planilla TCT", desc: "Se completa la Planilla TCT con la información del SKU y sus categorías, y se envía al Focal TCT Copec.", resp: "Equipo Comercial" },
+      ]},
+      { nombre: "Carga, validación y comunicación", pasos: [
+        { n: 4, act: "Recepcionar información", desc: "El Focal TCT Copec recepciona la Planilla de Actualización enviada.", resp: "Focal TCT Copec" },
+        { n: 5, act: "Cargar información", desc: "El Focal TCT Copec carga la información del SKU en el sistema TCT.", resp: "Focal TCT Copec" },
+        { n: 6, act: "Validación técnica de información cargada", desc: "El Focal TCT Copec valida que la información sea correcta y completa, y retorna el resultado.", resp: "Focal TCT Copec" },
+        { n: 7, act: "Verificación de información cargada", desc: "El Equipo Comercial verifica la información desde la perspectiva comercial.", resp: "Equipo Comercial" },
+        { n: 8, act: "Envío GOAP a tiendas", desc: "Envío formal del GOAP a las tiendas con la información verificada.", resp: "Equipo Comercial" },
+      ]},
+    ],
+  },
+
+  /* ── Sub-proceso 10: Modificación Abastecimiento ────────── */
+  {
+    id: "abastecimiento", numero: 10, nombre: "Gestión y Modificación de Abastecimiento", color: "morado", version: "2.0", estado: "En Revisión",
+    proposito: "Gestionar los cambios en el modelo de distribución de un producto (Centralizado ↔ Directo), alineando a todas las áreas involucradas frente a variaciones en condiciones de venta o stock, asegurando la continuidad operativa en tiendas.",
+    alcance_inicio: "Detección de caída en ventas, minstock bajo, o necesidad de cambio de modelo de distribución.",
+    alcance_fin: "Recepción de productos en tiendas bajo el nuevo modelo y comunicado GOAP enviado.",
+    contexto_preceden: "Subproceso de Condiciones de Abastecimiento · Seguimiento Comercial de Productos Vigentes.",
+    contexto_suceden: "Seguimiento de ventas post-modificación.",
+    actores: [
+      { rol: "Encargado Comercial / Tiendas", area: "Comercial / Tiendas", resp: "Activan el proceso al levantar el requerimiento de cambio. Son los receptores finales del nuevo modelo." },
+      { rol: "Equipo de Abastecimiento", area: "Abastecimiento (Dueño del Proceso)", resp: "Eje central del flujo: analiza factibilidad, audita in-stock, define la estrategia Directo/CD, selecciona distribuidor y emite órdenes de compra." },
+      { rol: "Distribuidor (Key Logistics / Blue Express)", area: "Operadores Logísticos Externos (CD)", resp: "Alta y setup técnico de SKUs y fichas de proveedores en sus plataformas. Recepcionan pedidos y validan inventario." },
+      { rol: "Datos Maestros (DDMM)", area: "DDMM", resp: "Recepcionan solicitudes formalizadas y realizan carga masiva en SAP (Libros de Pedidos, Fuentes de Aprovisionamiento y Bloqueos)." },
+      { rol: "Proveedor Externo", area: "Socio Comercial", resp: "En ruta Directa, despacha y distribuye los productos directamente a tiendas sin Centro de Distribución." },
+    ],
+    raci: {
+      cols: ["Comercial/Tiendas", "Abastecimiento", "Distribuidor (KL/Blue)", "DDMM"],
+      filas: [
+        { act: "Revisar solicitudes de cambio de distribución", vals: ["I", "R", "", ""] },
+        { act: "Revisar indicadores de instock", vals: ["I", "R", "", ""] },
+        { act: "Determinar tipo de abastecimiento (Directo / CD)", vals: ["C", "R", "", ""] },
+        { act: "Gestión propia proveedor (Ruta Directa)", vals: ["I", "A", "", ""] },
+        { act: "Determinar tipo de distribuidor (KL / Blue)", vals: ["", "R", "C", ""] },
+        { act: "Crear SKU y Proveedor en Distribuidor", vals: ["", "I", "R", ""] },
+        { act: "Enviar notificación de aprobación en CD", vals: ["I", "", "R", ""] },
+        { act: "Cargar pedido a proveedor y evaluar Bloqueo", vals: ["", "R", "", ""] },
+        { act: "Notificar solicitud de cambios a DDMM", vals: ["", "R", "", "I"] },
+        { act: "Recibir solicitud y cargar parámetros en SAP", vals: ["I", "", "", "R"] },
+        { act: "Ejecutar empujes a tiendas", vals: ["I", "R", "", ""] },
+      ],
+    },
+    fases: [
+      { nombre: "Evaluación y definición del modelo", pasos: [
+        { n: 0, act: "Trigger / Inicio", desc: "Se activa cuando se reciben solicitudes de cambio en el modelo de distribución de un SKU desde Comercial o Tiendas.", resp: "Comercial / Tiendas" },
+        { n: 1, act: "Revisar solicitudes de cambio de distribución", desc: "Recepción y análisis técnico del requerimiento inicial de cambio para evaluar prefactibilidad.", resp: "Equipo de Abastecimiento" },
+        { n: 2, act: "Revisar indicadores de instock", desc: "Auditoría de KPIs de disponibilidad de stock para fundamentar técnicamente el cambio.", resp: "Equipo de Abastecimiento" },
+        { n: 3, act: "¿Tipo de abastecimiento? (Decisión)", desc: "¿Migra a modelo Directo (entrega del proveedor) o a Centro de Distribución (CD)?", resp: "Equipo de Abastecimiento", decision: true },
+        { n: "4D", act: "Gestión propia proveedor (Ruta Directa)", desc: "Si Directo → el proveedor asume autonomía total del despacho bajo condiciones pactadas.", resp: "Proveedor / Abastecimiento" },
+        { n: "4CD", act: "¿Tipo de distribuidor? (Decisión)", desc: "Si CD → seleccionar operador: Key Logistics (KL) o Blue Express.", resp: "Equipo de Abastecimiento", decision: true },
+      ]},
+      { nombre: "Alta en distribuidor", pasos: [
+        { n: "5KL", act: "Manda a crear SKU (Ruta KL)", desc: "Solicitud formal de alta y configuración técnica bajo parámetros de Key Logistics.", resp: "Abastecimiento" },
+        { n: "6KL", act: "Crea SKU (Distribuidor KL)", desc: "Alta sistémica del SKU en plataformas KL. SLA estimado: 7 días.", resp: "Distribuidor (Key Logistics)" },
+        { n: "7KL", act: "Crear proveedor (Distribuidor KL)", desc: "Homologación y registro del proveedor en plataformas KL. SLA: 7 días a 2 semanas.", resp: "Distribuidor (Key Logistics)" },
+        { n: "5B", act: "Manda a crear SKU (Ruta Blue)", desc: "Solicitud formal de alta bajo parámetros de Blue Express.", resp: "Abastecimiento" },
+        { n: "6B", act: "Crear SKU (Distribuidor Blue)", desc: "Alta del SKU en sistemas operacionales de Blue Express.", resp: "Distribuidor (Blue Express)" },
+        { n: "7B", act: "Crea proveedor (Distribuidor Blue)", desc: "Registro y vinculación del proveedor en Blue Express. SLA estimado: 2 días.", resp: "Distribuidor (Blue Express)" },
+        { n: 8, act: "Enviar notificación de aprobación en CD", desc: "El operador logístico confirma que el setup del producto/proveedor está aprobado para operar.", resp: "Distribuidor (KL / Blue Express)" },
+      ]},
+      { nombre: "Carga en SAP y empujes a tiendas", pasos: [
+        { n: 9, act: "Cargar pedido a proveedor", desc: "Con la aprobación del CD, Abastecimiento carga la orden de compra inicial.", resp: "Equipo de Abastecimiento" },
+        { n: 10, act: "¿Requiere Bloqueo de Compra?", desc: "Si SÍ → solicitar Libro de Pedido, Fuentes de Aprovisionamiento y Bloqueo. Si NO → omitir bloqueos.", resp: "Abastecimiento", decision: true },
+        { n: 11, act: "Notifica a DDMM", desc: "Envío formal del expediente de aprovisionamiento estructurado hacia Datos Maestros.", resp: "Equipo de Abastecimiento" },
+        { n: 12, act: "Recibir solicitud", desc: "DDMM acusa recibo y valida que la documentación cumpla estándares de carga.", resp: "Datos Maestros (DDMM)" },
+        { n: 13, act: "Cargar datos solicitados", desc: "Parametrización y carga definitiva de datos de aprovisionamiento en SAP, activando el nuevo flujo sistémico.", resp: "Datos Maestros (DDMM)" },
+        { n: 14, act: "Solicitar pedido a proveedor", desc: "Abastecimiento emite la orden de compra al proveedor o distribuidor.", resp: "Abastecimiento" },
+        { n: 15, act: "Recibir pedido en bodegas CD", desc: "El distribuidor recepciona físicamente los pedidos del proveedor.", resp: "Distribuidor" },
+        { n: 16, act: "Confirmar stock en CD", desc: "Auditoría y validación de inventario en bodega.", resp: "Abastecimiento / Distribuidor" },
+        { n: 17, act: "Ejecutar empujes a tiendas", desc: "Abastecimiento despacha los productos hacia la red de tiendas bajo el nuevo modelo.", resp: "Equipo de Abastecimiento" },
+      ]},
+    ],
+  },
+];
+
+/* Datos heredados (se usan en otros lugares del código si los hubiera) */
 const CVP_ETAPAS = [
   {
     nombre: "Evaluación comercial e ideación",
@@ -1550,160 +2134,181 @@ const CVP_RACI = [
 ];
 
 /* ============================================================
-   VISTA CVP: guía visual del Ciclo de Vida del Producto
+   VISTA CVP: Ciclo de Vida del Producto — multi sub-proceso
    ============================================================ */
+const CVP_COLOR = {
+  verde:  { border: "#34c759", bg: "#f0faf2", badge: "#e8f5e9", text: "#1b5e20" },
+  azul:   { border: "#0071e3", bg: "#f0f6ff", badge: "#e3f2fd", text: "#0d47a1" },
+  naranja:{ border: "#ff9500", bg: "#fff8f0", badge: "#fff3e0", text: "#bf360c" },
+  rojo:   { border: "#ff3b30", bg: "#fff5f5", badge: "#ffebee", text: "#b71c1c" },
+  morado: { border: "#af52de", bg: "#f9f0ff", badge: "#f3e5f5", text: "#4a148c" },
+};
+
 function VistaCVP() {
-  const [etapa, setEtapa] = useState(null);
-  const [raciOpen, setRaciOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState("mapa");
+  const [openSecs, setOpenSecs] = useState({ proposito: true });
+
+  const sp = CVP_SUBPROCESOS.find(s => s.id === selectedId) || CVP_SUBPROCESOS[0];
+  const col = CVP_COLOR[sp.color] || CVP_COLOR.azul;
+
+  const toggleSec = (k) => setOpenSecs(prev => ({ ...prev, [k]: !prev[k] }));
+
+  const raciVal = (v) => {
+    if (!v) return <td key={v} />;
+    const cls = { R: "cvp2-r", A: "cvp2-a", C: "cvp2-c", I: "cvp2-i" }[v] || "";
+    return <td className={cls}>{v}</td>;
+  };
 
   return (
     <main className="sol-wrap">
       <div className="sol-head">
         <div>
           <h1 className="sol-title">Ciclo de Vida del Producto</h1>
-          <p className="sol-sub">Proceso estandarizado para la creación, modificación y baja de SKUs en SAP y SCKUBA. Área dueña: DDMM · Versión 2.0</p>
+          <p className="sol-sub">Proceso estandarizado para la creación, modificación y baja de SKUs. Área dueña: DDMM · Versión 2.0 · En Revisión</p>
         </div>
       </div>
 
-      {/* 3 flujos principales */}
-      <section className="seccion">
-        <h2 className="ayuda-h2"><Layers size={20} /> Flujos del proceso</h2>
-        <div className="cvp-flujos">
-          <div className="cvp-flujo cvp-alta">
-            <span className="cvp-flujo-ic"><Boxes size={22} /></span>
-            <strong>Alta de SKU</strong>
-            <p>Creación y habilitación de un nuevo SKU en SAP y SCKUBA. Es el flujo principal y punto de entrada del CVP.</p>
-          </div>
-          <div className="cvp-flujo cvp-mod">
-            <span className="cvp-flujo-ic"><RotateCcw size={22} /></span>
-            <strong>Modificaciones</strong>
-            <p>Cambios en precios, nombres, marcas o parámetros logísticos de SKUs ya existentes en el catálogo.</p>
-          </div>
-          <div className="cvp-flujo cvp-baja">
-            <span className="cvp-flujo-ic"><Trash2 size={22} /></span>
-            <strong>Baja definitiva</strong>
-            <p>Descontinuación del SKU: bloqueo automático de compras al proveedor y prohibición de venta en cajas.</p>
-          </div>
-        </div>
-      </section>
-
-      {/* Tipos de SKU */}
-      <section className="seccion">
-        <h2 className="ayuda-h2"><Tag size={20} /> Tipos de SKU</h2>
-        <div className="cvp-skus">
-          <div className="cvp-sku cvp-parcial">
-            <div className="cvp-sku-badge">SKU Parcial</div>
-            <p className="cvp-sku-desc">Creación inicial que <strong>no habilita venta ni abastecimiento completo</strong>. Uso principal: planogramación, importaciones y evaluaciones previas.</p>
-            <ul className="cvp-sku-lista">
-              <li>Nombre y descripción técnica/comercial</li>
-              <li>Grupo artículo y jerarquía</li>
-              <li>Dimensiones, medidas físicas y empaque</li>
-              <li>Flag de navegación (omnicanalidad: App, Caja Asistida, Autoatención)</li>
-              <li>Planograma y categoría de valoración</li>
-              <li>Foto (obligatoria si aplica navegación digital)</li>
-            </ul>
-          </div>
-          <div className="cvp-sku cvp-total">
-            <div className="cvp-sku-badge">SKU Total</div>
-            <p className="cvp-sku-desc">SKU <strong>completamente habilitado</strong> para operación y venta directa en tienda. Incluye todo el SKU Parcial más:</p>
-            <ul className="cvp-sku-lista">
-              <li><strong>Condiciones de venta:</strong> PVP e impuestos por clúster de tiendas</li>
-              <li><strong>Condiciones de compra:</strong> proveedor, costo neto y lead time</li>
-              <li><strong>Condiciones de abastecimiento:</strong> flujo (Directo/Centralizado/Mixto) y reposición automática</li>
-              <li><strong>Surtido:</strong> matriz de tiendas autorizadas y bloqueos por local</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      {/* Flujo paso a paso */}
-      <section className="seccion">
-        <h2 className="ayuda-h2"><ArrowRight size={20} /> Flujo Alta de SKU</h2>
-        <p className="ayuda-intro">El flujo de Alta de SKU tiene 24 pasos agrupados en 5 etapas. Haz clic en cada una para ver el detalle.</p>
-        <div className="cvp-etapas">
-          {CVP_ETAPAS.map((et, i) => {
-            const open = etapa === i;
+      <div className="cvp2-layout">
+        {/* ── Sidebar navegación ── */}
+        <nav className="cvp2-nav">
+          <div className="cvp2-nav-label">Sub-procesos</div>
+          {CVP_SUBPROCESOS.map(s => {
+            const c = CVP_COLOR[s.color] || CVP_COLOR.azul;
+            const active = s.id === selectedId;
             return (
-              <div key={i} className={"cvp-etapa" + (open ? " open" : "")}>
-                <button className="cvp-etapa-btn" onClick={() => setEtapa(open ? null : i)}>
-                  <span className="cvp-etapa-num">{i + 1}</span>
-                  <span className="cvp-etapa-head">
-                    <strong>{et.nombre}</strong>
-                    <em>{et.resumen}</em>
-                  </span>
-                  <span className="cvp-etapa-toggle">{open ? <ChevronUp size={18} /> : <ChevronDown size={18} />}</span>
-                </button>
-                {open && (
-                  <div className="cvp-etapa-body fade-in">
-                    {et.pasos.map((p) => (
-                      <div key={p.n} className="cvp-paso">
-                        <span className="cvp-paso-n">{p.n}</span>
-                        <div className="cvp-paso-cont">
-                          <strong>{p.act}</strong>
-                          <span>{p.desc}</span>
-                          <em className="cvp-paso-resp">{p.resp}</em>
-                        </div>
-                        {p.decision && <span className="cvp-decision">Decisión</span>}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <button
+                key={s.id}
+                className={"cvp2-nav-item" + (active ? " cvp2-nav-active" : "")}
+                style={active ? { borderLeftColor: c.border, background: c.bg } : {}}
+                onClick={() => { setSelectedId(s.id); setOpenSecs({ proposito: true }); }}
+              >
+                <span className="cvp2-nav-num" style={active ? { background: c.border, color: "#fff" } : {}}>
+                  {s.numero !== undefined ? s.numero : "★"}
+                </span>
+                <span className="cvp2-nav-name">{s.nombre}</span>
+              </button>
             );
           })}
-        </div>
-      </section>
+        </nav>
 
-      {/* Actores */}
-      <section className="seccion">
-        <h2 className="ayuda-h2"><User size={20} /> Actores del proceso</h2>
-        <div className="cvp-actores">
-          {CVP_ACTORES.map((a, i) => (
-            <div key={i} className="cvp-actor">
-              <strong>{a.rol}</strong>
-              <span className="cvp-actor-area">{a.area}</span>
-              <p>{a.resp}</p>
+        {/* ── Contenido principal ── */}
+        <div className="cvp2-main">
+          {/* Cabecera del sub-proceso */}
+          <div className="cvp2-header" style={{ borderTopColor: col.border, background: col.bg }}>
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
+                {sp.numero !== undefined && (
+                  <span className="cvp2-sp-num" style={{ background: col.border }}>SP {sp.numero}</span>
+                )}
+                <span className="cvp2-estado">{sp.estado}</span>
+                <span className="cvp2-version">v{sp.version}</span>
+              </div>
+              <h2 className="cvp2-title">{sp.nombre}</h2>
             </div>
-          ))}
-        </div>
-      </section>
-
-      {/* RACI */}
-      <section className="seccion">
-        <h2 className="ayuda-h2"><ClipboardList size={20} /> Matriz RACI</h2>
-        <button
-          onClick={() => setRaciOpen(!raciOpen)}
-          style={{ marginBottom: 12, display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "#0071e3", background: "none", border: "none", cursor: "pointer", font: "inherit", padding: 0 }}
-        >
-          {raciOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-          {raciOpen ? "Ocultar tabla" : "Ver tabla RACI"}
-        </button>
-        {raciOpen && (
-          <div className="cvp-raci-wrap fade-in">
-            <table className="cvp-raci">
-              <thead>
-                <tr>
-                  <th>Actividad</th>
-                  <th>Comercial</th>
-                  <th>DDMM</th>
-                  <th>Supply Chain</th>
-                  <th>Planograma</th>
-                  <th>Marketing</th>
-                </tr>
-              </thead>
-              <tbody>
-                {CVP_RACI.map((r, i) => (
-                  <tr key={i}>
-                    <td>{r.act}</td>
-                    {r.vals.map((v, j) => <td key={j} className={"cvp-raci-" + v.toLowerCase()}>{v}</td>)}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <p style={{ fontSize: 12, color: "#86868b", marginTop: 8 }}>R = Responsable · A = Accountable · C = Consultado · I = Informado</p>
           </div>
-        )}
-      </section>
+
+          {/* Propósito y Alcance */}
+          <div className="cvp2-sec">
+            <button className="cvp2-sec-btn" onClick={() => toggleSec("proposito")}>
+              <span><BookOpen size={15} style={{ marginRight: 6, verticalAlign: "middle" }} />Propósito y Alcance</span>
+              {openSecs.proposito ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+            </button>
+            {openSecs.proposito && (
+              <div className="cvp2-sec-body fade-in">
+                <p className="cvp2-proposito">{sp.proposito}</p>
+                <div className="cvp2-alcance-grid">
+                  <div className="cvp2-alcance-item"><strong>Inicio (trigger):</strong> {sp.alcance_inicio}</div>
+                  <div className="cvp2-alcance-item"><strong>Fin del proceso:</strong> {sp.alcance_fin}</div>
+                  {sp.contexto_preceden && <div className="cvp2-alcance-item"><strong>Preceden:</strong> {sp.contexto_preceden}</div>}
+                  {sp.contexto_suceden && <div className="cvp2-alcance-item"><strong>Suceden:</strong> {sp.contexto_suceden}</div>}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Actores */}
+          <div className="cvp2-sec">
+            <button className="cvp2-sec-btn" onClick={() => toggleSec("actores")}>
+              <span><User size={15} style={{ marginRight: 6, verticalAlign: "middle" }} />Actores e Integrantes</span>
+              {openSecs.actores ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+            </button>
+            {openSecs.actores && (
+              <div className="cvp2-sec-body fade-in">
+                <div className="cvp2-actores-grid">
+                  {sp.actores.map((a, i) => (
+                    <div key={i} className="cvp2-actor-card">
+                      <div className="cvp2-actor-rol">{a.rol}</div>
+                      <div className="cvp2-actor-area" style={{ color: col.border }}>{a.area}</div>
+                      <div className="cvp2-actor-resp">{a.resp}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* RACI */}
+          <div className="cvp2-sec">
+            <button className="cvp2-sec-btn" onClick={() => toggleSec("raci")}>
+              <span><ClipboardList size={15} style={{ marginRight: 6, verticalAlign: "middle" }} />Matriz RACI</span>
+              {openSecs.raci ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+            </button>
+            {openSecs.raci && (
+              <div className="cvp2-sec-body fade-in">
+                <div className="cvp2-raci-scroll">
+                  <table className="cvp2-raci-tbl">
+                    <thead>
+                      <tr>
+                        <th>Actividad / Decisión</th>
+                        {sp.raci.cols.map((c, i) => <th key={i}>{c}</th>)}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {sp.raci.filas.map((f, i) => (
+                        <tr key={i}>
+                          <td>{f.act}</td>
+                          {f.vals.map((v, j) => <td key={j} className={v ? "cvp2-" + v.toLowerCase() : ""}>{v}</td>)}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <p className="cvp2-raci-legend">R = Responsable · A = Accountable · C = Consultado · I = Informado</p>
+              </div>
+            )}
+          </div>
+
+          {/* Pasos del proceso */}
+          <div className="cvp2-sec">
+            <button className="cvp2-sec-btn" onClick={() => toggleSec("pasos")}>
+              <span><ArrowRight size={15} style={{ marginRight: 6, verticalAlign: "middle" }} />Flujo del Proceso · Pasos</span>
+              {openSecs.pasos ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+            </button>
+            {openSecs.pasos && (
+              <div className="cvp2-sec-body fade-in">
+                {sp.fases.map((fase, fi) => (
+                  <div key={fi} className="cvp2-fase">
+                    <div className="cvp2-fase-title" style={{ borderLeftColor: col.border }}>{fase.nombre}</div>
+                    <div className="cvp2-pasos-list">
+                      {fase.pasos.map((p, pi) => (
+                        <div key={pi} className={"cvp2-paso" + (p.decision ? " cvp2-paso-decision" : "")}>
+                          <span className="cvp2-paso-n" style={p.decision ? { background: col.border, color: "#fff" } : {}}>{p.n}</span>
+                          <div className="cvp2-paso-cont">
+                            <strong>{p.act}</strong>
+                            <span>{p.desc}</span>
+                            <em>{p.resp}</em>
+                          </div>
+                          {p.decision && <span className="cvp2-decision-tag" style={{ background: col.badge, color: col.text }}>⬦ Decisión</span>}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </main>
   );
 }
@@ -2602,6 +3207,68 @@ function Estilos() {
         .cvp-flujos { grid-template-columns: 1fr; }
         .cvp-skus { grid-template-columns: 1fr; }
         .cvp-actores { grid-template-columns: 1fr 1fr; }
+      }
+
+      /* CVP v2 — multi sub-proceso */
+      .cvp2-layout { display: grid; grid-template-columns: 240px 1fr; gap: 20px; align-items: start; margin-top: 4px; }
+      .cvp2-nav { background: #fff; border: 1px solid rgba(0,0,0,0.08); border-radius: 16px; padding: 8px; position: sticky; top: 80px; }
+      .cvp2-nav-label { font-size: 11px; font-weight: 600; color: #86868b; text-transform: uppercase; letter-spacing: .06em; padding: 8px 10px 6px; }
+      .cvp2-nav-item { display: flex; align-items: flex-start; gap: 10px; width: 100%; background: none; border: none; border-left: 3px solid transparent; border-radius: 10px; padding: 9px 10px; cursor: pointer; font: inherit; color: #3c3c43; text-align: left; transition: background .15s; }
+      .cvp2-nav-item:hover { background: #f5f5f7; }
+      .cvp2-nav-active { border-radius: 10px; }
+      .cvp2-nav-num { width: 22px; height: 22px; border-radius: 50%; background: #f0f0f2; font-size: 11px; font-weight: 700; color: #515154; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; transition: background .15s, color .15s; }
+      .cvp2-nav-name { font-size: 12.5px; line-height: 1.35; font-weight: 500; }
+      .cvp2-main { display: flex; flex-direction: column; gap: 10px; }
+      .cvp2-header { border-top: 4px solid #ccc; border-radius: 16px; background: #f5f5f7; padding: 20px 22px; }
+      .cvp2-sp-num { font-size: 11px; font-weight: 700; color: #fff; border-radius: 980px; padding: 3px 10px; }
+      .cvp2-estado { font-size: 11.5px; font-weight: 600; background: #fff3e0; color: #e65100; border-radius: 980px; padding: 3px 10px; }
+      .cvp2-version { font-size: 11.5px; color: #86868b; font-weight: 500; }
+      .cvp2-title { font-size: 20px; font-weight: 700; letter-spacing: -0.015em; color: #1d1d1f; margin: 0; }
+      .cvp2-sec { background: #fff; border: 1px solid rgba(0,0,0,0.08); border-radius: 16px; overflow: hidden; }
+      .cvp2-sec-btn { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: none; border: none; cursor: pointer; font: inherit; font-size: 14px; font-weight: 600; color: #1d1d1f; text-align: left; }
+      .cvp2-sec-btn:hover { background: #f9f9f9; }
+      .cvp2-sec-body { border-top: 1px solid rgba(0,0,0,0.06); padding: 16px 18px; }
+      .cvp2-proposito { font-size: 13.5px; color: #3c3c43; line-height: 1.6; margin: 0 0 14px; }
+      .cvp2-alcance-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+      .cvp2-alcance-item { font-size: 12.5px; color: #515154; line-height: 1.5; background: #f5f5f7; border-radius: 10px; padding: 10px 12px; }
+      .cvp2-alcance-item strong { display: block; color: #1d1d1f; font-size: 11.5px; margin-bottom: 3px; }
+      .cvp2-actores-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+      .cvp2-actor-card { background: #f9f9f9; border: 1px solid rgba(0,0,0,0.06); border-radius: 12px; padding: 12px 14px; }
+      .cvp2-actor-rol { font-size: 13px; font-weight: 600; color: #1d1d1f; margin-bottom: 2px; line-height: 1.3; }
+      .cvp2-actor-area { font-size: 11.5px; font-weight: 500; margin-bottom: 6px; }
+      .cvp2-actor-resp { font-size: 12px; color: #515154; line-height: 1.45; }
+      .cvp2-raci-scroll { overflow-x: auto; }
+      .cvp2-raci-tbl { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+      .cvp2-raci-tbl th { background: #f5f5f7; font-weight: 600; padding: 9px 12px; text-align: left; border-bottom: 1px solid rgba(0,0,0,0.08); white-space: nowrap; font-size: 12px; }
+      .cvp2-raci-tbl td { padding: 8px 12px; border-bottom: 1px solid rgba(0,0,0,0.05); text-align: center; font-weight: 700; font-size: 12px; min-width: 44px; }
+      .cvp2-raci-tbl td:first-child { text-align: left; font-weight: 400; color: #3c3c43; min-width: 200px; }
+      .cvp2-raci-tbl tr:last-child td { border-bottom: none; }
+      .cvp2-r { color: #1d1d1f !important; background: #f0f0f2; }
+      .cvp2-a { color: #0071e3 !important; }
+      .cvp2-c { color: #515154 !important; }
+      .cvp2-i { color: #aeaeb2 !important; }
+      .cvp2-raci-legend { font-size: 11.5px; color: #86868b; margin-top: 10px; }
+      .cvp2-fase { margin-bottom: 20px; }
+      .cvp2-fase:last-child { margin-bottom: 0; }
+      .cvp2-fase-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #515154; border-left: 3px solid; padding-left: 10px; margin-bottom: 10px; }
+      .cvp2-pasos-list { display: flex; flex-direction: column; gap: 8px; }
+      .cvp2-paso { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; background: #f9f9f9; border-radius: 10px; border: 1px solid rgba(0,0,0,0.05); }
+      .cvp2-paso-decision { border-style: dashed; }
+      .cvp2-paso-n { width: 24px; height: 24px; border-radius: 50%; background: #e5e5ea; font-size: 11px; font-weight: 700; color: #515154; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; transition: background .15s; font-variant-numeric: tabular-nums; }
+      .cvp2-paso-cont { flex: 1; }
+      .cvp2-paso-cont strong { display: block; font-size: 13px; font-weight: 600; color: #1d1d1f; margin-bottom: 2px; }
+      .cvp2-paso-cont span { display: block; font-size: 12px; color: #515154; line-height: 1.45; margin-bottom: 3px; }
+      .cvp2-paso-cont em { font-size: 11px; color: #86868b; font-style: normal; }
+      .cvp2-decision-tag { font-size: 11px; font-weight: 600; border-radius: 980px; padding: 3px 9px; flex-shrink: 0; white-space: nowrap; margin-top: 2px; }
+      @media (max-width: 900px) {
+        .cvp2-layout { grid-template-columns: 1fr; }
+        .cvp2-nav { position: static; display: flex; flex-wrap: wrap; gap: 6px; }
+        .cvp2-nav-item { flex: 1; min-width: 140px; }
+        .cvp2-alcance-grid { grid-template-columns: 1fr; }
+        .cvp2-actores-grid { grid-template-columns: 1fr 1fr; }
+      }
+      @media (max-width: 600px) {
+        .cvp2-actores-grid { grid-template-columns: 1fr; }
       }
 
       /* ADMIN */
