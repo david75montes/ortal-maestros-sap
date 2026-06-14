@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c ' *)",
+      "Bash(npx vite *)",
+      "Bash(npm install *)",
+      "Bash(npm list *)",
+      "Bash(awk -F'=' '{print $1\"=\"substr\\($2,1,12\\)\"...\"}' .env)",
+      "Bash(awk -F'=' '{print $1\"=\"substr\\($2,1,15\\)\"...\"}' .env)",
+      "Bash(awk -F'=' '{print $1\"=\"substr\\($2,1,20\\)\"...\"}' .env)",
+      "Bash(node -e ' *)"
+    ]
+  }
+}
