@@ -190,7 +190,7 @@ const PLANILLAS = [
     userCols: [
       { key: "centro", label: "Centro", hint: "2003,2549 o cluster", w: 150, multi: true, centro: true },
       { key: "sku", label: "SKU", hint: "32", w: 100, sku: true },
-      { key: "fechaInicio", label: "Fecha inicio", hint: "DD-MM-AAAA", w: 120, fecha: true },
+      { key: "fechaInicio", label: "Fecha inicio", hint: "DD-MM-AAAA", w: 120, fecha: true, def: hoy() },
       { key: "fechaFinal", label: "Fecha final", hint: "31-12-9999", w: 120, fecha: true, def: "31-12-9999" },
     ],
     autoCols: [
@@ -240,7 +240,7 @@ const PLANILLAS = [
     userCols: [
       { key: "centro", label: "Centro", hint: "2003,2549 o cluster", w: 150, multi: true, centro: true },
       { key: "sku", label: "SKU", hint: "32", w: 100, sku: true },
-      { key: "fechaInicio", label: "Fecha inicio", hint: "DD-MM-AAAA (vacío si desbloqueo)", w: 120, fecha: true, opcional: true },
+      { key: "fechaInicio", label: "Fecha inicio", hint: "DD-MM-AAAA (vacío si desbloqueo)", w: 120, fecha: true, opcional: true, def: hoy() },
       { key: "status", label: "Status", hint: "Z1-Z4 o vacío", w: 110, status: true, opcional: true },
     ],
     autoCols: [
@@ -260,7 +260,7 @@ const PLANILLAS = [
     userCols: [
       { key: "centro", label: "Centro", hint: "2003,2549 o cluster", w: 150, multi: true, centro: true },
       { key: "sku", label: "SKU", hint: "32", w: 100, sku: true },
-      { key: "fechaInicio", label: "Fecha inicio", hint: "DD-MM-AAAA", w: 120, fecha: true },
+      { key: "fechaInicio", label: "Fecha inicio", hint: "DD-MM-AAAA", w: 120, fecha: true, def: hoy() },
       { key: "fechaFinal", label: "Fecha final", hint: "31-12-9999", w: 120, fecha: true, def: "31-12-9999" },
       { key: "codProveedor", label: "Codigo proveedor", hint: "100000000", w: 130, prov: true },
       { key: "orgCompras", label: "Organizacion de compras", hint: "BP01", w: 150 },
@@ -286,7 +286,7 @@ const PLANILLAS = [
       { key: "proveedor", label: "Proveedor", hint: "100001173", w: 130, prov: true, opcional: true },
       { key: "orgCompras", label: "Organización de Compras", hint: "BP01", w: 160, def: "BP01" },
       { key: "precio", label: "Precio", hint: "669000", w: 110, num: true },
-      { key: "inicioValidez", label: "Inicio Validez", hint: "DD-MM-AAAA", w: 120, fecha: true },
+      { key: "inicioValidez", label: "Inicio Validez", hint: "DD-MM-AAAA", w: 120, fecha: true, def: hoy() },
       { key: "finValidez", label: "Fin Validez", hint: "31-12-9999", w: 120, fecha: true, def: "31-12-9999" },
       { key: "base", label: "Base", hint: "100", w: 80, def: "100" },
       { key: "unidadBase", label: "Unidades Base", hint: "UN", w: 100, def: "UN" },
@@ -320,7 +320,7 @@ const PLANILLAS = [
       { key: "tipoImpuesto", label: "Tipo Impuesto", hint: "C1", w: 110, def: "C1" },
       { key: "precio", label: "Precio (x cantidad base)", hint: "40000", w: 150, num: true },
       { key: "moneda", label: "Moneda", hint: "CLP", w: 90, def: "CLP" },
-      { key: "inicioValidez", label: "Inicio Validez", hint: "DD-MM-AAAA", w: 120, fecha: true },
+      { key: "inicioValidez", label: "Inicio Validez", hint: "DD-MM-AAAA", w: 120, fecha: true, def: hoy() },
       { key: "cantidadBase", label: "Cantidad Base", hint: "100", w: 110, def: "100", num: true },
     ],
     autoCols: [
@@ -374,7 +374,7 @@ const PLANILLAS = [
       { key: "proveedor", label: "Proveedor", hint: "100000116", w: 130, prov: true },
       { key: "sku", label: "Codigo Material SAP", hint: "131764", w: 150, sku: true },
       { key: "importe", label: "Importe ($)", hint: "1855", w: 110, num: true },
-      { key: "inicioValidez", label: "Inicio Validez", hint: "DD-MM-AAAA", w: 120, fecha: true },
+      { key: "inicioValidez", label: "Inicio Validez", hint: "DD-MM-AAAA", w: 120, fecha: true, def: hoy() },
       { key: "finValidez", label: "Fecha a", hint: "31-12-9999", w: 120, fecha: true, def: "31-12-9999" },
       { key: "moneda", label: "Moneda", hint: "CLP", w: 90, def: "CLP" },
       { key: "unidadBase", label: "Unidades Base", hint: "UN", w: 100, def: "UN" },
@@ -397,7 +397,7 @@ const PLANILLAS = [
       { key: "condicion", label: "Condicion", hint: "ZR02", w: 90, def: "ZR02", cond: ["ZR02"] },
       { key: "sku", label: "Codigo Material SAP", hint: "131774", w: 150, sku: true },
       { key: "impuesto", label: "Impuesto (%)", hint: "18", w: 110, num: true },
-      { key: "inicioValidez", label: "Inicio Validez", hint: "DD-MM-AAAA", w: 120, fecha: true },
+      { key: "inicioValidez", label: "Inicio Validez", hint: "DD-MM-AAAA", w: 120, fecha: true, def: hoy() },
       { key: "finValidez", label: "Fin Validez", hint: "31-12-9999", w: 120, fecha: true, def: "31-12-9999" },
     ],
     autoCols: [
@@ -417,7 +417,7 @@ const PLANILLAS = [
       { key: "proveedor", label: "Proveedor (pedido)", hint: "100000108", w: 140, prov: true },
       { key: "sku", label: "Codigo Material SAP", hint: "131774", w: 150, sku: true },
       { key: "importe", label: "Importe (Sin %)", hint: "15.33", w: 120, num: true },
-      { key: "inicioValidez", label: "Inicio Validez", hint: "DD-MM-AAAA", w: 120, fecha: true },
+      { key: "inicioValidez", label: "Inicio Validez", hint: "DD-MM-AAAA", w: 120, fecha: true, def: hoy() },
       { key: "finValidez", label: "Fecha a", hint: "31-12-9999", w: 120, fecha: true, def: "31-12-9999" },
     ],
     autoCols: [
@@ -952,6 +952,12 @@ export default function PortalSAP() {
 
   return (
     <AppShell vista={vista} setVista={setVista} perfil={perfil} rightPanel={panelDerecho}>
+
+      {/* ENCABEZADO */}
+      <div className="content-header">
+        <h1 className="content-title">Gestor de Solicitudes</h1>
+        <p className="content-sub">y Ciclo de Vida del Producto</p>
+      </div>
 
       {/* GUÍA DE SOLICITUDES */}
       <section className="seccion">
@@ -2122,28 +2128,28 @@ function VistaCVP() {
         </div>
       </div>
 
-      <div className="cvp2-layout">
-        {/* ── Sidebar navegación ── */}
-        <nav className="cvp2-nav">
-          <div className="cvp2-nav-label">Sub-procesos</div>
+      {/* ── Tabs horizontales de sub-procesos ── */}
+      <div className="cvp2-tabs-wrap">
+        <nav className="cvp2-tabs">
           {CVP_SUBPROCESOS.map(s => {
             const c = CVP_COLOR[s.color] || CVP_COLOR.azul;
             const active = s.id === selectedId;
             return (
               <button
                 key={s.id}
-                className={"cvp2-nav-item" + (active ? " cvp2-nav-active" : "")}
-                style={active ? { borderLeftColor: c.border, background: c.bg } : {}}
+                className={"cvp2-tab-item" + (active ? " cvp2-tab-active" : "")}
+                style={active ? { borderBottomColor: c.border, color: c.border } : {}}
                 onClick={() => { setSelectedId(s.id); setOpenSecs({ proposito: true }); }}
               >
-                <span className="cvp2-nav-num" style={active ? { background: c.border, color: "#fff" } : {}}>
+                <span className="cvp2-tab-num" style={active ? { background: c.border, color: "#fff" } : {}}>
                   {s.numero !== undefined ? s.numero : "★"}
                 </span>
-                <span className="cvp2-nav-name">{s.nombre}</span>
+                <span className="cvp2-tab-name">{s.nombre}</span>
               </button>
             );
           })}
         </nav>
+      </div>
 
         {/* ── Contenido principal ── */}
         <div className="cvp2-main">
@@ -2262,7 +2268,6 @@ function VistaCVP() {
             )}
           </div>
         </div>
-      </div>
     </main>
   );
 }
@@ -2807,7 +2812,7 @@ function VistaLogin() {
   return (
     <div className="login-wrap">
       <div className="login-box">
-        <div className="login-logo">◆ Maestros SAP</div>
+        <div className="login-logo">NEXUS</div>
 
         {modo === "login" ? (
           <>
@@ -2885,7 +2890,7 @@ function VistaCrearContrasena({ onDone }) {
   return (
     <div className="login-wrap">
       <div className="login-box">
-        <div className="login-logo">◆ Maestros SAP</div>
+        <div className="login-logo">NEXUS</div>
         <h1 className="login-title">Crear contraseña</h1>
         <p className="login-sub">Bienvenido/a al portal. Elige una contraseña para tu cuenta.</p>
         {listo ? (
@@ -2950,7 +2955,10 @@ function Sidebar({ vista, setVista, perfil }) {
     <>
       {/* Desktop sidebar */}
       <aside className="sidebar">
-        <div className="sidebar-logo">◆ Maestros SAP</div>
+        <div className="sidebar-logo">
+          <div>NEXUS</div>
+          <div className="sidebar-subtitulo">Gestor de Solicitudes y Ciclo de Vida del Producto</div>
+        </div>
         <nav className="sidebar-nav">
           {TABS.map(t => {
             const Icon = t.icon;
@@ -2969,7 +2977,7 @@ function Sidebar({ vista, setVista, perfil }) {
 
       {/* Mobile top bar */}
       <div className="topbar-mobile">
-        <span className="nav-logo">◆ Maestros SAP</span>
+        <span className="nav-logo">NEXUS</span>
         <button className="nav-hamburger" onClick={() => setMenuAbierto(o => !o)} aria-label="Menú">
           {menuAbierto ? <X size={20} /> : <Menu size={20} />}
         </button>
@@ -3092,7 +3100,7 @@ function NavBar({ info, vista, setVista, perfil }) {
     <>
       <nav className="nav">
         <div className="nav-inner">
-          <span className="nav-logo">◆ Maestros SAP</span>
+          <span className="nav-logo">NEXUS</span>
 
           {/* Tabs desktop */}
           <span className="nav-tabs nav-tabs-desktop">
@@ -3265,12 +3273,12 @@ function Estilos() {
     <style>{`
       * { box-sizing: border-box; margin: 0; }
       .portal { min-height: 100vh; background: #e4e7f1; color: #1d1d1f;
-        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Segoe UI", sans-serif;
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         -webkit-font-smoothing: antialiased; }
 
       /* ── Shell layout ── */
       .shell { display: flex; min-height: 100vh; background: #f0f2f8;
-        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Segoe UI", sans-serif;
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         -webkit-font-smoothing: antialiased; color: #1d1d1f; }
       .shell-body { flex: 1; display: flex; min-width: 0; }
       .shell-content { flex: 1; min-width: 0; overflow: hidden; padding: 32px 28px; }
@@ -3292,6 +3300,10 @@ function Estilos() {
       .sidebar-item:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.9); }
       .sidebar-item.on { background: rgba(255,255,255,0.13); color: #fff; font-weight: 600; }
       .sidebar-footer { border-top: 1px solid rgba(255,255,255,0.08); padding: 16px 14px; }
+      .sidebar-subtitulo { font-size: 10.5px; font-weight: 400; color: rgba(255,255,255,0.4); margin-top: 4px; line-height: 1.35; }
+      .content-header { margin-bottom: 24px; }
+      .content-title { font-size: 26px; font-weight: 700; letter-spacing: 0.04em; color: #1d1d1f; text-transform: uppercase; }
+      .content-sub { font-size: 13px; color: #86868b; margin-top: 3px; text-transform: capitalize; }
       .sidebar-user { font-size: 12px; color: rgba(255,255,255,0.45); padding: 0 6px 10px;
         white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       .sidebar-logout { width: 100%; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
@@ -3355,8 +3367,8 @@ function Estilos() {
       /* VISTA SOLICITUDES */
       .sol-wrap { max-width: 1060px; margin: 0 auto; padding: 48px 22px 60px; }
       .sol-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; }
-      .sol-title { font-size: 36px; font-weight: 800; letter-spacing: -0.025em; color: #14162a; }
-      .sol-sub { color: #6e6e80; font-size: 15px; margin-top: 6px; max-width: 560px; line-height: 1.55; }
+      .sol-title { font-size: 36px; font-weight: 800; letter-spacing: 0.04em; color: #14162a; text-transform: uppercase; }
+      .sol-sub { color: #6e6e80; font-size: 15px; margin-top: 6px; max-width: 560px; line-height: 1.55; text-transform: capitalize; }
       .sol-filtros { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
       .chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(180,185,220,0.4);
         background: rgba(255,255,255,0.7); cursor: pointer; font: inherit; font-size: 13px; font-weight: 500; color: #5a5f7a;
@@ -3745,61 +3757,58 @@ function Estilos() {
       }
 
       /* CVP v2 — multi sub-proceso */
-      .cvp2-layout { display: grid; grid-template-columns: 240px 1fr; gap: 20px; align-items: start; margin-top: 4px; }
-      .cvp2-nav { background: #fff; border: 1px solid rgba(0,0,0,0.08); border-radius: 16px; padding: 8px; position: sticky; top: 80px; }
-      .cvp2-nav-label { font-size: 11px; font-weight: 600; color: #86868b; text-transform: uppercase; letter-spacing: .06em; padding: 8px 10px 6px; }
-      .cvp2-nav-item { display: flex; align-items: flex-start; gap: 10px; width: 100%; background: none; border: none; border-left: 3px solid transparent; border-radius: 10px; padding: 9px 10px; cursor: pointer; font: inherit; color: #3c3c43; text-align: left; transition: background .15s; }
-      .cvp2-nav-item:hover { background: #f5f5f7; }
-      .cvp2-nav-active { border-radius: 10px; }
-      .cvp2-nav-num { width: 22px; height: 22px; border-radius: 50%; background: #f0f0f2; font-size: 11px; font-weight: 700; color: #515154; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; transition: background .15s, color .15s; }
-      .cvp2-nav-name { font-size: 12.5px; line-height: 1.35; font-weight: 500; }
-      .cvp2-main { display: flex; flex-direction: column; gap: 10px; }
-      .cvp2-header { border-top: 4px solid #ccc; border-radius: 16px; background: #f5f5f7; padding: 20px 22px; }
+      .cvp2-tabs-wrap { background: #fff; border: 1px solid rgba(0,0,0,0.08); border-radius: 16px; margin-bottom: 20px; overflow: hidden; }
+      .cvp2-tabs { display: flex; overflow-x: auto; scrollbar-width: none; gap: 0; }
+      .cvp2-tabs::-webkit-scrollbar { display: none; }
+      .cvp2-tab-item { display: flex; align-items: center; gap: 8px; flex-shrink: 0; padding: 14px 18px; background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; font: inherit; font-size: 13.5px; font-weight: 500; color: #86868b; text-align: left; transition: color .15s, border-color .15s; white-space: nowrap; }
+      .cvp2-tab-item:hover { color: #3c3c43; background: #f9f9f9; }
+      .cvp2-tab-active { font-weight: 600; }
+      .cvp2-tab-num { width: 20px; height: 20px; border-radius: 50%; background: #f0f0f2; font-size: 10.5px; font-weight: 700; color: #515154; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background .15s, color .15s; }
+      .cvp2-tab-name { line-height: 1.3; }
+      .cvp2-main { display: flex; flex-direction: column; gap: 14px; }
+      .cvp2-header { border-top: 4px solid #ccc; border-radius: 16px; background: #f5f5f7; padding: 24px 28px; }
       .cvp2-sp-num { font-size: 11px; font-weight: 700; color: #fff; border-radius: 980px; padding: 3px 10px; }
       .cvp2-estado { font-size: 11.5px; font-weight: 600; background: #fff3e0; color: #e65100; border-radius: 980px; padding: 3px 10px; }
       .cvp2-version { font-size: 11.5px; color: #86868b; font-weight: 500; }
-      .cvp2-title { font-size: 20px; font-weight: 700; letter-spacing: -0.015em; color: #1d1d1f; margin: 0; }
+      .cvp2-title { font-size: 22px; font-weight: 700; letter-spacing: -0.015em; color: #1d1d1f; margin: 0; }
       .cvp2-sec { background: #fff; border: 1px solid rgba(200,205,230,0.5); border-radius: 16px; overflow: hidden;
         box-shadow: 0 2px 10px rgba(100,110,180,0.06); }
-      .cvp2-sec-btn { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: none; border: none; cursor: pointer; font: inherit; font-size: 14px; font-weight: 600; color: #1d1d1f; text-align: left; }
+      .cvp2-sec-btn { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; background: none; border: none; cursor: pointer; font: inherit; font-size: 15px; font-weight: 600; color: #1d1d1f; text-align: left; }
       .cvp2-sec-btn:hover { background: #f9f9f9; }
-      .cvp2-sec-body { border-top: 1px solid rgba(0,0,0,0.06); padding: 16px 18px; }
-      .cvp2-proposito { font-size: 13.5px; color: #3c3c43; line-height: 1.6; margin: 0 0 14px; }
-      .cvp2-alcance-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-      .cvp2-alcance-item { font-size: 12.5px; color: #515154; line-height: 1.5; background: #f5f5f7; border-radius: 10px; padding: 10px 12px; }
-      .cvp2-alcance-item strong { display: block; color: #1d1d1f; font-size: 11.5px; margin-bottom: 3px; }
-      .cvp2-actores-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-      .cvp2-actor-card { background: #f9f9f9; border: 1px solid rgba(0,0,0,0.06); border-radius: 12px; padding: 12px 14px; }
-      .cvp2-actor-rol { font-size: 13px; font-weight: 600; color: #1d1d1f; margin-bottom: 2px; line-height: 1.3; }
-      .cvp2-actor-area { font-size: 11.5px; font-weight: 500; margin-bottom: 6px; }
-      .cvp2-actor-resp { font-size: 12px; color: #515154; line-height: 1.45; }
+      .cvp2-sec-body { border-top: 1px solid rgba(0,0,0,0.06); padding: 22px 24px; }
+      .cvp2-proposito { font-size: 14px; color: #3c3c43; line-height: 1.65; margin: 0 0 18px; }
+      .cvp2-alcance-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      .cvp2-alcance-item { font-size: 13px; color: #515154; line-height: 1.55; background: #f5f5f7; border-radius: 12px; padding: 14px 16px; }
+      .cvp2-alcance-item strong { display: block; color: #1d1d1f; font-size: 12px; margin-bottom: 4px; }
+      .cvp2-actores-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+      .cvp2-actor-card { background: #f9f9f9; border: 1px solid rgba(0,0,0,0.06); border-radius: 14px; padding: 16px 18px; }
+      .cvp2-actor-rol { font-size: 14px; font-weight: 600; color: #1d1d1f; margin-bottom: 3px; line-height: 1.3; }
+      .cvp2-actor-area { font-size: 12px; font-weight: 500; margin-bottom: 8px; }
+      .cvp2-actor-resp { font-size: 12.5px; color: #515154; line-height: 1.5; }
       .cvp2-raci-scroll { overflow-x: auto; }
-      .cvp2-raci-tbl { width: 100%; border-collapse: collapse; font-size: 12.5px; }
-      .cvp2-raci-tbl th { background: #f5f5f7; font-weight: 600; padding: 9px 12px; text-align: left; border-bottom: 1px solid rgba(0,0,0,0.08); white-space: nowrap; font-size: 12px; }
-      .cvp2-raci-tbl td { padding: 8px 12px; border-bottom: 1px solid rgba(0,0,0,0.05); text-align: center; font-weight: 700; font-size: 12px; min-width: 44px; }
-      .cvp2-raci-tbl td:first-child { text-align: left; font-weight: 400; color: #3c3c43; min-width: 200px; }
+      .cvp2-raci-tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+      .cvp2-raci-tbl th { background: #f5f5f7; font-weight: 600; padding: 11px 14px; text-align: left; border-bottom: 1px solid rgba(0,0,0,0.08); white-space: nowrap; font-size: 12.5px; }
+      .cvp2-raci-tbl td { padding: 10px 14px; border-bottom: 1px solid rgba(0,0,0,0.05); text-align: center; font-weight: 700; font-size: 13px; min-width: 50px; }
+      .cvp2-raci-tbl td:first-child { text-align: left; font-weight: 400; color: #3c3c43; min-width: 220px; }
       .cvp2-raci-tbl tr:last-child td { border-bottom: none; }
       .cvp2-r { color: #1d1d1f !important; background: #f0f0f2; }
       .cvp2-a { color: #5b8dee !important; }
       .cvp2-c { color: #515154 !important; }
       .cvp2-i { color: #aeaeb2 !important; }
-      .cvp2-raci-legend { font-size: 11.5px; color: #86868b; margin-top: 10px; }
-      .cvp2-fase { margin-bottom: 20px; }
+      .cvp2-raci-legend { font-size: 12px; color: #86868b; margin-top: 12px; }
+      .cvp2-fase { margin-bottom: 28px; }
       .cvp2-fase:last-child { margin-bottom: 0; }
-      .cvp2-fase-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #515154; border-left: 3px solid; padding-left: 10px; margin-bottom: 10px; }
-      .cvp2-pasos-list { display: flex; flex-direction: column; gap: 8px; }
-      .cvp2-paso { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; background: #f9f9f9; border-radius: 10px; border: 1px solid rgba(0,0,0,0.05); }
+      .cvp2-fase-title { font-size: 12.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #515154; border-left: 3px solid; padding-left: 12px; margin-bottom: 14px; }
+      .cvp2-pasos-list { display: flex; flex-direction: column; gap: 10px; }
+      .cvp2-paso { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; background: #f9f9f9; border-radius: 12px; border: 1px solid rgba(0,0,0,0.05); }
       .cvp2-paso-decision { border-style: dashed; }
-      .cvp2-paso-n { width: 24px; height: 24px; border-radius: 50%; background: #e5e5ea; font-size: 11px; font-weight: 700; color: #515154; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; transition: background .15s; font-variant-numeric: tabular-nums; }
+      .cvp2-paso-n { width: 26px; height: 26px; border-radius: 50%; background: #e5e5ea; font-size: 11.5px; font-weight: 700; color: #515154; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; transition: background .15s; font-variant-numeric: tabular-nums; }
       .cvp2-paso-cont { flex: 1; }
-      .cvp2-paso-cont strong { display: block; font-size: 13px; font-weight: 600; color: #1d1d1f; margin-bottom: 2px; }
-      .cvp2-paso-cont span { display: block; font-size: 12px; color: #515154; line-height: 1.45; margin-bottom: 3px; }
-      .cvp2-paso-cont em { font-size: 11px; color: #86868b; font-style: normal; }
+      .cvp2-paso-cont strong { display: block; font-size: 13.5px; font-weight: 600; color: #1d1d1f; margin-bottom: 3px; }
+      .cvp2-paso-cont span { display: block; font-size: 12.5px; color: #515154; line-height: 1.5; margin-bottom: 4px; }
+      .cvp2-paso-cont em { font-size: 11.5px; color: #86868b; font-style: normal; }
       .cvp2-decision-tag { font-size: 11px; font-weight: 600; border-radius: 980px; padding: 3px 9px; flex-shrink: 0; white-space: nowrap; margin-top: 2px; }
       @media (max-width: 900px) {
-        .cvp2-layout { grid-template-columns: 1fr; }
-        .cvp2-nav { position: static; display: flex; flex-wrap: wrap; gap: 6px; }
-        .cvp2-nav-item { flex: 1; min-width: 140px; }
         .cvp2-alcance-grid { grid-template-columns: 1fr; }
         .cvp2-actores-grid { grid-template-columns: 1fr 1fr; }
       }
