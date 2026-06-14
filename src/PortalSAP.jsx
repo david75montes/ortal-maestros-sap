@@ -1273,8 +1273,8 @@ function VistaInicio({ perfil, setVista }) {
 
       <div className="inicio-logos">
         <img src="/logo-ap.png"     alt="Arcoprime"   className="inicio-logo" />
-        <img src="/logo-pronto.png" alt="Pronto"      className="inicio-logo" />
-        <img src="/logo-jv.png"     alt="Juan Valdez" className="inicio-logo" />
+        <img src="/logo-pronto.png" alt="Pronto"      className="inicio-logo" style={{ height: 72 }} />
+        <img src="/logo-jv.png"     alt="Juan Valdez" className="inicio-logo" style={{ height: 72 }} />
         <img src="/logo-sb.svg"     alt="Sbarro"      className="inicio-logo" />
       </div>
 
