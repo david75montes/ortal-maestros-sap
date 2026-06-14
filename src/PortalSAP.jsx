@@ -17,10 +17,12 @@ const PROVEEDORES = {"100000000": "Comercial Puerto Chico Ltda", "100000001": "I
 
 
 /* Maestros vivos: parten con la muestra embebida y se reemplazan
-   al cargar el Excel maestro completo (hojas CENTROS, SKU, PROVEEDORES). */
+   al cargar el Excel maestro completo (hojas CENTROS, SKU, PROVEEDORES).
+   centros y skus almacenan objetos para soportar campos adicionales que
+   se auto-completan en las planillas (orgVenta, unidadVenta, etc.). */
 let MAESTROS = {
-  centros: { ...CENTROS },
-  skus: { ...SKUS },
+  centros: Object.fromEntries(Object.entries(CENTROS).map(([k, v]) => [k, { nombre: v, orgVenta: "BP01" }])),
+  skus: Object.fromEntries(Object.entries(SKUS).map(([k, v]) => [k, { nombre: v, unidadVenta: "UN", unidadCondicion: "UN" }])),
   proveedores: { ...PROVEEDORES },
 };
 
@@ -204,26 +206,31 @@ const PLANILLAS = [
     nombre: "Precio Venta",
     desc: "Actualiza precio y condiciones de venta por centro.",
     icon: Tag,
+    // Solo lo que el solicitante ingresa
     userCols: [
       { key: "centro", label: "Centro", hint: "2003,2549 o cluster", w: 150, multi: true, centro: true },
       { key: "sku", label: "SKU", hint: "32", w: 100, sku: true },
-      { key: "fechaInicio", label: "Fecha inicio", hint: "DD-MM-AAAA", w: 120, fecha: true },
+      { key: "fechaInicio", label: "Fecha inicio", hint: "DD-MM-AAAA", w: 120, fecha: true, def: hoy() },
       { key: "fechaFinal", label: "Fecha final", hint: "31-12-9999", w: 120, fecha: true, def: "31-12-9999" },
-      { key: "unidadVenta", label: "Unidad de venta", hint: "UN", w: 110 },
       { key: "precio", label: "Precio", hint: "1290", w: 100, num: true },
-      { key: "unidadCondicion", label: "Unidad de condicion", hint: "UN", w: 130 },
-      { key: "claseCondicion", label: "Clase de condicion", hint: "ZPVP", w: 130 },
-      { key: "orgVenta", label: "Organizacion de venta", hint: "BP01", w: 140 },
-      { key: "canal", label: "Canal de distribucion", hint: "02", w: 130 },
-      { key: "moneda", label: "Moneda", hint: "CLP", w: 90 },
+      { key: "moneda", label: "Moneda", hint: "CLP", w: 90, def: "CLP" },
     ],
+    // Auto-resueltos desde tablas maestras (visibles para ambos, solo lectura)
     autoCols: [
-      { key: "nombreCentro", label: "Nombre centro", src: "centro_nombre" },
-      { key: "descSku", label: "Descripcion SKU", src: "sku_desc" },
+      { key: "nombreCentro",    label: "Nombre centro",          src: "centro_nombre" },
+      { key: "descSku",         label: "Descripcion SKU",        src: "sku_desc" },
+      { key: "unidadVenta",     label: "Unidad de venta",        src: "sku_unidadVenta" },
+      { key: "unidadCondicion", label: "Unidad de condicion",    src: "sku_unidadCondicion" },
+      { key: "orgVenta",        label: "Organizacion de venta",  src: "centro_orgVenta" },
+    ],
+    // Valores fijos internos: no visibles para el solicitante, van en el Excel SAP
+    agentCols: [
+      { key: "canal",          label: "Canal de distribucion", def: "02" },
+      { key: "claseCondicion", label: "Clase de condicion",    def: "ZPVP" },
     ],
     salida: ["centro", "nombreCentro", "sku", "descSku", "fechaInicio", "fechaFinal", "unidadVenta", "precio", "unidadCondicion", "claseCondicion", "orgVenta", "canal", "moneda"],
     salidaLabels: ["Centro", "Nombre centro", "SKU", "Descripcion SKU", "Fecha inicio", "Fecha final", "Unidad de venta", "Precio", "Unidad de condicion", "Clase de condicion", "Organizacion de venta", "Canal de distribucion", "Moneda"],
-    ejemplo: { centro: "2003", sku: "32", fechaInicio: "01-07-2026", fechaFinal: "31-12-9999", unidadVenta: "UN", precio: "1290", unidadCondicion: "UN", claseCondicion: "ZPVP", orgVenta: "BP01", canal: "02", moneda: "CLP" },
+    ejemplo: { centro: "2003", sku: "32", fechaInicio: hoy(), fechaFinal: "31-12-9999", precio: "1290", moneda: "CLP" },
   },
   {
     id: "bloqueo",
@@ -431,10 +438,13 @@ const colKey = (planilla, flag) => planilla.userCols.find(c => c[flag])?.key;
 function resolverAuto(planilla, src, row) {
   const get = flag => { const k = colKey(planilla, flag); return k ? row[k] : null; };
   switch (src) {
-    case "centro_nombre": return MAESTROS.centros[code(get("centro"))] ?? null;
-    case "sku_desc": return MAESTROS.skus[code(get("sku"))] ?? null;
-    case "prov_nombre": return MAESTROS.proveedores[code(get("prov"))] ?? null;
-    case "status_signif": return STATUS_VALIDOS[norm(get("status")).toUpperCase()] ?? null;
+    case "centro_nombre":      return MAESTROS.centros[code(get("centro"))]?.nombre ?? null;
+    case "centro_orgVenta":    return MAESTROS.centros[code(get("centro"))]?.orgVenta ?? null;
+    case "sku_desc":           return MAESTROS.skus[code(get("sku"))]?.nombre ?? null;
+    case "sku_unidadVenta":    return MAESTROS.skus[code(get("sku"))]?.unidadVenta ?? null;
+    case "sku_unidadCondicion":return MAESTROS.skus[code(get("sku"))]?.unidadCondicion ?? null;
+    case "prov_nombre":        return MAESTROS.proveedores[code(get("prov"))] ?? null;
+    case "status_signif":      return STATUS_VALIDOS[norm(get("status")).toUpperCase()] ?? null;
     default: return null;
   }
 }
@@ -445,14 +455,14 @@ function validarFila(planilla, row) {
     const v = norm(row[c.key]);
     if (c.centro) {
       if (!v) { e.push("Centro vacío"); return; }
-      if (!MAESTROS.centros[code(v)]) e.push(/^\d+$/.test(code(v))
+      if (!MAESTROS.centros[code(v)]?.nombre) e.push(/^\d+$/.test(code(v))
         ? `Centro ${v} no existe en la base`
         : `Cluster o centro "${v}" no existe (revisa Gestor de locales)`);
       return;
     }
     if (c.sku) {
       if (!v) { e.push(`${c.label} vacío`); return; }
-      if (!MAESTROS.skus[code(v)]) e.push(`Material ${v} no está en el maestro`);
+      if (!MAESTROS.skus[code(v)]?.nombre) e.push(`Material ${v} no está en el maestro`);
       return;
     }
     if (!v && !c.opcional) { e.push(`${c.label} vacío`); return; }
@@ -488,7 +498,11 @@ function validarTodo(planilla, gridRows) {
       const errores = validarFila(planilla, row);
       const auto = {};
       planilla.autoCols.forEach(c => { auto[c.key] = resolverAuto(planilla, c.src, row) ?? "—"; });
-      filas.push({ gi, data: row, auto, errores, ok: errores.length === 0 });
+      const agent = {};
+      (planilla.agentCols ?? []).forEach(c => {
+        agent[c.key] = c.src ? (resolverAuto(planilla, c.src, row) ?? "—") : (c.def ?? "—");
+      });
+      filas.push({ gi, data: row, auto, agent, errores, ok: errores.length === 0 });
     });
   });
 
@@ -581,7 +595,7 @@ function importarExcel(planilla, workbook) {
 function exportarSalida(planilla, filas) {
   const headers = planilla.salidaLabels;
   const aoa = [headers];
-  filas.filter(f => f.ok).forEach(f => aoa.push(planilla.salida.map(k => f.data[k] ?? f.auto[k] ?? "")));
+  filas.filter(f => f.ok).forEach(f => aoa.push(planilla.salida.map(k => f.data[k] ?? f.auto[k] ?? f.agent?.[k] ?? "")));
   const ws = XLSX.utils.aoa_to_sheet(aoa);
   ws["!cols"] = headers.map(h => ({ wch: Math.max(h.length + 2, 14) }));
   const wb = XLSX.utils.book_new();
@@ -700,15 +714,15 @@ export default function PortalSAP() {
     (async () => {
       const [{ data: p }, { data: centros }, { data: skus }, { data: proveedores }] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", session.user.id).single(),
-        supabase.from("centros").select("codigo,nombre"),
-        supabase.from("skus").select("codigo,nombre"),
+        supabase.from("centros").select("codigo,nombre,org_venta"),
+        supabase.from("skus").select("codigo,nombre,unidad_venta,unidad_condicion"),
         supabase.from("proveedores").select("codigo,nombre"),
       ]);
       if (p) setPerfil(p);
       if (centros && skus && proveedores) {
         MAESTROS = {
-          centros: Object.fromEntries(centros.map(r => [r.codigo, r.nombre])),
-          skus: Object.fromEntries(skus.map(r => [r.codigo, r.nombre])),
+          centros: Object.fromEntries(centros.map(r => [r.codigo, { nombre: r.nombre, orgVenta: r.org_venta ?? "BP01" }])),
+          skus: Object.fromEntries(skus.map(r => [r.codigo, { nombre: r.nombre, unidadVenta: r.unidad_venta ?? "UN", unidadCondicion: r.unidad_condicion ?? "UN" }])),
           proveedores: Object.fromEntries(proveedores.map(r => [r.codigo, r.nombre])),
         };
         setMaestrosInfo({ centros: centros.length, skus: skus.length, proveedores: proveedores.length });
@@ -808,6 +822,7 @@ export default function PortalSAP() {
     reader.onload = ev => {
       try {
         const wb = XLSX.read(ev.target.result, { type: "array" });
+        // lee plano: codigo -> nombre (para proveedores)
         const lee = (hoja, kcol, vcol) => {
           const sh = wb.Sheets[hoja]; if (!sh) return null;
           const rows = XLSX.utils.sheet_to_json(sh, { header: 1, defval: "" });
@@ -818,7 +833,24 @@ export default function PortalSAP() {
           }
           return m;
         };
-        const c = lee("CENTROS", 0, 1), s = lee("SKU", 0, 3), p = lee("PROVEEDORES", 0, 1);
+        // lee objeto: codigo -> { nombre, ...extraCols } con fallback a defaults
+        const leeObj = (hoja, kcol, vcol, extras) => {
+          const sh = wb.Sheets[hoja]; if (!sh) return null;
+          const rows = XLSX.utils.sheet_to_json(sh, { header: 1, defval: "" });
+          const m = {};
+          for (let i = 1; i < rows.length; i++) {
+            const k = code(rows[i][kcol]); const v = norm(rows[i][vcol]);
+            if (!k) continue;
+            const obj = { nombre: v };
+            extras.forEach(({ key, col, def }) => { obj[key] = norm(rows[i][col]) || def; });
+            m[k] = obj;
+          }
+          return m;
+        };
+        // CENTROS col 2 = org_venta | SKU col 4 = unidad_venta, col 5 = unidad_condicion
+        const c = leeObj("CENTROS", 0, 1, [{ key: "orgVenta", col: 2, def: "BP01" }]);
+        const s = leeObj("SKU", 0, 3, [{ key: "unidadVenta", col: 4, def: "UN" }, { key: "unidadCondicion", col: 5, def: "UN" }]);
+        const p = lee("PROVEEDORES", 0, 1);
         if (!c || !s || !p) { setMaestrosInfo({ error: "El archivo no tiene las hojas CENTROS, SKU y PROVEEDORES." }); return; }
         MAESTROS = { centros: c, skus: s, proveedores: p };
         setMaestrosInfo({ centros: Object.keys(c).length, skus: Object.keys(s).length, proveedores: Object.keys(p).length });
@@ -863,8 +895,7 @@ export default function PortalSAP() {
   /* ---------- ÉXITO ---------- */
   if (enviado) {
     return (
-      <div className="portal">
-        <Estilos /><NavBar info={maestrosInfo} vista={vista} setVista={v => { reiniciar(); setVista(v); }} perfil={perfil} />
+      <AppShell vista={vista} setVista={v => { reiniciar(); setVista(v); }} perfil={perfil}>
         <main className="success-wrap">
           <div className="success-check"><CheckCircle2 size={64} strokeWidth={1.3} /></div>
           <h1 className="success-title">Solicitud enviada.</h1>
@@ -886,7 +917,7 @@ export default function PortalSAP() {
             <button className="btn-primary" onClick={reiniciar}><RotateCcw size={16} /> Nueva solicitud</button>
           </div>
         </main>
-      </div>
+      </AppShell>
     );
   }
 
@@ -901,90 +932,26 @@ export default function PortalSAP() {
     return <div className="portal"><Estilos /><VistaCrearContrasena onDone={() => setAuthFlow(null)} /></div>;
   }
 
-  /* ---------- VISTA ADMIN ---------- */
-  if (vista === "admin") {
-    return (
-      <div className="portal">
-        <Estilos /><NavBar info={maestrosInfo} vista={vista} setVista={setVista} perfil={perfil} />
-        <VistaAdmin />
-      </div>
-    );
-  }
+  /* ---------- VISTAS SECUNDARIAS ---------- */
+  if (vista === "maestros")    return <AppShell vista={vista} setVista={setVista} perfil={perfil}><VistaMaestros /></AppShell>;
+  if (vista === "admin")       return <AppShell vista={vista} setVista={setVista} perfil={perfil}><VistaAdmin /></AppShell>;
+  if (vista === "solicitudes") return <AppShell vista={vista} setVista={setVista} perfil={perfil}><VistaSolicitudes /></AppShell>;
+  if (vista === "clusters")    return <AppShell vista={vista} setVista={setVista} perfil={perfil}><VistaClusters clusters={clusters} onChange={actualizarClusters} /></AppShell>;
+  if (vista === "ayuda")       return <AppShell vista={vista} setVista={setVista} perfil={perfil}><VistaAyuda /></AppShell>;
+  if (vista === "cvp")         return <AppShell vista={vista} setVista={setVista} perfil={perfil}><VistaCVP /></AppShell>;
 
-  /* ---------- VISTA SOLICITUDES ---------- */
-  if (vista === "solicitudes") {
-    return (
-      <div className="portal">
-        <Estilos /><NavBar info={maestrosInfo} vista={vista} setVista={setVista} perfil={perfil} />
-        <VistaSolicitudes />
-      </div>
-    );
-  }
-
-  /* ---------- VISTA GESTOR DE LOCALES / CLUSTERS ---------- */
-  if (vista === "clusters") {
-    return (
-      <div className="portal">
-        <Estilos /><NavBar info={maestrosInfo} vista={vista} setVista={setVista} perfil={perfil} />
-        <VistaClusters clusters={clusters} onChange={actualizarClusters} />
-      </div>
-    );
-  }
-
-  /* ---------- VISTA CENTRO DE AYUDA ---------- */
-  if (vista === "ayuda") {
-    return (
-      <div className="portal">
-        <Estilos /><NavBar info={maestrosInfo} vista={vista} setVista={setVista} perfil={perfil} />
-        <VistaAyuda />
-      </div>
-    );
-  }
-
-  if (vista === "cvp") {
-    return (
-      <div className="portal">
-        <Estilos /><NavBar info={maestrosInfo} vista={vista} setVista={setVista} perfil={perfil} />
-        <VistaCVP />
-      </div>
-    );
-  }
+  /* ---------- NUEVA SOLICITUD ---------- */
+  const panelDerecho = (
+    <PanelValidacion
+      plSel={plSel} totales={totales} totalOk={totalOk} totalErr={totalErr}
+      todoValidado={todoValidado} puedeEnviar={puedeEnviar}
+      solicitante={solicitante} setSolicitante={setSolicitante}
+      enviar={enviar} estado={estado}
+    />
+  );
 
   return (
-    <div className="portal">
-      <Estilos /><NavBar info={maestrosInfo} vista={vista} setVista={setVista} perfil={perfil} />
-
-      <header className="hero">
-        <div className="hero-eyebrow"><Sparkles size={14} /> Solicitudes de Datos Maestros · SAP</div>
-        <h1 className="hero-title">Ingresa los datos.<br /><span className="hero-grad">Nosotros los validamos.</span></h1>
-        <p className="hero-sub">Escribe directamente en la grilla o importa tu planilla Excel. Al enviar a validación cruzamos cada fila contra las bases de centros, SKU y proveedores, y te devolvemos los errores para corregir al instante.</p>
-      </header>
-
-      {/* MAESTROS — solo visible para datos_maestros */}
-      {perfil?.rol === "datos_maestros" && <section className="seccion">
-        <div className={"maestro-card" + (maestrosInfo && !maestrosInfo.error ? " full" : "")}>
-          <button className="maestro-head" onClick={() => setMaestroOpen(o => !o)}>
-            <span className="maestro-ic"><Database size={18} /></span>
-            <div className="maestro-txt">
-              <strong>Bases de datos maestras</strong>
-              <span>
-                {maestrosInfo && !maestrosInfo.error
-                  ? `Cargadas: ${maestrosInfo.centros} centros · ${maestrosInfo.skus.toLocaleString("es-CL")} SKU · ${maestrosInfo.proveedores.toLocaleString("es-CL")} proveedores`
-                  : `Muestra demo: ${Object.keys(CENTROS).length} centros · ${Object.keys(SKUS).length} SKU · ${Object.keys(PROVEEDORES).length} proveedores. Carga el Excel maestro para validar contra la base completa.`}
-              </span>
-            </div>
-            {maestroOpen ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
-          </button>
-          {maestroOpen && (
-            <div className="maestro-body">
-              <p>Sube el Excel con las hojas <strong>CENTROS</strong>, <strong>SKU</strong> y <strong>PROVEEDORES</strong>. Las validaciones se harán contra esa base.</p>
-              <input type="file" accept=".xlsx,.xls" hidden ref={maestroInput} onChange={e => { cargarMaestro(e.target.files[0]); e.target.value = ""; }} />
-              <button className="btn-soft" onClick={() => maestroInput.current?.click()}><Upload size={15} /> Cargar Excel maestro</button>
-              {maestrosInfo?.error && <span className="maestro-err"><AlertTriangle size={14} /> {maestrosInfo.error}</span>}
-            </div>
-          )}
-        </div>
-      </section>}
+    <AppShell vista={vista} setVista={setVista} perfil={perfil} rightPanel={panelDerecho}>
 
       {/* GUÍA DE SOLICITUDES */}
       <section className="seccion">
@@ -993,7 +960,7 @@ export default function PortalSAP() {
 
       {/* PASO 1 */}
       <section className="seccion" id="paso-seleccion">
-        <Paso n="1" t="Selecciona los cambios" s="Puedes elegir uno o varios tipos de solicitud, o dejar que la guía los marque por ti." />
+        <Paso n="1" t="Selecciona los cambios" s="Elige uno o varios tipos de solicitud, o usa la guía para que los marque por ti." />
         <div className="grid-tipos">
           {PLANILLAS.map(p => {
             const activo = seleccion.includes(p.id);
@@ -1011,16 +978,14 @@ export default function PortalSAP() {
         </div>
       </section>
 
-      {/* PASO 2: ingreso + validación por planilla */}
+      {/* PASO 2 */}
       {plSel.length > 0 && (
         <section className="seccion fade-in">
           <Paso n="2" t="Ingresa los datos y envía a validar" s="Escribe en la grilla o importa el Excel. Los nombres y descripciones se completan al validar." />
           <div className="zona-cargas">
             {plSel.map(p => (
               <BloquePlanilla
-                key={p.id}
-                planilla={p}
-                est={estado[p.id]}
+                key={p.id} planilla={p} est={estado[p.id]}
                 onEdit={(ri, k, v) => editCell(p.id, ri, k, v)}
                 onAdd={() => addRow(p.id, p)}
                 onDup={ri => dupRow(p.id, ri)}
@@ -1036,37 +1001,8 @@ export default function PortalSAP() {
         </section>
       )}
 
-      {/* PASO 3: envío */}
-      {plSel.length > 0 && (
-        <section className="seccion fade-in">
-          <div className="barra-envio">
-            <div className="barra-stats">
-              <span className="stat ok"><CheckCircle2 size={16} /> {totalOk} válidas</span>
-              {totalErr > 0 && <span className="stat err"><XCircle size={16} /> {totalErr} con error</span>}
-            </div>
-            <div className="barra-msg">
-              {!todoValidado ? "Envía cada planilla a validación para habilitar el envío."
-                : totalErr > 0 ? "Corrige las filas con error y vuelve a validar."
-                : norm(solicitante).length < 3 ? "Escribe tu nombre para registrar la solicitud."
-                : "Todo validado contra los maestros. Listo para enviar."}
-            </div>
-            <div className="barra-solicitante">
-              <User size={15} />
-              <input
-                className="inp-solicitante"
-                value={solicitante}
-                placeholder="Nombre del solicitante"
-                onChange={e => setSolicitante(e.target.value)}
-                aria-label="Nombre del solicitante"
-              />
-            </div>
-            <button className="btn-primary" disabled={!puedeEnviar} onClick={enviar}>Enviar solicitud <ArrowRight size={16} /></button>
-          </div>
-        </section>
-      )}
-
       <footer className="pie">Gestión de Datos Maestros · Las solicitudes validadas se procesan en el siguiente ciclo de carga en SAP.</footer>
-    </div>
+    </AppShell>
   );
 }
 
@@ -2346,8 +2282,8 @@ function VistaClusters({ clusters, onChange }) {
       .filter((v, i, a) => a.indexOf(v) === i);
   }, [pegado]);
   const linea = codigos.join(",");
-  const validos = codigos.filter(c => MAESTROS.centros[c]);
-  const invalidos = codigos.filter(c => !MAESTROS.centros[c]);
+  const validos = codigos.filter(c => MAESTROS.centros[c]?.nombre);
+  const invalidos = codigos.filter(c => !MAESTROS.centros[c]?.nombre);
 
   const copiar = async () => {
     try { await navigator.clipboard.writeText(linea); }
@@ -2364,7 +2300,7 @@ function VistaClusters({ clusters, onChange }) {
     () => listaCluster.split(",").map(code).filter(Boolean).filter((v, i, a) => a.indexOf(v) === i),
     [listaCluster]
   );
-  const invalidosForm = centrosForm.filter(c => !MAESTROS.centros[c]);
+  const invalidosForm = centrosForm.filter(c => !MAESTROS.centros[c]?.nombre);
 
   const guardarCluster = () => {
     const n = norm(nombre);
@@ -2456,7 +2392,7 @@ function VistaClusters({ clusters, onChange }) {
             <div className="clu-lista">
               {nombres.map(n => {
                 const cs = clusters[n];
-                const malos = cs.filter(c => !MAESTROS.centros[code(c)]).length;
+                const malos = cs.filter(c => !MAESTROS.centros[code(c)]?.nombre).length;
                 return (
                   <div key={n} className="clu-item">
                     <div className="clu-item-info">
@@ -2487,6 +2423,227 @@ function VistaClusters({ clusters, onChange }) {
 /* ============================================================
    VISTA ADMIN: gestión de usuarios y roles
    ============================================================ */
+/* ============================================================
+   VISTA MAESTROS: mantenedor de tablas maestras por tabla
+   ============================================================ */
+const TABLAS_CONFIG = [
+  {
+    id: "centros",
+    nombre: "Centros",
+    desc: "Locales con organización de ventas. Columnas esperadas: Codigo centro, Nombre centro, Sociedad.",
+    icon: Database,
+    tabla: "centros",
+    conflicto: "codigo",
+    columnas: [
+      { key: "codigo",    label: "Codigo centro",  col: 0, req: true },
+      { key: "nombre",    label: "Nombre centro",   col: 1, req: true },
+      { key: "org_venta", label: "Sociedad",        col: 2, req: false, def: "BP01" },
+    ],
+    templateEjemplo: [["2003", "Pronto Pargua", "BP01"], ["2549", "Pronto Rosario Norte", "BP01"]],
+  },
+  {
+    id: "skus",
+    nombre: "SKUs",
+    desc: "Materiales con unidad de venta y condición. Columnas esperadas: Codigo, Nombre, Unidad Venta, Unidad Condicion.",
+    icon: Boxes,
+    tabla: "skus",
+    conflicto: "codigo",
+    columnas: [
+      { key: "codigo",           label: "Codigo",          col: 0, req: true },
+      { key: "nombre",           label: "Nombre",          col: 1, req: true },
+      { key: "unidad_venta",     label: "Unidad Venta",    col: 2, req: false, def: "UN" },
+      { key: "unidad_condicion", label: "Unidad Condicion",col: 3, req: false, def: "UN" },
+    ],
+    templateEjemplo: [["32", "COCA-COLA ZERO 250C", "UN", "UN"], ["145873", "MATERIAL EJEMPLO", "CJ", "UN"]],
+  },
+  {
+    id: "proveedores",
+    nombre: "Proveedores",
+    desc: "Proveedores registrados en SAP. Columnas esperadas: Codigo, Nombre.",
+    icon: Truck,
+    tabla: "proveedores",
+    conflicto: "codigo",
+    columnas: [
+      { key: "codigo", label: "Codigo", col: 0, req: true },
+      { key: "nombre", label: "Nombre", col: 1, req: true },
+    ],
+    templateEjemplo: [["100000000", "Comercial Puerto Chico Ltda"], ["100000108", "Embotelladora Andina S.A"]],
+  },
+];
+
+function VistaMaestros() {
+  const [tabActiva, setTabActiva] = useState("centros");
+  const fileRefs = { centros: useRef(), skus: useRef(), proveedores: useRef() };
+  const [previews, setPreviews] = useState({});
+  const [subiendo, setSubiendo] = useState({});
+  const [resultado, setResultado] = useState({});
+
+  const leerExcel = (cfg, file) => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const wb = XLSX.read(ev.target.result, { type: "array" });
+        const sh = wb.Sheets[wb.SheetNames[0]];
+        const rawRows = XLSX.utils.sheet_to_json(sh, { header: 1, defval: "" });
+        if (rawRows.length < 2) {
+          setPreviews(p => ({ ...p, [cfg.id]: { error: "El archivo no contiene datos.", fileName: file.name } }));
+          return;
+        }
+        const rows = [];
+        for (let i = 1; i < rawRows.length; i++) {
+          const raw = rawRows[i];
+          const r = {};
+          cfg.columnas.forEach(c => { r[c.key] = norm(raw[c.col]) || c.def || ""; });
+          // ignorar filas completamente vacías
+          if (cfg.columnas.filter(c => c.req).every(c => !r[c.key])) continue;
+          const errs = cfg.columnas.filter(c => c.req && !r[c.key]).map(c => `${c.label} vacío`);
+          rows.push({ data: r, errores: errs, ok: errs.length === 0 });
+        }
+        setPreviews(p => ({ ...p, [cfg.id]: { rows, fileName: file.name } }));
+        setResultado(r => ({ ...r, [cfg.id]: null }));
+      } catch {
+        setPreviews(p => ({ ...p, [cfg.id]: { error: "No se pudo leer el archivo.", fileName: file.name } }));
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  };
+
+  const subirTabla = async (cfg) => {
+    const prev = previews[cfg.id];
+    if (!prev?.rows) return;
+    const filas_ok = prev.rows.filter(r => r.ok);
+    if (!filas_ok.length) return;
+    setSubiendo(s => ({ ...s, [cfg.id]: true }));
+    const { error } = await supabase.from(cfg.tabla).upsert(filas_ok.map(r => r.data), { onConflict: cfg.conflicto });
+    setSubiendo(s => ({ ...s, [cfg.id]: false }));
+    if (error) {
+      setResultado(r => ({ ...r, [cfg.id]: { tipo: "error", texto: error.message } }));
+    } else {
+      setResultado(r => ({ ...r, [cfg.id]: { tipo: "ok", texto: `${filas_ok.length} registros actualizados. Recarga el portal para usar la nueva base.` } }));
+      setPreviews(p => ({ ...p, [cfg.id]: null }));
+    }
+  };
+
+  const descargarPlantilla = (cfg) => {
+    const headers = cfg.columnas.map(c => c.label);
+    const aoa = [headers, ...cfg.templateEjemplo];
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+    ws["!cols"] = headers.map(h => ({ wch: Math.max(h.length + 4, 16) }));
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, cfg.nombre);
+    XLSX.writeFile(wb, `plantilla_${cfg.id}.xlsx`);
+  };
+
+  const cfg = TABLAS_CONFIG.find(t => t.id === tabActiva);
+  const prev = previews[tabActiva];
+  const res = resultado[tabActiva];
+  const filasOk = prev?.rows?.filter(r => r.ok).length ?? 0;
+  const filasErr = prev?.rows?.filter(r => !r.ok).length ?? 0;
+
+  return (
+    <main className="sol-wrap">
+      <div className="sol-head">
+        <div>
+          <h1 className="sol-title">Bases de Datos Maestras</h1>
+          <p className="sol-sub">Actualiza cada tabla de forma independiente subiendo un Excel. Los registros existentes se actualizan, los nuevos se agregan.</p>
+        </div>
+      </div>
+
+      {/* Tabs de tablas */}
+      <div className="mto-tabs">
+        {TABLAS_CONFIG.map(t => {
+          const Icon = t.icon;
+          return (
+            <button key={t.id} className={"mto-tab" + (tabActiva === t.id ? " on" : "")} onClick={() => setTabActiva(t.id)}>
+              <Icon size={16} /> {t.nombre}
+              {previews[t.id]?.rows && (
+                <span className={"mto-badge " + (previews[t.id].rows.some(r => !r.ok) ? "err" : "ok")}>
+                  {previews[t.id].rows.length}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Panel activo */}
+      <div className="mto-panel">
+        <p className="mto-desc">{cfg.desc}</p>
+
+        {/* Acciones */}
+        <div className="mto-actions">
+          <button className="btn-soft" onClick={() => descargarPlantilla(cfg)}>
+            <Download size={15} /> Descargar plantilla
+          </button>
+          <input type="file" accept=".xlsx,.xls" hidden ref={fileRefs[cfg.id]}
+            onChange={e => { leerExcel(cfg, e.target.files[0]); e.target.value = ""; }} />
+          <button className="btn-validar" onClick={() => fileRefs[cfg.id].current?.click()}>
+            <Upload size={15} /> Subir Excel
+          </button>
+        </div>
+
+        {/* Error de lectura */}
+        {prev?.error && (
+          <div className="mto-msg err"><XCircle size={15} /> {prev.error}</div>
+        )}
+
+        {/* Preview */}
+        {prev?.rows && (
+          <>
+            <div className="mto-summary">
+              <span className="mto-file"><strong>{prev.fileName}</strong></span>
+              <span className="mto-cnt ok"><CheckCircle2 size={14} /> {filasOk} válidas</span>
+              {filasErr > 0 && <span className="mto-cnt err"><XCircle size={14} /> {filasErr} con errores</span>}
+            </div>
+
+            <div className="mto-table-wrap">
+              <table className="mto-table">
+                <thead>
+                  <tr>
+                    <th></th>
+                    {cfg.columnas.map(c => <th key={c.key}>{c.label}</th>)}
+                    <th>Observaciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {prev.rows.slice(0, 50).map((r, i) => (
+                    <tr key={i} className={r.ok ? "" : "fila-err"}>
+                      <td>{r.ok ? <CheckCircle2 size={14} color="#248a3d" /> : <XCircle size={14} color="#c2271c" />}</td>
+                      {cfg.columnas.map(c => <td key={c.key}>{r.data[c.key] || <span className="mto-vacio">—</span>}</td>)}
+                      <td>{r.errores.join(", ") || ""}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {prev.rows.length > 50 && (
+                <p className="mto-mas">Mostrando primeras 50 filas de {prev.rows.length} total.</p>
+              )}
+            </div>
+
+            <div className="mto-actions" style={{ marginTop: 16 }}>
+              <button
+                className="btn-enviar"
+                disabled={filasOk === 0 || subiendo[cfg.id]}
+                onClick={() => subirTabla(cfg)}
+              >
+                {subiendo[cfg.id] ? "Actualizando..." : `Confirmar y actualizar ${filasOk} registros en Supabase`}
+              </button>
+            </div>
+          </>
+        )}
+
+        {/* Resultado de subida */}
+        {res && (
+          <div className={"mto-msg " + res.tipo}>
+            {res.tipo === "ok" ? <CheckCircle2 size={15} /> : <XCircle size={15} />} {res.texto}
+          </div>
+        )}
+      </div>
+    </main>
+  );
+}
+
 function VistaAdmin() {
   const [usuarios, setUsuarios] = useState([]);
   const [cargando, setCargando] = useState(true);
@@ -2754,6 +2911,167 @@ function VistaCrearContrasena({ onDone }) {
   );
 }
 
+/* ============================================================
+   SHELL DE APLICACIÓN: sidebar + contenido + panel derecho
+   ============================================================ */
+function AppShell({ vista, setVista, perfil, children, rightPanel }) {
+  return (
+    <div className={"shell" + (rightPanel ? " shell-has-right" : "")}>
+      <Estilos />
+      <Sidebar vista={vista} setVista={setVista} perfil={perfil} />
+      <div className="shell-body">
+        <main className="shell-content">{children}</main>
+        {rightPanel && <aside className="shell-right">{rightPanel}</aside>}
+      </div>
+    </div>
+  );
+}
+
+function Sidebar({ vista, setVista, perfil }) {
+  const [menuAbierto, setMenuAbierto] = useState(false);
+  const cerrarSesion = async () => { await supabase.auth.signOut(); };
+  const esDDMM = perfil?.rol === "datos_maestros";
+
+  const TABS = [
+    { id: "nueva",       label: "Nueva solicitud",  icon: Plus },
+    { id: "solicitudes", label: "Solicitudes",       icon: Inbox },
+    { id: "clusters",    label: "Gestor de locales", icon: Boxes },
+    { id: "cvp",         label: "Ciclo de Vida",     icon: Layers },
+    { id: "ayuda",       label: "Centro de Ayuda",   icon: Lightbulb },
+    ...(esDDMM ? [
+      { id: "maestros", label: "Bases Maestras", icon: Database },
+      { id: "admin",    label: "Admin",           icon: ShieldCheck },
+    ] : []),
+  ];
+
+  const navegarA = id => { setVista(id); setMenuAbierto(false); };
+
+  return (
+    <>
+      {/* Desktop sidebar */}
+      <aside className="sidebar">
+        <div className="sidebar-logo">◆ Maestros SAP</div>
+        <nav className="sidebar-nav">
+          {TABS.map(t => {
+            const Icon = t.icon;
+            return (
+              <button key={t.id} className={"sidebar-item" + (vista === t.id ? " on" : "")} onClick={() => navegarA(t.id)}>
+                <Icon size={16} strokeWidth={1.8} /><span>{t.label}</span>
+              </button>
+            );
+          })}
+        </nav>
+        <div className="sidebar-footer">
+          {perfil && <div className="sidebar-user">{perfil.nombre}</div>}
+          <button className="sidebar-logout" onClick={cerrarSesion}>Cerrar sesión</button>
+        </div>
+      </aside>
+
+      {/* Mobile top bar */}
+      <div className="topbar-mobile">
+        <span className="nav-logo">◆ Maestros SAP</span>
+        <button className="nav-hamburger" onClick={() => setMenuAbierto(o => !o)} aria-label="Menú">
+          {menuAbierto ? <X size={20} /> : <Menu size={20} />}
+        </button>
+      </div>
+
+      {/* Mobile overlay */}
+      {menuAbierto && (
+        <div className="nav-mobile-overlay" onClick={() => setMenuAbierto(false)}>
+          <div className="nav-mobile-menu" onClick={e => e.stopPropagation()}>
+            {perfil && <div className="nav-mobile-user">{perfil.nombre}</div>}
+            {TABS.map(t => (
+              <button key={t.id} className={"nav-mobile-item" + (vista === t.id ? " on" : "")} onClick={() => navegarA(t.id)}>
+                {t.label}
+              </button>
+            ))}
+            <button className="nav-mobile-salir" onClick={cerrarSesion}>Cerrar sesión</button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+function PanelValidacion({ plSel, totales, totalOk, totalErr, todoValidado, puedeEnviar, solicitante, setSolicitante, enviar, estado }) {
+  if (plSel.length === 0) {
+    return (
+      <div className="panel-vacio">
+        <ShieldCheck size={38} strokeWidth={1.2} color="#b0b0b5" />
+        <p>Selecciona un tipo de solicitud para comenzar</p>
+      </div>
+    );
+  }
+
+  const totalFilas = totales.reduce((a, t) => a + t.ok + t.err, 0);
+
+  return (
+    <div className="panel-val">
+      <h2 className="panel-titulo"><ShieldCheck size={17} /> Validación</h2>
+
+      {totalFilas > 0 && (
+        <div className="panel-progreso">
+          <span className="panel-prog-txt">{totalOk} de {totalFilas} filas válidas</span>
+          <div className="panel-bar">
+            <div className="panel-bar-fill" style={{ width: `${Math.round(totalOk / totalFilas * 100)}%`, background: totalErr > 0 ? "#ff9500" : "#34c759" }} />
+          </div>
+          {totalErr > 0 && <span className="panel-badge-err"><XCircle size={12} /> {totalErr} con error</span>}
+        </div>
+      )}
+
+      {!todoValidado && (
+        <div className="panel-lista">
+          {plSel.map(p => {
+            const t = totales.find(x => x.id === p.id);
+            return (
+              <div key={p.id} className={"panel-item" + (t?.validado ? (t.err > 0 ? " item-err" : " item-ok") : "")}>
+                <p.icon size={14} /><span>{p.nombre}</span>
+                <span className="panel-item-tag">
+                  {!t?.validado ? "Pendiente" : t.err > 0 ? `${t.err} errores` : `${t.ok} OK`}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {todoValidado && totalErr > 0 && (
+        <div className="panel-errores">
+          {plSel.flatMap(p => {
+            const res = estado[p.id]?.resultado;
+            if (!res) return [];
+            return res.filas.filter(f => !f.ok).slice(0, 4).map((f, i) => (
+              <div key={p.id + i} className="panel-err-item">
+                <span className="panel-err-dot" />
+                <div>
+                  <div><strong>Fila {f.gi + 1}</strong> · {p.nombre}</div>
+                  <div className="panel-err-txt">{f.errores[0]}</div>
+                </div>
+              </div>
+            ));
+          })}
+        </div>
+      )}
+
+      <div className="panel-footer">
+        <div className="panel-sol-row">
+          <User size={14} />
+          <input className="inp-solicitante" style={{ flex: 1 }} value={solicitante} onChange={e => setSolicitante(e.target.value)} placeholder="Tu nombre completo" />
+        </div>
+        <p className="panel-hint">
+          {!todoValidado ? "Valida cada planilla para continuar"
+            : totalErr > 0 ? "Corrige los errores y vuelve a validar"
+            : norm(solicitante).length < 3 ? "Escribe tu nombre para registrar"
+            : "Todo listo. Revisa y envía."}
+        </p>
+        <button className="btn-primary" style={{ width: "100%" }} disabled={!puedeEnviar} onClick={enviar}>
+          Enviar solicitud <ArrowRight size={16} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function NavBar({ info, vista, setVista, perfil }) {
   const [menuAbierto, setMenuAbierto] = useState(false);
   const cerrarSesion = async () => { await supabase.auth.signOut(); };
@@ -2765,7 +3083,7 @@ function NavBar({ info, vista, setVista, perfil }) {
     { id: "clusters", label: "Gestor de locales" },
     { id: "cvp", label: "Ciclo de Vida" },
     { id: "ayuda", label: "Centro de Ayuda" },
-    ...(esDDMM ? [{ id: "admin", label: "Admin" }] : []),
+    ...(esDDMM ? [{ id: "maestros", label: "Bases Maestras" }, { id: "admin", label: "Admin" }] : []),
   ];
 
   const navegarA = (id) => { setVista(id); setMenuAbierto(false); };
@@ -2949,6 +3267,77 @@ function Estilos() {
       .portal { min-height: 100vh; background: #e4e7f1; color: #1d1d1f;
         font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Segoe UI", sans-serif;
         -webkit-font-smoothing: antialiased; }
+
+      /* ── Shell layout ── */
+      .shell { display: flex; min-height: 100vh; background: #f0f2f8;
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Segoe UI", sans-serif;
+        -webkit-font-smoothing: antialiased; color: #1d1d1f; }
+      .shell-body { flex: 1; display: flex; min-width: 0; }
+      .shell-content { flex: 1; min-width: 0; overflow: hidden; padding: 32px 28px; }
+      .shell-right { width: 300px; flex-shrink: 0; border-left: 1px solid rgba(0,0,0,0.07);
+        background: #fff; position: sticky; top: 0; height: 100vh; overflow-y: auto;
+        display: flex; flex-direction: column; }
+
+      /* ── Sidebar ── */
+      .sidebar { width: 230px; flex-shrink: 0; background: #1a1a2e; color: #fff;
+        display: flex; flex-direction: column; padding: 0; position: sticky; top: 0;
+        height: 100vh; overflow-y: auto; }
+      .sidebar-logo { font-weight: 700; font-size: 15px; letter-spacing: -0.02em;
+        padding: 24px 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+      .sidebar-nav { flex: 1; padding: 12px 10px; display: flex; flex-direction: column; gap: 2px; }
+      .sidebar-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+        border-radius: 10px; border: none; background: none; color: rgba(255,255,255,0.6);
+        font: inherit; font-size: 13.5px; font-weight: 500; cursor: pointer; text-align: left;
+        width: 100%; transition: all .15s; }
+      .sidebar-item:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.9); }
+      .sidebar-item.on { background: rgba(255,255,255,0.13); color: #fff; font-weight: 600; }
+      .sidebar-footer { border-top: 1px solid rgba(255,255,255,0.08); padding: 16px 14px; }
+      .sidebar-user { font-size: 12px; color: rgba(255,255,255,0.45); padding: 0 6px 10px;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .sidebar-logout { width: 100%; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+        color: rgba(255,255,255,0.7); border-radius: 8px; padding: 8px; font: inherit; font-size: 13px;
+        cursor: pointer; transition: all .15s; }
+      .sidebar-logout:hover { background: rgba(255,59,48,0.15); border-color: rgba(255,59,48,0.3); color: #ff6b6b; }
+      .topbar-mobile { display: none; }
+
+      /* ── Panel derecho (validación) ── */
+      .panel-vacio { flex: 1; display: flex; flex-direction: column; align-items: center;
+        justify-content: center; gap: 14px; padding: 32px; text-align: center;
+        color: #86868b; font-size: 14px; }
+      .panel-val { display: flex; flex-direction: column; gap: 0; height: 100%; }
+      .panel-titulo { font-size: 14px; font-weight: 700; color: #1d1d1f; padding: 22px 20px 16px;
+        border-bottom: 1px solid rgba(0,0,0,0.06); display: flex; align-items: center; gap: 8px; }
+      .panel-progreso { padding: 16px 20px; border-bottom: 1px solid rgba(0,0,0,0.05); }
+      .panel-prog-txt { font-size: 13px; font-weight: 600; color: #1d1d1f; display: block; margin-bottom: 8px; }
+      .panel-bar { height: 6px; background: #e8e8ed; border-radius: 3px; overflow: hidden; margin-bottom: 8px; }
+      .panel-bar-fill { height: 100%; border-radius: 3px; transition: width .4s; }
+      .panel-badge-err { display: inline-flex; align-items: center; gap: 5px; font-size: 12px;
+        font-weight: 600; color: #c2271c; background: rgba(255,59,48,0.08); padding: 3px 9px; border-radius: 980px; }
+      .panel-lista { padding: 12px 16px; border-bottom: 1px solid rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 6px; }
+      .panel-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #515154;
+        padding: 8px 10px; background: #f5f5f7; border-radius: 8px; }
+      .panel-item span:nth-child(2) { flex: 1; font-weight: 500; }
+      .panel-item-tag { font-size: 11px; font-weight: 600; color: #86868b; background: rgba(0,0,0,0.06);
+        padding: 2px 8px; border-radius: 980px; white-space: nowrap; }
+      .panel-item.item-ok .panel-item-tag { color: #248a3d; background: rgba(52,199,89,0.12); }
+      .panel-item.item-err .panel-item-tag { color: #c2271c; background: rgba(255,59,48,0.1); }
+      .panel-errores { padding: 12px 16px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+      .panel-err-item { display: flex; gap: 10px; font-size: 12.5px; color: #515154;
+        background: rgba(255,59,48,0.04); border: 1px solid rgba(255,59,48,0.12);
+        border-radius: 8px; padding: 10px 12px; }
+      .panel-err-dot { width: 7px; height: 7px; border-radius: 50%; background: #ff3b30;
+        flex-shrink: 0; margin-top: 4px; }
+      .panel-err-txt { color: #86868b; font-size: 11.5px; margin-top: 2px; }
+      .panel-footer { padding: 16px 20px; border-top: 1px solid rgba(0,0,0,0.06);
+        display: flex; flex-direction: column; gap: 10px; margin-top: auto; }
+      .panel-sol-row { display: flex; align-items: center; gap: 8px; background: #f5f5f7;
+        border-radius: 10px; padding: 10px 12px; color: #86868b; }
+      .panel-hint { font-size: 12px; color: #86868b; line-height: 1.4; }
+      .inp-solicitante { background: none; border: none; outline: none; font: inherit;
+        font-size: 13.5px; color: #1d1d1f; }
+      .inp-solicitante::placeholder { color: #b0b0b5; }
+
+      /* ── NavBar legacy (mantener para vistas que aún lo usen) ── */
       .nav { position: sticky; top: 0; z-index: 50; background: rgba(228,231,241,0.92);
         backdrop-filter: saturate(200%) blur(24px); -webkit-backdrop-filter: saturate(200%) blur(24px);
         border-bottom: 1px solid rgba(180,185,220,0.35); }
@@ -2962,11 +3351,6 @@ function Estilos() {
         font-weight: 500; color: #5a5f7a; padding: 5px 12px; border-radius: 980px;
         transition: background .2s, color .2s; white-space: nowrap; flex-shrink: 0; }
       .nav-tab.on { background: #fff; color: #1d1d1f; box-shadow: 0 1px 4px rgba(100,110,180,0.18); font-weight: 600; }
-      .barra-solicitante { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.1);
-        border-radius: 980px; padding: 8px 14px; color: #a1a1a6; }
-      .inp-solicitante { background: none; border: none; outline: none; font: inherit; font-size: 13.5px;
-        color: #f5f5f7; width: 170px; }
-      .inp-solicitante::placeholder { color: #6e6e73; }
 
       /* VISTA SOLICITUDES */
       .sol-wrap { max-width: 1060px; margin: 0 auto; padding: 48px 22px 60px; }
@@ -3424,6 +3808,35 @@ function Estilos() {
       }
 
       /* ADMIN */
+      /* ── Mantenedor de bases maestras ── */
+      .mto-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+      .mto-tab { display: flex; align-items: center; gap: 7px; padding: 9px 18px; border-radius: 980px; border: 1.5px solid rgba(0,0,0,0.1); background: #fff; font: inherit; font-size: 14px; font-weight: 500; color: #515154; cursor: pointer; transition: all .18s; }
+      .mto-tab:hover { border-color: rgba(0,0,0,0.22); color: #1d1d1f; }
+      .mto-tab.on { background: #1d1d1f; color: #fff; border-color: #1d1d1f; }
+      .mto-badge { margin-left: 4px; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 980px; }
+      .mto-badge.ok { background: rgba(52,199,89,0.15); color: #248a3d; }
+      .mto-badge.err { background: rgba(255,59,48,0.12); color: #c2271c; }
+      .mto-panel { background: #fff; border: 1px solid rgba(0,0,0,0.08); border-radius: 18px; padding: 28px; }
+      .mto-desc { font-size: 14px; color: #515154; margin: 0 0 20px; }
+      .mto-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+      .mto-msg { display: flex; align-items: center; gap: 8px; font-size: 14px; padding: 12px 16px; border-radius: 10px; margin-top: 18px; font-weight: 500; }
+      .mto-msg.ok { background: rgba(52,199,89,0.1); color: #248a3d; }
+      .mto-msg.err { background: rgba(255,59,48,0.08); color: #c2271c; }
+      .mto-msg.error { background: rgba(255,59,48,0.08); color: #c2271c; }
+      .mto-summary { display: flex; align-items: center; gap: 14px; margin: 18px 0 12px; flex-wrap: wrap; }
+      .mto-file { font-size: 13px; color: #1d1d1f; font-weight: 600; }
+      .mto-cnt { display: flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 980px; }
+      .mto-cnt.ok { background: rgba(52,199,89,0.1); color: #248a3d; }
+      .mto-cnt.err { background: rgba(255,59,48,0.08); color: #c2271c; }
+      .mto-table-wrap { overflow-x: auto; border: 1px solid rgba(0,0,0,0.08); border-radius: 12px; margin-top: 4px; }
+      .mto-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+      .mto-table th { background: #f5f5f7; font-weight: 600; padding: 10px 14px; text-align: left; border-bottom: 1px solid rgba(0,0,0,0.08); white-space: nowrap; }
+      .mto-table td { padding: 9px 14px; border-bottom: 1px solid rgba(0,0,0,0.04); white-space: nowrap; }
+      .mto-table tr:last-child td { border-bottom: none; }
+      .mto-table tr.fila-err td { background: rgba(255,59,48,0.03); }
+      .mto-vacio { color: #b0b0b5; font-style: italic; }
+      .mto-mas { font-size: 12px; color: #86868b; text-align: center; padding: 10px; }
+      /* ── Admin ── */
       .admin-form { background: #fff; border: 1px solid rgba(0,0,0,0.08); border-radius: 16px; padding: 20px; }
       .admin-form-row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 14px; align-items: start; }
       .admin-select { border: 1px solid rgba(0,0,0,0.15); border-radius: 10px; padding: 10px 14px; font: inherit; font-size: 15px; outline: none; width: 100%; background: #fff; color: #1d1d1f; }
@@ -3536,6 +3949,16 @@ function Estilos() {
         /* Bloque de planillas */
         .bloque-head { flex-direction: column; align-items: flex-start; }
         .paso-head { flex-direction: column; gap: 8px; }
+
+        /* Shell mobile: sidebar oculta, topbar visible */
+        .shell { flex-direction: column; }
+        .shell-body { flex-direction: column; }
+        .shell-content { padding: 16px 14px; }
+        .shell-right { width: 100%; height: auto; position: static; border-left: none; border-top: 1px solid rgba(0,0,0,0.07); }
+        .sidebar { display: none; }
+        .topbar-mobile { display: flex; align-items: center; justify-content: space-between;
+          padding: 0 16px; height: 52px; background: #f2f2f7; color: #1d1d1f;
+          position: sticky; top: 0; z-index: 50; border-bottom: 1px solid rgba(0,0,0,0.1); }
       }
     `}</style>
   );
