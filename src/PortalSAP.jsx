@@ -2051,8 +2051,8 @@ function NavBar({ info, vista, setVista, perfil }) {
           <button className={"nav-tab" + (vista === "nueva" ? " on" : "")} onClick={() => setVista("nueva")}>Nueva solicitud</button>
           <button className={"nav-tab" + (vista === "solicitudes" ? " on" : "")} onClick={() => setVista("solicitudes")}>Solicitudes</button>
           <button className={"nav-tab" + (vista === "clusters" ? " on" : "")} onClick={() => setVista("clusters")}>Gestor de locales</button>
-          <button className={"nav-tab" + (vista === "ayuda" ? " on" : "")} onClick={() => setVista("ayuda")}>Centro de Ayuda</button>
           <button className={"nav-tab" + (vista === "cvp" ? " on" : "")} onClick={() => setVista("cvp")}>Ciclo de Vida</button>
+          <button className={"nav-tab" + (vista === "ayuda" ? " on" : "")} onClick={() => setVista("ayuda")}>Centro de Ayuda</button>
           {esDDMM && <button className={"nav-tab" + (vista === "admin" ? " on" : "")} onClick={() => setVista("admin")}>Admin</button>}
         </span>
         <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
