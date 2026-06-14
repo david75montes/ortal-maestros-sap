@@ -1260,13 +1260,13 @@ function VistaInicio({ perfil, setVista }) {
         <div className="inicio-hero-text">
           <div className="inicio-logomark">N ·</div>
           <h1 className="inicio-title">
-            El programa Nexus se concibe como una iniciativa estratégica destinada a transformar y optimizar la gestión de datos maestros dentro de Arcoprime
+            Nexus se concibe como una iniciativa estratégica destinada a transformar y optimizar la gestión de datos maestros dentro de Arcoprime
           </h1>
           <p className="inicio-desc-blue">
             Su objetivo principal es establecer un marco de trabajo cohesivo y eficiente que garantice la integridad, precisión y accesibilidad de los datos esenciales para la operación y toma de decisiones en la compañía.
           </p>
           <p className="inicio-desc-orange">
-            Este portal es la plataforma para la carga y el control de modificaciones de datos maestros SAP{nombre ? `. Bienvenido, ${nombre}.` : "."}
+            Este portal es la plataforma para la carga y el control de modificaciones de datos maestros.
           </p>
         </div>
       </div>
