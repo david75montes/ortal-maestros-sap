@@ -666,6 +666,7 @@ const fmtFecha = iso => {
    ============================================================ */
 export default function PortalSAP() {
   const [session, setSession] = useState(undefined); // undefined = cargando
+  const [perfil, setPerfil] = useState(null);
   const [vista, setVista] = useState("nueva"); // 'nueva' | 'solicitudes' | 'clusters'
   const [solicitante, setSolicitante] = useState("");
   const [clusters, setClusters] = useState({});
@@ -678,15 +679,17 @@ export default function PortalSAP() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Cargar maestros desde Supabase al iniciar sesión
+  // Cargar perfil y maestros desde Supabase al iniciar sesión
   useEffect(() => {
     if (!session) return;
     (async () => {
-      const [{ data: centros }, { data: skus }, { data: proveedores }] = await Promise.all([
+      const [{ data: p }, { data: centros }, { data: skus }, { data: proveedores }] = await Promise.all([
+        supabase.from("profiles").select("*").eq("id", session.user.id).single(),
         supabase.from("centros").select("codigo,nombre"),
         supabase.from("skus").select("codigo,nombre"),
         supabase.from("proveedores").select("codigo,nombre"),
       ]);
+      if (p) setPerfil(p);
       if (centros && skus && proveedores) {
         MAESTROS = {
           centros: Object.fromEntries(centros.map(r => [r.codigo, r.nombre])),
@@ -880,11 +883,21 @@ export default function PortalSAP() {
     return <div className="portal"><Estilos /><VistaLogin /></div>;
   }
 
+  /* ---------- VISTA ADMIN ---------- */
+  if (vista === "admin") {
+    return (
+      <div className="portal">
+        <Estilos /><NavBar info={maestrosInfo} vista={vista} setVista={setVista} perfil={perfil} />
+        <VistaAdmin />
+      </div>
+    );
+  }
+
   /* ---------- VISTA SOLICITUDES ---------- */
   if (vista === "solicitudes") {
     return (
       <div className="portal">
-        <Estilos /><NavBar info={maestrosInfo} vista={vista} setVista={setVista} />
+        <Estilos /><NavBar info={maestrosInfo} vista={vista} setVista={setVista} perfil={perfil} />
         <VistaSolicitudes />
       </div>
     );
@@ -904,7 +917,7 @@ export default function PortalSAP() {
   if (vista === "ayuda") {
     return (
       <div className="portal">
-        <Estilos /><NavBar info={maestrosInfo} vista={vista} setVista={setVista} />
+        <Estilos /><NavBar info={maestrosInfo} vista={vista} setVista={setVista} perfil={perfil} />
         <VistaAyuda />
       </div>
     );
@@ -913,7 +926,7 @@ export default function PortalSAP() {
   if (vista === "cvp") {
     return (
       <div className="portal">
-        <Estilos /><NavBar info={maestrosInfo} vista={vista} setVista={setVista} />
+        <Estilos /><NavBar info={maestrosInfo} vista={vista} setVista={setVista} perfil={perfil} />
         <VistaCVP />
       </div>
     );
@@ -1849,6 +1862,143 @@ function VistaClusters({ clusters, onChange }) {
 }
 
 /* ============================================================
+   VISTA ADMIN: gestión de usuarios y roles
+   ============================================================ */
+function VistaAdmin() {
+  const [usuarios, setUsuarios] = useState([]);
+  const [cargando, setCargando] = useState(true);
+  const [msj, setMsj] = useState(null);
+  const [nuevoEmail, setNuevoEmail] = useState("");
+  const [nuevoNombre, setNuevoNombre] = useState("");
+  const [nuevoRol, setNuevoRol] = useState("solicitante");
+  const [creando, setCreando] = useState(false);
+
+  const cargar = async () => {
+    setCargando(true);
+    const { data } = await supabase.from("profiles").select("*").order("nombre");
+    setUsuarios(data ?? []);
+    setCargando(false);
+  };
+
+  useEffect(() => { cargar(); }, []);
+
+  const actualizarRol = async (id, rol) => {
+    const { error } = await supabase.from("profiles").update({ rol }).eq("id", id);
+    if (!error) setUsuarios(u => u.map(x => x.id === id ? { ...x, rol } : x));
+  };
+
+  const toggleActivo = async (id, activo) => {
+    const { error } = await supabase.from("profiles").update({ activo }).eq("id", id);
+    if (!error) setUsuarios(u => u.map(x => x.id === id ? { ...x, activo } : x));
+  };
+
+  const crearUsuario = async (e) => {
+    e.preventDefault();
+    setCreando(true);
+    setMsj(null);
+    const { error } = await supabase.auth.signUp({
+      email: nuevoEmail,
+      password: Math.random().toString(36).slice(-10) + "A1!",
+      options: { data: { nombre: nuevoNombre }, emailRedirectTo: window.location.origin },
+    });
+    if (error) {
+      setMsj({ tipo: "error", texto: error.message });
+    } else {
+      setMsj({ tipo: "ok", texto: `Invitación enviada a ${nuevoEmail}. El usuario recibirá un email para activar su cuenta.` });
+      setNuevoEmail(""); setNuevoNombre(""); setNuevoRol("solicitante");
+      setTimeout(cargar, 1500);
+    }
+    setCreando(false);
+  };
+
+  return (
+    <main className="sol-wrap">
+      <div className="sol-head">
+        <div>
+          <h1 className="sol-title">Administración de Usuarios</h1>
+          <p className="sol-sub">Gestiona accesos y roles del portal. Solo visible para el equipo Datos Maestros.</p>
+        </div>
+      </div>
+
+      {/* Crear usuario */}
+      <section className="seccion">
+        <h2 className="ayuda-h2"><User size={20} /> Invitar nuevo usuario</h2>
+        <form onSubmit={crearUsuario} className="admin-form">
+          <div className="admin-form-row">
+            <div className="login-field">
+              <label>Nombre</label>
+              <input value={nuevoNombre} onChange={e => setNuevoNombre(e.target.value)} placeholder="Nombre completo" required />
+            </div>
+            <div className="login-field">
+              <label>Correo electrónico</label>
+              <input type="email" value={nuevoEmail} onChange={e => setNuevoEmail(e.target.value)} placeholder="nombre@arcoprime.cl" required />
+            </div>
+            <div className="login-field">
+              <label>Rol</label>
+              <select value={nuevoRol} onChange={e => setNuevoRol(e.target.value)} className="admin-select">
+                <option value="solicitante">Solicitante</option>
+                <option value="datos_maestros">Datos Maestros</option>
+              </select>
+            </div>
+            <button type="submit" className="btn-primary" disabled={creando} style={{ alignSelf: "flex-end" }}>
+              {creando ? "Enviando…" : "Enviar invitación"}
+            </button>
+          </div>
+          {msj && <p className={msj.tipo === "ok" ? "admin-msj-ok" : "login-error"} style={{ marginTop: 8 }}>{msj.tipo === "ok" ? <CheckCircle2 size={14} /> : <AlertTriangle size={14} />} {msj.texto}</p>}
+        </form>
+      </section>
+
+      {/* Lista de usuarios */}
+      <section className="seccion">
+        <h2 className="ayuda-h2"><Layers size={20} /> Usuarios registrados</h2>
+        {cargando ? (
+          <p style={{ color: "#86868b", fontSize: 14 }}>Cargando usuarios…</p>
+        ) : (
+          <div className="admin-tabla-wrap">
+            <table className="admin-tabla">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Correo</th>
+                  <th>Rol</th>
+                  <th>Activo</th>
+                </tr>
+              </thead>
+              <tbody>
+                {usuarios.map(u => (
+                  <tr key={u.id}>
+                    <td><strong>{u.nombre}</strong></td>
+                    <td style={{ color: "#6e6e73" }}>{u.email}</td>
+                    <td>
+                      <select
+                        value={u.rol}
+                        onChange={e => actualizarRol(u.id, e.target.value)}
+                        className={"admin-rol-sel " + (u.rol === "datos_maestros" ? "rol-ddmm" : "rol-sol")}
+                      >
+                        <option value="solicitante">Solicitante</option>
+                        <option value="datos_maestros">Datos Maestros</option>
+                      </select>
+                    </td>
+                    <td>
+                      <button
+                        onClick={() => toggleActivo(u.id, !u.activo)}
+                        className={"admin-activo " + (u.activo ? "activo-on" : "activo-off")}
+                      >
+                        {u.activo ? "Activo" : "Inactivo"}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+    </main>
+  );
+}
+
+/* ============================================================
    VISTA LOGIN
    ============================================================ */
 function VistaLogin() {
@@ -1890,8 +2040,9 @@ function VistaLogin() {
   );
 }
 
-function NavBar({ info, vista, setVista }) {
+function NavBar({ info, vista, setVista, perfil }) {
   const cerrarSesion = async () => { await supabase.auth.signOut(); };
+  const esDDMM = perfil?.rol === "datos_maestros";
   return (
     <nav className="nav">
       <div className="nav-inner">
@@ -1902,11 +2053,13 @@ function NavBar({ info, vista, setVista }) {
           <button className={"nav-tab" + (vista === "clusters" ? " on" : "")} onClick={() => setVista("clusters")}>Gestor de locales</button>
           <button className={"nav-tab" + (vista === "ayuda" ? " on" : "")} onClick={() => setVista("ayuda")}>Centro de Ayuda</button>
           <button className={"nav-tab" + (vista === "cvp" ? " on" : "")} onClick={() => setVista("cvp")}>Ciclo de Vida</button>
+          {esDDMM && <button className={"nav-tab" + (vista === "admin" ? " on" : "")} onClick={() => setVista("admin")}>Admin</button>}
         </span>
         <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <span className={"nav-badge" + (info && !info.error ? " on" : "")}>
             <Database size={13} /> {info && !info.error ? "Base completa" : "Base demo"}
           </span>
+          {perfil && <span style={{ fontSize: 12, color: "#6e6e73" }}>{perfil.nombre}</span>}
           <button className="nav-logout" onClick={cerrarSesion} title="Cerrar sesión">Salir</button>
         </span>
       </div>
@@ -2450,6 +2603,24 @@ function Estilos() {
         .cvp-skus { grid-template-columns: 1fr; }
         .cvp-actores { grid-template-columns: 1fr 1fr; }
       }
+
+      /* ADMIN */
+      .admin-form { background: #fff; border: 1px solid rgba(0,0,0,0.08); border-radius: 16px; padding: 20px; }
+      .admin-form-row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 14px; align-items: start; }
+      .admin-select { border: 1px solid rgba(0,0,0,0.15); border-radius: 10px; padding: 10px 14px; font: inherit; font-size: 15px; outline: none; width: 100%; background: #fff; color: #1d1d1f; }
+      .admin-msj-ok { font-size: 13px; color: #34c759; display: flex; align-items: center; gap: 6px; }
+      .admin-tabla-wrap { overflow-x: auto; background: #fff; border: 1px solid rgba(0,0,0,0.08); border-radius: 16px; }
+      .admin-tabla { width: 100%; border-collapse: collapse; font-size: 14px; }
+      .admin-tabla th { background: #f5f5f7; font-weight: 600; padding: 12px 16px; text-align: left; border-bottom: 1px solid rgba(0,0,0,0.08); font-size: 13px; }
+      .admin-tabla td { padding: 12px 16px; border-bottom: 1px solid rgba(0,0,0,0.05); }
+      .admin-tabla tr:last-child td { border-bottom: none; }
+      .admin-rol-sel { border: 1px solid rgba(0,0,0,0.12); border-radius: 980px; padding: 4px 12px; font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; outline: none; }
+      .rol-ddmm { background: #e3f2fd; color: #1565c0; border-color: #bbdefb; }
+      .rol-sol { background: #f5f5f7; color: #515154; }
+      .admin-activo { border: none; border-radius: 980px; padding: 5px 14px; font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
+      .activo-on { background: #e8f5e9; color: #2e7d32; }
+      .activo-off { background: #fff3e0; color: #e65100; }
+      @media (max-width: 700px) { .admin-form-row { grid-template-columns: 1fr; } }
 
       /* LOGIN */
       .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #fbfbfd; padding: 20px; }
