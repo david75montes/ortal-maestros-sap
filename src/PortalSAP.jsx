@@ -616,57 +616,43 @@ const PREFIJO = "solicitudes:";
 const memoria = []; // fallback
 
 const ESTADOS = {
-  "Enviada":   { color: "#5b8dee", bg: "rgba(91,141,238,0.1)" },
-  "En proceso":{ color: "#b25000", bg: "rgba(255,149,0,0.12)" },
-  "Aplicada":  { color: "#248a3d", bg: "rgba(52,199,89,0.12)" },
-  "Rechazada": { color: "#c2271c", bg: "rgba(255,59,48,0.1)" },
+  "Enviada":    { color: "#5b8dee", bg: "rgba(91,141,238,0.1)" },
+  "En proceso": { color: "#b25000", bg: "rgba(255,149,0,0.12)" },
+  "Aprobada":   { color: "#248a3d", bg: "rgba(52,199,89,0.12)" },
+  "Rechazada":  { color: "#c2271c", bg: "rgba(255,59,48,0.1)" },
+  "Aplicada":   { color: "#515154", bg: "rgba(0,0,0,0.07)" },
 };
 
 async function guardarSolicitud(sol) {
-  try {
-    if (window.storage) {
-      await window.storage.set(PREFIJO + sol.folio, JSON.stringify(sol), true);
-      return "storage";
-    }
-  } catch (e) { console.error("storage set:", e); }
-  memoria.unshift(sol);
-  return "memoria";
+  const { error } = await supabase.from("solicitudes").insert({
+    folio:               sol.folio,
+    solicitante_id:      sol.user_id,
+    solicitante_nombre:  sol.solicitante,
+    solicitante_email:   sol.email,
+    estado:              sol.estado,
+    planillas:           sol.planillas,
+    historial:           sol.historial,
+  });
+  if (error) { console.error("guardar solicitud:", error); return "error"; }
+  return "supabase";
 }
 
-async function listarSolicitudes() {
-  try {
-    if (window.storage) {
-      const res = await window.storage.list(PREFIJO, true);
-      const keys = res?.keys || [];
-      const sols = [];
-      for (const k of keys) {
-        try {
-          const r = await window.storage.get(k, true);
-          if (r?.value) sols.push(JSON.parse(r.value));
-        } catch (e) { /* clave ilegible: omitir */ }
-      }
-      return sols.sort((a, b) => (b.fecha || "").localeCompare(a.fecha || ""));
-    }
-  } catch (e) { console.error("storage list:", e); }
-  return [...memoria];
+async function listarSolicitudes(perfil) {
+  let q = supabase.from("solicitudes").select("*").order("created_at", { ascending: false });
+  if (perfil?.rol !== "datos_maestros") q = q.eq("solicitante_id", perfil?.id);
+  const { data, error } = await q;
+  if (error) { console.error("listar solicitudes:", error); return []; }
+  return data || [];
 }
 
-async function cambiarEstado(folio, estado) {
-  try {
-    if (window.storage) {
-      const r = await window.storage.get(PREFIJO + folio, true);
-      if (r?.value) {
-        const sol = JSON.parse(r.value);
-        sol.estado = estado;
-        sol.historial = [...(sol.historial || []), { estado, fecha: new Date().toISOString() }];
-        await window.storage.set(PREFIJO + folio, JSON.stringify(sol), true);
-        return sol;
-      }
-    }
-  } catch (e) { console.error("storage estado:", e); }
-  const m = memoria.find(s => s.folio === folio);
-  if (m) { m.estado = estado; return m; }
-  return null;
+async function cambiarEstado(folio, estado, motivo) {
+  const { data: prev } = await supabase.from("solicitudes").select("historial").eq("folio", folio).single();
+  const historial = [...(prev?.historial || []), { estado, fecha: new Date().toISOString() }];
+  const upd = { estado, historial, updated_at: new Date().toISOString() };
+  if (motivo) upd.motivo_rechazo = motivo;
+  const { data, error } = await supabase.from("solicitudes").update(upd).eq("folio", folio).select().single();
+  if (error) { console.error("cambiar estado:", error); return null; }
+  return data;
 }
 
 const fmtFecha = iso => {
@@ -877,6 +863,8 @@ export default function PortalSAP() {
       folio,
       fecha: new Date().toISOString(),
       solicitante: norm(solicitante),
+      user_id: session?.user?.id,
+      email: session?.user?.email,
       estado: "Enviada",
       historial: [{ estado: "Enviada", fecha: new Date().toISOString() }],
       planillas: plSel.map(p => ({
@@ -936,7 +924,7 @@ export default function PortalSAP() {
   if (vista === "inicio")      return <AppShell vista={vista} setVista={setVista} perfil={perfil}><VistaInicio perfil={perfil} setVista={setVista} /></AppShell>;
   if (vista === "maestros")    return <AppShell vista={vista} setVista={setVista} perfil={perfil}><VistaMaestros /></AppShell>;
   if (vista === "admin")       return <AppShell vista={vista} setVista={setVista} perfil={perfil}><VistaAdmin /></AppShell>;
-  if (vista === "solicitudes") return <AppShell vista={vista} setVista={setVista} perfil={perfil}><VistaSolicitudes /></AppShell>;
+  if (vista === "solicitudes") return <AppShell vista={vista} setVista={setVista} perfil={perfil}><VistaSolicitudes perfil={perfil} /></AppShell>;
   if (vista === "clusters")    return <AppShell vista={vista} setVista={setVista} perfil={perfil}><VistaClusters clusters={clusters} onChange={actualizarClusters} /></AppShell>;
   if (vista === "ayuda")       return <AppShell vista={vista} setVista={setVista} perfil={perfil}><VistaAyuda /></AppShell>;
   if (vista === "cvp")         return <AppShell vista={vista} setVista={setVista} perfil={perfil}><VistaCVP /></AppShell>;
@@ -3256,24 +3244,68 @@ function NavBar({ info, vista, setVista, perfil }) {
 /* ============================================================
    VISTA SOLICITUDES: listado, detalle y gestión de estado
    ============================================================ */
-function VistaSolicitudes() {
+function VistaSolicitudes({ perfil }) {
   const [cargando, setCargando] = useState(true);
   const [sols, setSols] = useState([]);
-  const [abierta, setAbierta] = useState(null); // folio expandido
+  const [abierta, setAbierta] = useState(null);
   const [filtro, setFiltro] = useState("Todas");
+  const [rechazando, setRechazando] = useState(null); // folio en rechazo
+  const [motivo, setMotivo] = useState("");
+  const [notifMsg, setNotifMsg] = useState(null);
+  const esDDMM = perfil?.rol === "datos_maestros";
 
   const recargar = useCallback(async () => {
     setCargando(true);
-    const lista = await listarSolicitudes();
+    const lista = await listarSolicitudes(perfil);
     setSols(lista);
     setCargando(false);
-  }, []);
+  }, [perfil]);
 
   React.useEffect(() => { recargar(); }, [recargar]);
 
-  const setEstadoSol = async (folio, est) => {
-    const actualizada = await cambiarEstado(folio, est);
-    if (actualizada) setSols(s => s.map(x => x.folio === folio ? actualizada : x));
+  const notificar = async (sol, est, motivoRec) => {
+    try {
+      await supabase.functions.invoke("notificar-solicitud", {
+        body: {
+          folio: sol.folio,
+          estado: est,
+          solicitante_nombre: sol.solicitante_nombre,
+          solicitante_email: sol.solicitante_email,
+          planillas: sol.planillas,
+          motivo_rechazo: motivoRec || null,
+        },
+      });
+      if (est === "Aprobada") {
+        await supabase.functions.invoke("crear-ticket-freshdesk", {
+          body: {
+            folio: sol.folio,
+            solicitante_nombre: sol.solicitante_nombre,
+            solicitante_email: sol.solicitante_email,
+            planillas: sol.planillas,
+          },
+        });
+      }
+    } catch (e) { console.error("notificar:", e); }
+  };
+
+  const setEstadoSol = async (folio, est, motivoRec) => {
+    const actualizada = await cambiarEstado(folio, est, motivoRec);
+    if (!actualizada) return;
+    setSols(s => s.map(x => x.folio === folio ? actualizada : x));
+    if (est === "Aprobada" || est === "Rechazada") {
+      notificar(actualizada, est, motivoRec);
+      setNotifMsg(est === "Aprobada"
+        ? "✓ Solicitud aprobada — se notificó al solicitante y se creó el ticket en Freshdesk."
+        : "✓ Solicitud rechazada — se notificó al solicitante.");
+      setTimeout(() => setNotifMsg(null), 5000);
+    }
+  };
+
+  const confirmarRechazo = async (folio) => {
+    if (!motivo.trim()) return;
+    await setEstadoSol(folio, "Rechazada", motivo.trim());
+    setRechazando(null);
+    setMotivo("");
   };
 
   const exportarDeSolicitud = (plData) => {
@@ -3288,10 +3320,12 @@ function VistaSolicitudes() {
       <div className="sol-head">
         <div>
           <h1 className="sol-title">Solicitudes</h1>
-          <p className="sol-sub">Registro compartido de todas las solicitudes enviadas. El equipo de Datos Maestros actualiza el estado a medida que las procesa en SAP.</p>
+          <p className="sol-sub">{esDDMM ? "Todas las solicitudes del portal. Aprueba o rechaza para notificar al solicitante." : "Tus solicitudes enviadas. Te notificaremos por email cuando cambien de estado."}</p>
         </div>
         <button className="btn-ghost" onClick={recargar}><RotateCcw size={14} /> Actualizar</button>
       </div>
+
+      {notifMsg && <div className="sol-notif">{notifMsg}</div>}
 
       <div className="sol-filtros">
         {["Todas", ...Object.keys(ESTADOS)].map(f => (
@@ -3318,10 +3352,10 @@ function VistaSolicitudes() {
                 <button className="sol-fila" onClick={() => setAbierta(open ? null : s.folio)}>
                   <div className="sol-folio">
                     <strong>{s.folio}</strong>
-                    <span>{fmtFecha(s.fecha)} · {s.solicitante || "Sin nombre"}</span>
+                    <span>{fmtFecha(s.created_at || s.fecha)} · {s.solicitante_nombre || "Sin nombre"}</span>
                   </div>
                   <div className="sol-tipos">
-                    {s.planillas.map(p => {
+                    {(s.planillas || []).map(p => {
                       const Pl = PLANILLAS.find(x => x.id === p.id);
                       const Ic = Pl?.icon;
                       return <span key={p.id} className="sol-tipo">{Ic && <Ic size={13} />}{p.nombre} · {p.filas.length}</span>;
@@ -3333,13 +3367,42 @@ function VistaSolicitudes() {
 
                 {open && (
                   <div className="sol-detalle">
-                    <div className="sol-estado-edit">
-                      <span>Cambiar estado:</span>
-                      {Object.keys(ESTADOS).map(e => (
-                        <button key={e} className={"chip mini" + (s.estado === e ? " on" : "")} onClick={() => setEstadoSol(s.folio, e)}>{e}</button>
-                      ))}
-                    </div>
-                    {s.planillas.map(p => {
+                    {esDDMM && (
+                      <div className="sol-estado-edit">
+                        <span>Cambiar estado:</span>
+                        {["En proceso", "Aprobada"].map(e => (
+                          <button key={e} className={"chip mini" + (s.estado === e ? " on" : "")}
+                            onClick={() => setEstadoSol(s.folio, e)}>{e}</button>
+                        ))}
+                        {rechazando === s.folio ? (
+                          <div className="sol-rechazo-form">
+                            <input
+                              className="sol-rechazo-input"
+                              placeholder="Motivo del rechazo..."
+                              value={motivo}
+                              onChange={e => setMotivo(e.target.value)}
+                              onKeyDown={e => e.key === "Enter" && confirmarRechazo(s.folio)}
+                              autoFocus
+                            />
+                            <button className="btn-primary" style={{ fontSize: 13, padding: "6px 14px" }} onClick={() => confirmarRechazo(s.folio)}>Confirmar</button>
+                            <button className="btn-ghost" onClick={() => { setRechazando(null); setMotivo(""); }}>Cancelar</button>
+                          </div>
+                        ) : (
+                          <button className={"chip mini" + (s.estado === "Rechazada" ? " on" : "")}
+                            style={{ color: "#c2271c" }}
+                            onClick={() => { setRechazando(s.folio); setMotivo(""); }}>Rechazar</button>
+                        )}
+                        <button className={"chip mini" + (s.estado === "Aplicada" ? " on" : "")}
+                          onClick={() => setEstadoSol(s.folio, "Aplicada")}>Aplicada</button>
+                      </div>
+                    )}
+                    {s.motivo_rechazo && (
+                      <div className="sol-motivo-rechazo">
+                        <strong>Motivo rechazo:</strong> {s.motivo_rechazo}
+                      </div>
+                    )}
+
+                    {(s.planillas || []).map(p => {
                       const pl = PLANILLAS.find(x => x.id === p.id);
                       if (!pl) return null;
                       return (
@@ -3505,6 +3568,10 @@ function Estilos() {
       .sol-estado { font-size: 13px; font-weight: 600; border-radius: 980px; padding: 5px 12px; flex: none; }
       .sol-detalle { border-top: 1px solid rgba(0,0,0,0.06); padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 14px; }
       .sol-estado-edit { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 14px; color: #6e6e73; }
+      .sol-notif { background: rgba(52,199,89,0.12); color: #248a3d; border-radius: 12px; padding: 12px 18px; font-size: 14px; font-weight: 500; margin-bottom: 16px; }
+      .sol-rechazo-form { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+      .sol-rechazo-input { flex: 1; min-width: 220px; padding: 7px 12px; border: 1.5px solid #ff3b30; border-radius: 8px; font: inherit; font-size: 14px; outline: none; }
+      .sol-motivo-rechazo { font-size: 14px; color: #c2271c; background: rgba(255,59,48,0.07); border-radius: 10px; padding: 10px 14px; margin-bottom: 8px; }
       .success-botones { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
 
       /* GUÍA DE SOLICITUDES */
