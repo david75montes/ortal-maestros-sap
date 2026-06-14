@@ -1268,13 +1268,14 @@ function VistaInicio({ perfil, setVista }) {
           <p className="inicio-desc-orange">
             Este portal es la plataforma para la carga y el control de modificaciones de datos maestros.
           </p>
-          <div className="inicio-logos">
-            <img src="/logo-ap.png"     alt="Arcoprime"   className="inicio-logo" />
-            <img src="/logo-pronto.png" alt="Pronto"      className="inicio-logo" />
-            <img src="/logo-jv.png"     alt="Juan Valdez" className="inicio-logo" />
-            <img src="/logo-sb.svg"     alt="Sbarro"      className="inicio-logo" />
-          </div>
         </div>
+      </div>
+
+      <div className="inicio-logos">
+        <img src="/logo-ap.png"     alt="Arcoprime"   className="inicio-logo" />
+        <img src="/logo-pronto.png" alt="Pronto"      className="inicio-logo" />
+        <img src="/logo-jv.png"     alt="Juan Valdez" className="inicio-logo" />
+        <img src="/logo-sb.svg"     alt="Sbarro"      className="inicio-logo" />
       </div>
 
       {/* ── Módulos ── */}
@@ -3948,8 +3949,8 @@ function Estilos() {
       .inicio-title { font-size: 21px; font-weight: 700; color: #ffffff; line-height: 1.45; letter-spacing: -0.01em; margin: 0; }
       .inicio-desc-blue { font-size: 15px; color: #6fa8f5; line-height: 1.7; margin: 0; font-weight: 500; }
       .inicio-desc-orange { font-size: 15px; color: #ffb347; line-height: 1.7; margin: 0; font-weight: 500; }
-      .inicio-logos { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 4px; }
-      .inicio-logo { height: 32px; width: auto; object-fit: contain; opacity: 0.85; filter: brightness(0) invert(1); transition: opacity .2s; }
+      .inicio-logos { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; margin: 20px 0 4px; }
+      .inicio-logo { height: 36px; width: auto; object-fit: contain; opacity: 0.7; transition: opacity .2s; }
       .inicio-logo:hover { opacity: 1; }
       .inicio-section-title { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #86868b; margin-bottom: 12px; }
       .inicio-modules { display: flex; flex-direction: column; gap: 10px; }
