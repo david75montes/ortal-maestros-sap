@@ -3949,8 +3949,8 @@ function Estilos() {
       .inicio-title { font-size: 21px; font-weight: 700; color: #ffffff; line-height: 1.45; letter-spacing: -0.01em; margin: 0; }
       .inicio-desc-blue { font-size: 15px; color: #6fa8f5; line-height: 1.7; margin: 0; font-weight: 500; }
       .inicio-desc-orange { font-size: 15px; color: #ffb347; line-height: 1.7; margin: 0; font-weight: 500; }
-      .inicio-logos { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; margin: 20px 0 4px; }
-      .inicio-logo { height: 36px; width: auto; object-fit: contain; opacity: 0.7; transition: opacity .2s; }
+      .inicio-logos { display: flex; align-items: center; gap: 36px; flex-wrap: wrap; margin: 20px 0 4px; }
+      .inicio-logo { height: 52px; width: auto; object-fit: contain; opacity: 0.85; transition: opacity .2s; }
       .inicio-logo:hover { opacity: 1; }
       .inicio-section-title { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #86868b; margin-bottom: 12px; }
       .inicio-modules { display: flex; flex-direction: column; gap: 10px; }
