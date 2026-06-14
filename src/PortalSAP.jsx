@@ -2128,8 +2128,9 @@ function VistaCVP() {
         </div>
       </div>
 
-      {/* ── Tabs horizontales de sub-procesos ── */}
+      {/* ── Tabs horizontales de sub-procesos (desktop) / select (mobile) ── */}
       <div className="cvp2-tabs-wrap">
+        {/* Desktop: tabs */}
         <nav className="cvp2-tabs">
           {CVP_SUBPROCESOS.map(s => {
             const c = CVP_COLOR[s.color] || CVP_COLOR.azul;
@@ -2149,6 +2150,18 @@ function VistaCVP() {
             );
           })}
         </nav>
+        {/* Mobile: select nativo */}
+        <select
+          className="cvp2-tabs-select"
+          value={selectedId}
+          onChange={e => { setSelectedId(e.target.value); setOpenSecs({ proposito: true }); }}
+        >
+          {CVP_SUBPROCESOS.map(s => (
+            <option key={s.id} value={s.id}>
+              {s.numero !== undefined ? `${s.numero}. ` : "★  "}{s.nombre}
+            </option>
+          ))}
+        </select>
       </div>
 
         {/* ── Contenido principal ── */}
@@ -3765,6 +3778,7 @@ function Estilos() {
       .cvp2-tab-active { font-weight: 600; }
       .cvp2-tab-num { width: 20px; height: 20px; border-radius: 50%; background: #f0f0f2; font-size: 10.5px; font-weight: 700; color: #515154; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background .15s, color .15s; }
       .cvp2-tab-name { line-height: 1.3; }
+      .cvp2-tabs-select { display: none; width: 100%; padding: 14px 16px; font: inherit; font-size: 14px; font-weight: 500; color: #1d1d1f; background: #fff; border: none; border-radius: 0; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2386868b' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; cursor: pointer; }
       .cvp2-main { display: flex; flex-direction: column; gap: 14px; }
       .cvp2-header { border-top: 4px solid #ccc; border-radius: 16px; background: #f5f5f7; padding: 24px 28px; }
       .cvp2-sp-num { font-size: 11px; font-weight: 700; color: #fff; border-radius: 980px; padding: 3px 10px; }
@@ -3812,8 +3826,16 @@ function Estilos() {
         .cvp2-alcance-grid { grid-template-columns: 1fr; }
         .cvp2-actores-grid { grid-template-columns: 1fr 1fr; }
       }
-      @media (max-width: 600px) {
+      @media (max-width: 700px) {
+        .cvp2-tabs { display: none; }
+        .cvp2-tabs-select { display: block; }
+        .cvp2-tabs-wrap { border-radius: 12px; }
+        .cvp2-header { padding: 18px 16px; }
+        .cvp2-title { font-size: 18px; }
+        .cvp2-sec-btn { padding: 14px 16px; font-size: 14px; }
+        .cvp2-sec-body { padding: 16px; }
         .cvp2-actores-grid { grid-template-columns: 1fr; }
+        .cvp2-alcance-grid { grid-template-columns: 1fr; }
       }
 
       /* ADMIN */
