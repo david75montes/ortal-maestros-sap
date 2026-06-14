@@ -942,8 +942,8 @@ export default function PortalSAP() {
         <p className="hero-sub">Escribe directamente en la grilla o importa tu planilla Excel. Al enviar a validación cruzamos cada fila contra las bases de centros, SKU y proveedores, y te devolvemos los errores para corregir al instante.</p>
       </header>
 
-      {/* MAESTROS */}
-      <section className="seccion">
+      {/* MAESTROS — solo visible para datos_maestros */}
+      {perfil?.rol === "datos_maestros" && <section className="seccion">
         <div className={"maestro-card" + (maestrosInfo && !maestrosInfo.error ? " full" : "")}>
           <button className="maestro-head" onClick={() => setMaestroOpen(o => !o)}>
             <span className="maestro-ic"><Database size={18} /></span>
@@ -966,7 +966,7 @@ export default function PortalSAP() {
             </div>
           )}
         </div>
-      </section>
+      </section>}
 
       {/* GUÍA DE SOLICITUDES */}
       <section className="seccion">
