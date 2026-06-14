@@ -2551,11 +2551,38 @@ const TABLAS_CONFIG = [
     ],
     templateEjemplo: [["100000000", "Comercial Puerto Chico Ltda"], ["100000108", "Embotelladora Andina S.A"]],
   },
+  {
+    id: "grupos_articulo",
+    nombre: "Grupos Artículo",
+    desc: "Grupos de artículo SAP. Columnas esperadas: Codigo, Nombre.",
+    icon: Tag,
+    tabla: "grupos_articulo",
+    conflicto: "codigo",
+    columnas: [
+      { key: "codigo", label: "Codigo", col: 0, req: true },
+      { key: "nombre", label: "Nombre", col: 1, req: true },
+    ],
+    templateEjemplo: [["ALIM", "Alimentos"], ["BEBE", "Bebidas"]],
+  },
+  {
+    id: "materiales_modelo",
+    nombre: "Materiales Modelo",
+    desc: "Materiales modelo para catalogación. Columnas esperadas: Codigo, Nombre, Descripcion.",
+    icon: FileText,
+    tabla: "materiales_modelo",
+    conflicto: "codigo",
+    columnas: [
+      { key: "codigo",      label: "Codigo",      col: 0, req: true },
+      { key: "nombre",      label: "Nombre",      col: 1, req: true },
+      { key: "descripcion", label: "Descripcion", col: 2, req: false, def: "" },
+    ],
+    templateEjemplo: [["MAT001", "Material Ejemplo", "Descripcion del material"], ["MAT002", "Otro Material", ""]],
+  },
 ];
 
 function VistaMaestros() {
   const [tabActiva, setTabActiva] = useState("centros");
-  const fileRefs = { centros: useRef(), skus: useRef(), proveedores: useRef() };
+  const fileRefs = Object.fromEntries(TABLAS_CONFIG.map(t => [t.id, useRef()]));
   const [previews, setPreviews] = useState({});
   const [subiendo, setSubiendo] = useState({});
   const [resultado, setResultado] = useState({});
