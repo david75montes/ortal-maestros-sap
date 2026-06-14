@@ -1272,10 +1272,10 @@ function VistaInicio({ perfil, setVista }) {
       </div>
 
       <div className="inicio-logos">
-        <img src="/logo-ap.png"     alt="Arcoprime"   className="inicio-logo" />
-        <img src="/logo-pronto.png" alt="Pronto"      className="inicio-logo" style={{ height: 72 }} />
-        <img src="/logo-jv.png"     alt="Juan Valdez" className="inicio-logo" style={{ height: 72 }} />
-        <img src="/logo-sb.svg"     alt="Sbarro"      className="inicio-logo" />
+        <img src="/logo-pronto.png" alt="Pronto"      className="inicio-logo" style={{ height: 84 }} />
+        <img src="/logo-jv.png"     alt="Juan Valdez" className="inicio-logo" style={{ height: 84 }} />
+        <img src="/logo-sb.svg"     alt="Sbarro"      className="inicio-logo" style={{ height: 64 }} />
+        <img src="/logo-ap.png"     alt="Arcoprime"   className="inicio-logo" style={{ height: 64 }} />
       </div>
 
       {/* ── Módulos ── */}
@@ -3939,12 +3939,12 @@ function Estilos() {
 
       /* ── VISTA INICIO ── */
       .inicio-wrap { padding-top: 0 !important; }
-      .inicio-hero { display: grid; grid-template-columns: 1fr 1fr; border-radius: 20px; overflow: hidden; background: #0c0c14; margin-bottom: 28px; min-height: 400px; }
+      .inicio-hero { display: grid; grid-template-columns: 1fr 1fr; border-radius: 20px; overflow: hidden; background: #0c0c14; margin-bottom: 28px; min-height: 280px; }
       .inicio-hero-visual { position: relative; overflow: hidden; background: radial-gradient(ellipse at 60% 80%, #1a0800 0%, #0c0c14 70%); }
       .inicio-planet-fire { position: absolute; width: 180px; height: 180px; border-radius: 50%; background: radial-gradient(circle at 38% 38%, #ff6b2b 0%, #c0392b 40%, #7f0000 70%, #1a0000 100%); bottom: 14%; left: 50%; transform: translateX(-50%); box-shadow: 0 0 80px rgba(220,60,0,0.35), inset -12px -8px 30px rgba(0,0,0,0.6); }
       .inicio-planet-earth { position: absolute; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle at 32% 28%, #1a3a5c 0%, #0d2137 55%, #04101e 100%); top: -90px; right: -70px; box-shadow: 0 0 100px rgba(20,60,130,0.25), inset -20px -12px 50px rgba(0,0,0,0.5); }
       .inicio-stars { position: absolute; inset: 0; background-image: radial-gradient(circle, rgba(255,255,255,0.7) 1px, transparent 1px); background-size: 40px 40px; opacity: 0.18; }
-      .inicio-hero-text { padding: 44px 40px; display: flex; flex-direction: column; justify-content: center; gap: 22px; }
+      .inicio-hero-text { padding: 28px 36px; display: flex; flex-direction: column; justify-content: center; gap: 16px; }
       .inicio-logomark { font-size: 18px; font-weight: 800; color: rgba(255,255,255,0.35); letter-spacing: 0.1em; }
       .inicio-title { font-size: 21px; font-weight: 700; color: #ffffff; line-height: 1.45; letter-spacing: -0.01em; margin: 0; }
       .inicio-desc-blue { font-size: 15px; color: #6fa8f5; line-height: 1.7; margin: 0; font-weight: 500; }
