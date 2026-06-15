@@ -7,7 +7,7 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    const { folio, solicitante_nombre, solicitante_email, planillas } = await req.json();
+    const { folio, solicitante_nombre, solicitante_email, planillas, attachments } = await req.json();
 
     const apiKey = Deno.env.get("FRESHDESK_API_KEY");
     const domain = "ddmm.freshdesk.com";
@@ -21,27 +21,37 @@ Deno.serve(async (req) => {
 <b>Solicitante:</b> ${solicitante_nombre} (${solicitante_email})<br><br>
 <b>Planillas a procesar:</b><br>
 ${planillasDesc}<br><br>
-Esta solicitud fue aprobada en el portal NEXUS y requiere carga en SAP.
+Esta solicitud fue aprobada en el portal NEXUS y requiere carga en SAP.<br>
+Los archivos Excel SAP están adjuntos a este ticket.
     `.trim();
-
-    const ticketData = {
-      subject: `[NEXUS] Solicitud ${folio}`,
-      description,
-      email: solicitante_email,
-      priority: 2,
-      status: 2,
-      tags: ["nexus", "datos-maestros"],
-    };
 
     const credentials = btoa(`${apiKey}:X`);
 
+    const formData = new FormData();
+    formData.append("subject", `[NEXUS] Solicitud ${folio}`);
+    formData.append("description", description);
+    formData.append("email", solicitante_email);
+    formData.append("priority", "2");
+    formData.append("status", "2");
+    formData.append("tags[]", "nexus");
+    formData.append("tags[]", "datos-maestros");
+
+    if (attachments && attachments.length > 0) {
+      for (const att of (attachments as { base64: string; filename: string }[])) {
+        const binStr = atob(att.base64);
+        const bytes = new Uint8Array(binStr.length);
+        for (let i = 0; i < binStr.length; i++) bytes[i] = binStr.charCodeAt(i);
+        const blob = new Blob([bytes], {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        });
+        formData.append("attachments[]", blob, att.filename);
+      }
+    }
+
     const response = await fetch(`https://${domain}/api/v2/tickets`, {
       method: "POST",
-      headers: {
-        "Authorization": `Basic ${credentials}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(ticketData),
+      headers: { "Authorization": `Basic ${credentials}` },
+      body: formData,
     });
 
     if (!response.ok) {

@@ -8,7 +8,7 @@ import {
   Plus, Trash2, ShieldCheck, Pencil, Copy, ClipboardList, Clock, User, Inbox,
   Layers, ArrowLeftRight, Check, Save, Unlock,
   ShoppingCart, FileText, Truck, Percent, TicketPercent,
-  Lightbulb, ArrowDown, ChevronUp, Menu, Home
+  Lightbulb, ArrowDown, ChevronUp, Menu, Home, Table2, Package
 } from "lucide-react";
 
 const CENTROS = {"2003": "Pronto Pargua", "2549": "Pronto Rosario Norte", "2626": "Pronto Metro Quilicura", "2004": "Pronto Sierra Gorda", "2005": "Pronto Laguna Chicureo", "2006": "Pronto Manuel Rodriguez", "2615": "Pronto UAI Peñalolen", "2766": "Pronto Metro Pedro de Valdivia", "2778": "Pronto Carretera Longitudinal Austral", "2788": "Pronto Vicuña Mackenna", "2783": "Pronto Baquedano", "2100": "Pronto Antonio Rendic", "2101": "Pronto Pedro Aguirre Cerda", "2582": "Pronto Chañaral", "2102": "Pronto Diego Portales", "2796": "Pronto Ruta 27", "2103": "Punto Teniente Merino", "2510": "Pronto Antofagasta", "2722": "Punto Francisco Bilbao", "2105": "Pronto Vivar", "2106": "Pronto Ruta A-16", "2009": "Pronto Pozo Al Monte", "2107": "Punto Arturo Merino Correa", "2502": "Pronto Perez Zujovic", "2108": "Punto Granaderos", "2109": "Punto Panamericana Sur", "2110": "Pronto Luis Valente Rossi", "2111": "Pronto Angamos", "2112": "ProntoRuta 5 Norte", "2113": "Pronto Av Argentina I", "2758": "ProntoAntonio Rendic Esq.", "2114": "Pronto Barrio Industrial", "2115": "Pronto Pedro Prado", "2116": "Punto Abaroa", "2581": "Pronto Av Argentina II", "2118": "Punto 11 de Septiembre", "2119": "Pronto 18 de Septiembre", "2120": "Pronto Alto Hospicio", "2121": "Pronto Edmundo Perez Zujovic", "2122": "Punto Balmaceda", "2777": "Punto Diego Portales II", "2779": "Punto 27 de Abril", "2770": "Punto República de Croacia", "2514": "Pronto Iquique", "2123": "Pronto Santiago Arata", "2720": "Punto Anibal Pinto", "2124": "Punto Ruta 5 Sur", "2125": "Pronto Sotomayor", "2013": "Pronto San Rafael", "2012": "Pronto San Carlos", "2017": "Pronto Cosmito", "2540": "Pronto Paicaví", "2544": "Pronto Pedro De Valdivia", "2128": "Punto Rudecindo Ortega", "2737": "Punto Condell", "2053": "Pronto San José De La Mariquina", "2129": "Pronto Calle 8 Oriente", "2803": "Punto Camino Alerce", "2713": "Punto O'Higgins Chiguayante", "2131": "Punto Salvador Allende II", "2132": "Pronto Prat San Martin", "2133": "Punto Los Notros", "2134": "Punto Almirante La Torre", "2797": "Punto Pedro Aguirre Cerda II", "2135": "Pronto Vicente Mendez", "2056": "Pronto Puerto Varas", "2052": "Pronto Parral", "2055": "Pronto Trafun Poniente", "2059": "Pronto Victoria", "2063": "Pronto San Javier", "2136": "Pronto Futaleufu", "2705": "Pronto Rio Tranquilo", "2786": "Punto Maipu San Martin", "2137": "Pronto Ecuador O'Higgins", "2749": "Pronto Colin", "2138": "Punto Cardonal", "2757": "Punto Galvarino Riveros", "2139": "Pronto Prat II", "2140": "Pronto Kurt Moller", "2743": "Punto Lastarria", "2043": "Pronto Los Angeles Centro", "2721": "Punto O'Higgins III", "2142": "Punto Walker Martinez", "2143": "Punto Fresia Brasil", "2593": "Punto Rudecindo Ortega II", "2144": "Pronto Valdivia", "2145": "Punto San Martin Benavente", "2146": "Punto Av Mackenna", "2773": "Punto Arturo Alessandri", "2594": "Punto M. Rozas", "2719": "Pronto Sargento Aldea", "2148": "Pronto Balmaceda II", "2712": "Punto Bernardo O'Higgins", "2015": "Pronto Puerto Montt", "2794": "Pronto 2 Sur", "2150": "Punto Libertad", "2151": "Punto Picarte", "2152": "Punto Comercio", "2014": "Punto Jose Puchi", "2723": "Pronto Balmaceda", "2155": "Punto Mac-Iver", "2156": "Punto Caupolican", "2537": "Pronto Los Carrera", "2157": "Pronto Cristobal Colon", "2064": "Pronto Palomares", "2811": "Pronto Ladrilleros", "2159": "Punto Republica Victoria", "2048": "Pronto Chillán Oriente", "2160": "Pronto Presidente Frei", "2161": "Punto Geronimo De Alderete", "2162": "Punto Panamericana", "2163": "Pronto Manuel Rodriguez Chigu", "2164": "Pronto Pedro Aguirre Cerda", "2726": "Pronto 21 de Mayo", "2517": "Pronto Michimalonco", "2166": "Pronto 2 Norte", "2167": "Punto Picarte Simpson", "2168": "Punto Camino A Coñaripe", "2731": "Punto Los Carreras", "2590": "Punto Andres Bello", "2724": "Pronto Juan Antonio Rios", "2170": "Pronto Calle 5 Norte", "2171": "Punto Balmaceda III", "2065": "Pronto Cabrero", "2733": "Pronto Gabriela Mistral", "2173": "Punto Panamericana Sur II", "2030": "Pronto Horcones", "2706": "Pronto Alemania", "2175": "Pronto Lircay", "2176": "Punto Rene Soriano", "2177": "Pronto Vicuña Mackenna II", "2178": "Pronto Maraton", "2179": "Pronto Ruta S-30", "2180": "Pronto Camino Internacional", "2747": "Pronto La Junta", "2181": "Pronto Camino Internacional II", "2774": "Pronto Daniel Vera", "2182": "Pronto Av Argentina III", "2183": "Punto Vicente Perez Rosales", "2021": "Pronto Trafún Oriente", "2023": "Pronto Freire", "2020": "Pronto Loncoche", "2022": "Pronto Los Angeles Poniente", "2184": "Punto O'Higgins IV", "2185": "Punto Bulnes", "2186": "Punto Bulnes II", "2187": "Punto Bulnes III", "2188": "Punto Don Bosco", "2189": "Punto Ruta 5 Sur II", "2190": "Punto Los Rios", "2024": "Pronto Lautaro", "2191": "Pronto Los Carrera Lautaro", "2709": "Punto Castellon", "2018": "Pronto Eusebio Ibar", "2802": "Pronto Ogana", "2542": "Pronto Av Alemania", "2193": "Pronto Latorre", "2554": "Pronto Carlos Schorr", "2522": "Pronto Talcahuano", "2050": "Pronto Los Angeles Oriente", "2194": "Pronto Camino Coronel", "2195": "Punto O'Higgins Alemania", "2031": "Pronto Penco", "2800": "Punto Sargento Candelaria", "2196": "Punto Anibal Pinto II", "2197": "Punto Presidente Ibañez", "2730": "Punto Maipu 895", "2199": "Pronto Americo Vespucio", "2200": "Punto San Martin Uruguay", "2201": "Pronto Ercilla", "2202": "Punto Abate Molina", "2047": "Pronto Chillán Poniente", "2028": "Pronto Maule", "2203": "Punto Prat", "2204": "Pronto Calle B-20", "2205": "Pronto Los Carrera II", "2206": "Pronto Libertad", "2207": "Pronto Ruta 60-C", "2208": "Pronto Ruta F-30-E", "2209": "Pronto Lauro Barros", "2210": "Pronto Normandie", "2587": "Pronto Portales", "2211": "Pronto Colo Colo", "2051": "Pronto Hijuelas", "2784": "Punto Los Loros", "2212": "Pronto Sta. Teresita Peñablanca", "2213": "Pronto Agua Santa", "2214": "Pronto Valparaiso", "2543": "Pronto Bosques de Montemar", "2215": "Pronto Bernardo O'Higgins II", "2742": "Pronto Esmeralda Santa Teresa", "2217": "Pronto Humeres", "2058": "Pronto Palo Colorado", "2218": "Punto O'Higgins V", "2219": "Pronto Palmira Romano Norte", "2060": "Pronto Marbella", "2220": "Pronto Marga Marga", "2221": "Pronto Teniente Cruz Martinez", "2519": "Pronto Las Salinas", "2746": "Pronto Carretera Panamericana Norte", "2222": "Pronto Freire Echeverria", "2223": "Pronto Freire Gomez Carreño", "2703": "Pronto Jose Joaquin Perez", "2225": "Pronto Constitucion", "2069": "Pronto Placilla", "2226": "Punto Panamericana Norte II", "2567": "Punto Brasil I", "2228": "Punto Ignacio De La Carrera", "2229": "Punto Panamericana Norte Fco. Aguirre", "2230": "Pronto Balmaceda IV", "2231": "Punto Ariztia", "2057": "Pronto Socos", "2232": "Pronto El Peral", "2233": "Pronto Lusitania", "2234": "Pronto Los Carrera III", "2235": "Pronto Irarrazaval O'Higgins", "2236": "Pronto Borgoño", "2237": "Pronto Playa Ancha", "2577": "Pronto Alessandri", "2239": "Pronto Irarrazaval", "2240": "Pronto Las Delicias Sargento Aldea", "2241": "Pronto Balmaceda Paradero", "2242": "Pronto Vicuña Mackenna III", "2243": "Pronto Chacabuco General Cruz", "2244": "Punto Alessandri Norte", "2245": "Pronto San Martin 2510", "2246": "Pronto El Arrayan", "2044": "Pronto Los Vilos", "2247": "Pronto Marga Marga II", "2716": "Pronto Camino Internacional Oriente", "2805": "Pronto Rafael Ariztia", "2249": "Pronto Matta Cerro Placeres", "2250": "Pronto Colo Colo", "2251": "Pronto Circunvalacion Ariztia", "2252": "Pronto Tocornal", "2253": "Pronto Adolfo Eastman", "2254": "Punto Merino Jarpa", "2255": "Pronto La Cantera I", "2256": "Pronto Ruta F30", "2257": "Pronto Camino Troncal", "2258": "Pronto Curauma Sur", "2259": "Pronto Isidoro Dubournais", "2260": "Pronto Jose M. Balmaceda", "2708": "Pronto Emilio Valle", "2262": "Pronto Juan Rusque", "2263": "Pronto Palmira Romano Sur", "2771": "Pronto Gabriel Gonzalez Videla", "2732": "Pronto Av Argentina , Las Juntas", "2025": "Pronto Los Vilos Oriente", "2265": "Pronto La Cantera II", "2266": "Pronto Calle Larga", "2267": "Punto Socos Victoria", "2268": "Pronto Tarcicio Valderrama", "2269": "Pronto Januario Ovalle", "2270": "Punto Carretera Panamericana III", "2096": "Pronto Copiapo Km 811", "2271": "Punto Copayapu", "2089": "Pronto Copiapo Km 838", "2272": "Pronto El Islon", "2273": "Pronto Alessandri II", "2595": "Pronto 4 Esquinas", "2534": "Pronto Parcela 20", "2275": "Pronto Ambrosio Ohiggins", "2045": "Pronto Coquimbo", "2276": "Pronto Camino Internacional II", "2277": "Pronto Los Carrera N° 01050", "2810": "Pronto Nicaragua", "2041": "Pronto Llay Llay", "2278": "Punto Camino Tuqui", "2040": "Pronto La Serena", "2046": "Pronto Tabolango", "2545": "Pronto Troncal Sur", "2279": "Pronto Los Copihues", "2280": "Pronto Juan Bautista Alberdi", "2011": "Pronto Puente Ruta 78", "2536": "Pronto Isidora", "2612": "Pronto Plaza Peru", "2614": "Pronto UDD Concepción", "2616": "Pronto UAI Viña Del Mar", "2618": "Pronto Metro Vicuña Mackenna", "2619": "Pronto USS Cede Los Leones", "2621": "Pronto Casino UNAB", "2622": "Pronto Casino UAI Peñalolen", "2624": "Pronto DUOC Vina Del Mar", "2775": "Pronto Lyon", "2761": "Pronto Plaza Sucre", "2763": "Pronto Plaza de Armas Temuco", "2764": "Pronto Mall Plaza El Trebol", "2765": "Pronto Metro Cal Y Canto", "2767": "Pronto Valparaiso", "2768": "Pronto Bellavista Pio Nono", "2780": "Pronto Luis Thayer Ojeda", "2789": "Pronto UAI Viña Del Mar Casino", "2790": "Pronto UAI Peñalolén Casino Edif. A", "2791": "Pronto UAI Peñalolén Casino Edif. E", "2792": "Pronto UAI Peñaloles Cafetería Edif. C", "3014": "Pronto CIUC Piso 1", "2762": "Pronto Huérfanos 815", "8201": "Pronto Metro U De Chile", "2500": "Pronto Pedro Fontova", "2532": "Pronto Chamisero", "2010": "Pronto Nos", "2281": "Pronto Balmaceda Malloco", "2282": "Pronto General San Martin", "2283": "Pronto Alcalde Lopez", "2617": "Pronto Macul", "2782": "Pronto Americo Vespucio II", "2284": "Punto Errazuriz", "2285": "Pronto Pedro Aguirre Cerda II", "2062": "Pronto Ruta 78 Poniente", "2061": "Pronto Ruta 78 Oriente", "2287": "Pronto Bilbao", "2288": "Pronto Vitacura", "2289": "Pronto Macul", "2290": "Punto San Martin N° 401", "2291": "Pronto Ecuador", "2292": "Pronto General Prieto", "2293": "Pronto Balmaceda II", "2509": "Pronto Vitacura 5579", "2511": "Pronto Av La Florida", "2294": "Pronto Blanco Encalada", "2531": "Pronto Cantagallo", "2296": "Pronto Pedro Aguirre Cerda III", "2812": "Pronto Ruta G16 Arco Iris", "2298": "Pronto Irarrazaval II", "2299": "Punto Chicureo", "2801": "Pronto Panamericana Norte", "2300": "Pronto San Ramon", "2539": "Pronto Pajaritos 5200", "2301": "Pronto Irarrazaval III", "2054": "Pronto San Fernando", "2302": "Pronto San Pablo Bismark", "2541": "Pronto Costanera E0", "2303": "Pronto Bernardo O'Higgins I", "2578": "Pronto Camino Melipilla II", "2305": "Pronto Camino Nos", "2306": "Pronto Eliodoro Yañez", "2307": "Pronto Concha Y Toro I", "2308": "Pronto Oriental", "2813": "Pronto El Rosal", "2310": "Pronto Salvador", "2311": "Pronto Membrillar", "2312": "Pronto Lota", "2513": "Pronto Portal La Dehesa", "2019": "Pronto Nos Km 27", "2313": "Pronto Vicuña Mackenna IV", "2717": "Pronto Colon", "2754": "Pronto Pedro De Valdivia", "2315": "Pronto Ossa", "2515": "Pronto Principe De Gales", "2704": "Pronto Santa Rosa II", "2317": "Punto Gran Avenida", "2318": "Pronto San Pablo II", "2586": "Pronto Mapocho Brasil", "2320": "Punto Jose Miguel Carrera", "2321": "Pronto Americo Vespucio III", "2707": "Pronto General San Martin", "2323": "Pronto Departamental", "2324": "Pronto Av San Juan", "2325": "Pronto España", "2326": "Pronto O'Higgins Lote B-5A", "2327": "Pronto Arturo Pratt", "2002": "Pronto Sagrada Familia", "2328": "Pronto Circunvalacion Norte", "2714": "Pronto Alberto Llona", "2330": "Pronto Concha Y Toro II", "2331": "Pronto Recoleta", "2769": "Pronto San Pablo Brasil", "2575": "Pronto Lia Aguirre", "2333": "Pronto Bernardo O'Higgins III", "2334": "Punto Salvador Gutierrez", "2335": "Pronto Longitudinal Sur", "2336": "Punto Carrascal", "2337": "Pronto El Valle", "2338": "Punto Mapocho", "2339": "Pronto Manso De Velasco", "2340": "Pronto Carretera El Cobre", "2772": "Punto Irarrazabal II", "2341": "Pronto Recoleta", "2342": "Pronto Vespucio", "2343": "Pronto 18 De Septiembre", "2344": "Pronto 5 De Abril", "2345": "Pronto Libertador Bernardo O'Higgins", "2346": "Pronto Walker Martinez", "2793": "Pronto Tobalaba", "2347": "Pronto Bernardo O'Higgins II", "2503": "Pronto Pajaritos 3333", "2049": "Pronto Ruta 68", "2348": "Pronto Alameda", "2349": "Pronto Riesgo", "2566": "Pronto Ignacio Carrera Pinto", "2351": "Punto Orlandi", "2088": "Pronto Chimbarongo", "2352": "Pronto Longitudinal Sur II", "2715": "Pronto Carmen Camilo Henriquez", "2745": "Pronto Independencia", "2354": "Pronto Longitudinal Sur III", "2355": "Punto Argomedo", "2356": "Pronto Viel", "2785": "Pronto Bustamante", "2357": "Pronto Freire II", "2358": "Pronto Camino Melipilla II", "2359": "Punto San Martin M. Solis", "2360": "Pronto Bascuñan Guerrero", "2807": "Pronto Manuel Montt", "2361": "Pronto Cachapoal", "2565": "Pronto Manquehue", "2362": "Pronto Departamental II", "2363": "Pronto Las Condes", "2729": "Pronto Vicuña Mackenna V", "2365": "Pronto Los Leones", "2727": "Pronto Carmen", "2367": "Pronto Consistorial", "2368": "Pronto Calera De Tango", "2711": "Pronto Arturo Prat II", "2370": "Punto San Eugenio", "2806": "Pronto Camino Lo Sierra", "2371": "Punto Jose Pedro Alessandri", "2372": "Pronto Francisco Bilbao II", "2804": "Pronto Diagonal Oriente", "2373": "Punto Alberto Edwards", "2718": "Pronto Camino El Alba", "2776": "Pronto Ortuzar", "2374": "Pronto Trinidad", "2728": "Pronto Providencia", "2026": "Pronto San Fco Mostazal Poniente", "2027": "Pronto San Fco Mostazal Oriente", "2376": "Pronto San Jose", "2548": "Pronto Trapenses", "2377": "Pronto Camino Lonquen", "2505": "Pronto Lord Cochrane", "2378": "Pronto Americo Vespucio", "2787": "Pronto Virginia Subercaseaux", "2379": "Punto Jose Joaquin Perez II", "2556": "Pronto Vitacura 4207", "2530": "Pronto Vicuña Mackenna 1990", "2380": "Pronto Bascuñan Guerrero II", "2381": "Pronto Camino Lo Ovalle", "2576": "Pronto Apoquindo", "2504": "Pronto Vicuña Mackenna 5700", "2506": "Pronto La Dehesa", "2016": "Pronto Lampa", "2525": "Pronto Costanera E1", "2526": "Pronto Costanera E2", "2029": "Pronto Costanera E6", "2507": "Pronto San Pablo", "2568": "Pronto Carmen III", "2512": "Pronto Santa Maria", "2086": "Pronto Requinoa", "2087": "Pronto Romeral", "2384": "Pronto 21 De Mayo", "2385": "Pronto Mexico El Peñon", "2508": "Pronto Las Condes 10912", "2599": "Pronto Americo Vespucio IV", "2387": "Pronto Recreo", "2589": "Pronto Gabriela", "2518": "Pronto C Henriquez", "2521": "Pronto Los Libertadores", "2388": "Pronto Leonardo Murialdo", "2781": "Pronto Comercio", "2389": "Pronto Concha Y Toro III", "2390": "Pronto Santa Rosa III", "2538": "Pronto Tobalaba", "2795": "Pronto Austral", "2391": "Punto Henriquez", "2392": "Pronto Manzano", "2799": "Pronto Ruta 215", "2798": "Pronto Matta III", "2007": "Pronto Panamericana Norte II", "2633": "Pronto Irarrazaval Brown Sur", "2637": "Pronto Antonio Bellet", "2394": "Pronto General Velasquez", "2630": "Pronto Colo Colo", "2808": "Pronto Padre Las Casas", "2809": "Pronto Tijerales", "2638": "Pronto San Carlos de Apoquindo", "2396": "Pronto Mejillones", "2634": "Pronto Holanda", "2648": "Pronto Mall Plaza Alameda", "2631": "Pronto Agustinas San Antonio", "2397": "Pronto Quillon", "2641": "Pronto Antofagasta Arauco Express", "2645": "Pronto Agustinas Morande", "2405": "Pronto San Diego", "2643": "Pronto Padre Mariano", "2104": "Pronto Tinuche", "2639": "Pronto La Florida El Membrillar", "2651": "Sbarro Mall Plaza Norte", "2650": "Sbarro Mall Plaza Egaña", "2635": "Pronto Bulnes-Portales Temuco", "2652": "Sbarro Mall Costanera Center", "2552": "Pronto Quilin", "2066": "Pronto Monterilla", "2036": "Pronto Vallenar", "2130": "Pronto Villarrica", "2141": "Pronto Colegio Ingles talca", "2147": "Pronto Huamachuco", "2117": "Pronto Los Carrera", "2149": "Pronto Lorca", "2127": "Pronto San Carlos Sur", "2814": "Pronto Pichilemu Comercio", "2153": "Pronto Laura Pizarro", "7002": "Juan Valdez Providencia", "7003": "Juan Valdez M Pza Dominicos", "7004": "Juan Valdez MUT", "7005": "Juan Valdez M Plaza La Serena", "7006": "Juan Valdez M Plaza Los Ríos", "7007": "Juan Valdez Clínica Las Condes", "7008": "Juan Valdez M Plaza Trebol", "7009": "Juan Valdez M Portal Osorno", "7010": "Juan Valdez M Costanera PM", "7011": "Juan Valdez Aires Vespucio", "7012": "Juan Valdez M Arauco Maipu", "7013": "Juan Valdez M Pza Egana Corn", "7014": "Juan Valdez Rosario Norte", "7015": "Juan Valdez M Marina Arauco", "7016": "Juan Valdez Catedral", "7017": "Juan Valdez M Independencia", "7018": "Juan Valdez Open Kennedy", "7019": "Juan Valdez Apto Espigon C", "7020": "Juan Valdez Apto Espigon E", "7021": "Juan Valdez M P Arauco Corn", "7022": "Juan Valdez M Parque Arauco", "7023": "Juan Valdez M Costanera Ctr", "7024": "Juan Valdez M Plaza Egana", "7025": "Juan Valdez Open Pza Rancagua", "7026": "Juan Valdez M Alto Las Condes", "7027": "Juan Valdez M Pza Antofagasta", "7028": "Juan Valdez M Plaza Tobalaba", "7029": "Juan Valdez Lider Puente Nuevo", "9005": "Juan Valdez Darkstore Wallmart", "9008": "Juan Valdez Darkstore Justo", "9003": "Centro Distribucion Bluex", "9002": "Centro Distribucion 3PL"};
@@ -197,8 +197,8 @@ const PLANILLAS = [
       { key: "nombreCentro", label: "Nombre centro", src: "centro_nombre" },
       { key: "descSku", label: "Descripcion SKU", src: "sku_desc" },
     ],
-    salida: ["centro", "nombreCentro", "sku", "descSku", "fechaInicio", "fechaFinal"],
-    salidaLabels: ["Centro", "Nombre centro", "SKU", "Descripcion SKU", "Fecha inicio", "Fecha final"],
+    salida: ["centro", "sku", "fechaInicio", "fechaFinal"],
+    salidaLabels: ["Centro", "SKU", "Fecha inicio", "Fecha final"],
     ejemplo: { centro: "2003,2549", sku: "32", fechaInicio: "01-07-2026", fechaFinal: "31-12-9999" },
   },
   {
@@ -613,6 +613,33 @@ const filaVacia = planilla => Object.fromEntries(planilla.userCols.map(c => [c.k
    un registro en memoria de la sesión.
    ============================================================ */
 const PREFIJO = "solicitudes:";
+
+/* ---- Creación SKU ---- */
+const TIPOS_SKU      = ["Retail", "Insumo", "Receta", "Combos", "Menaje", "Packaging"];
+const TIPOS_SIN_DIM  = new Set(["Receta", "Combos"]);
+const TIPOS_SIN_FOTO = new Set(["Insumo", "Packaging"]);
+const UNIDADES_DIM   = ["UN", "CJ", "DSP", "BL", "KG", "LT", "DOC", "PAR", "PAQ"];
+const DIM_CAMPOS = [
+  { key: "alto",       label: "Alto" },
+  { key: "largo",      label: "Largo" },
+  { key: "ancho",      label: "Ancho" },
+  { key: "peso_neto",  label: "Peso neto" },
+  { key: "peso_bruto", label: "Peso bruto" },
+];
+const emptyDim    = () => ({ unidad: "", alto: "", largo: "", ancho: "", peso_neto: "", peso_bruto: "" });
+const emptySkuRow = () => ({
+  _id: Math.random().toString(36).slice(2),
+  id_creacion: "CSKU-" + new Date().toISOString().slice(0, 10).replace(/-/g, "") + "-" + Math.random().toString(36).slice(2, 6).toUpperCase(),
+  nombre: "", descripcion: "", tipo: "",
+  grupo_articulo: "", material_modelo: "",
+  marca: "", fabricante: "",
+  flag_planograma: false, flag_navegacion: false,
+  factor_conversion: "",
+  dim_primaria: emptyDim(), dim_secundaria: emptyDim(),
+  insumos: [],
+  fotos_planograma: [], fotos_navegacion: [],
+  errores: [],
+});
 const memoria = []; // fallback
 
 const ESTADOS = {
@@ -924,6 +951,8 @@ export default function PortalSAP() {
   if (vista === "inicio")      return <AppShell vista={vista} setVista={setVista} perfil={perfil}><VistaInicio perfil={perfil} setVista={setVista} /></AppShell>;
   if (vista === "maestros")    return <AppShell vista={vista} setVista={setVista} perfil={perfil}><VistaMaestros /></AppShell>;
   if (vista === "admin")       return <AppShell vista={vista} setVista={setVista} perfil={perfil}><VistaAdmin /></AppShell>;
+  if (vista === "planillas")   return <AppShell vista={vista} setVista={setVista} perfil={perfil}><VistaMantenedorPlanillas /></AppShell>;
+  if (vista === "nuevo-sku")   return <VistaCreacionSKU perfil={perfil} session={session} vista={vista} setVista={setVista} />;
   if (vista === "solicitudes") return <AppShell vista={vista} setVista={setVista} perfil={perfil}><VistaSolicitudes perfil={perfil} /></AppShell>;
   if (vista === "clusters")    return <AppShell vista={vista} setVista={setVista} perfil={perfil}><VistaClusters clusters={clusters} onChange={actualizarClusters} /></AppShell>;
   if (vista === "ayuda")       return <AppShell vista={vista} setVista={setVista} perfil={perfil}><VistaAyuda /></AppShell>;
@@ -2573,6 +2602,32 @@ const TABLAS_CONFIG = [
     ],
     templateEjemplo: [["MAT001", "Material Ejemplo", "Descripcion del material"], ["MAT002", "Otro Material", ""]],
   },
+  {
+    id: "marcas",
+    nombre: "Marcas",
+    desc: "Marcas de productos. Columnas esperadas: Codigo, Nombre.",
+    icon: Tag,
+    tabla: "marcas",
+    conflicto: "codigo",
+    columnas: [
+      { key: "codigo", label: "Codigo", col: 0, req: true },
+      { key: "nombre", label: "Nombre", col: 1, req: true },
+    ],
+    templateEjemplo: [["COCA", "Coca-Cola"], ["NESTLE", "Nestlé"]],
+  },
+  {
+    id: "fabricantes",
+    nombre: "Fabricantes",
+    desc: "Fabricantes de productos. Columnas esperadas: Codigo, Nombre.",
+    icon: Truck,
+    tabla: "fabricantes",
+    conflicto: "codigo",
+    columnas: [
+      { key: "codigo", label: "Codigo", col: 0, req: true },
+      { key: "nombre", label: "Nombre", col: 1, req: true },
+    ],
+    templateEjemplo: [["FAB001", "Nestlé Chile S.A."], ["FAB002", "Coca-Cola Andina"]],
+  },
 ];
 
 function VistaMaestros() {
@@ -2743,6 +2798,734 @@ function VistaMaestros() {
             {res.tipo === "ok" ? <CheckCircle2 size={15} /> : <XCircle size={15} />} {res.texto}
           </div>
         )}
+      </div>
+    </main>
+  );
+}
+
+/* ============================================================
+   CREACIÓN DE NUEVOS SKUs
+   ============================================================ */
+function SkuFieldLabel({ children }) {
+  return <div style={{ fontSize: 12, color: "#636366", marginBottom: 4 }}>{children}</div>;
+}
+function SkuSectionLabel({ children }) {
+  return <div style={{ fontSize: 12, fontWeight: 700, color: "#5b8dee", textTransform: "uppercase", letterSpacing: "0.05em", margin: "18px 0 10px" }}>{children}</div>;
+}
+
+// Columnas del template Excel de importación de SKUs
+const SKU_EXCEL_COLS = [
+  { key: "nombre",            label: "Nombre",              col: 0 },
+  { key: "descripcion",       label: "Descripcion",         col: 1 },
+  { key: "tipo",              label: "Tipo",                col: 2 },
+  { key: "grupo_articulo",    label: "Grupo Articulo",      col: 3 },
+  { key: "material_modelo",   label: "Material Modelo",     col: 4 },
+  { key: "marca",             label: "Marca",               col: 5 },
+  { key: "fabricante",        label: "Fabricante",          col: 6 },
+  { key: "flag_planograma",   label: "Flag Planograma",     col: 7 },
+  { key: "flag_navegacion",   label: "Flag Navegacion",     col: 8 },
+  { key: "_p_unidad",         label: "Primaria Unidad",     col: 9 },
+  { key: "_p_alto",           label: "Primaria Alto",       col: 10 },
+  { key: "_p_largo",          label: "Primaria Largo",      col: 11 },
+  { key: "_p_ancho",          label: "Primaria Ancho",      col: 12 },
+  { key: "_p_peso_neto",      label: "Primaria Peso Neto",  col: 13 },
+  { key: "_p_peso_bruto",     label: "Primaria Peso Bruto", col: 14 },
+  { key: "factor_conversion", label: "Factor Conversion",   col: 15 },
+  { key: "_s_unidad",         label: "Secundaria Unidad",   col: 16 },
+  { key: "_s_alto",           label: "Secundaria Alto",     col: 17 },
+  { key: "_s_largo",          label: "Secundaria Largo",    col: 18 },
+  { key: "_s_ancho",          label: "Secundaria Ancho",    col: 19 },
+  { key: "_s_peso_neto",      label: "Secundaria Peso Neto",col: 20 },
+  { key: "_s_peso_bruto",     label: "Secundaria Peso Bruto",col: 21 },
+];
+
+function VistaCreacionSKU({ perfil, session, vista, setVista }) {
+  const [skus, setSkus] = useState([emptySkuRow()]);
+  const [expandedRow, setExpandedRow] = useState(null);
+  const [insumoModal, setInsumoModal] = useState(null);
+  const [colGroup, setColGroup] = useState("basicos");
+  const [solicitante, setSolicitante] = useState(perfil?.nombre || "");
+  const [enviando, setEnviando] = useState(false);
+  const [enviado, setEnviado] = useState(null);
+  const [cat, setCat] = useState({ grupos: [], modelos: [], marcas: [], fabricantes: [] });
+  const importRef = useRef();
+  const insumoImportRef = useRef();
+
+  useEffect(() => {
+    (async () => {
+      const [{ data: grupos }, { data: modelos }, { data: marcas }, { data: fabricantes }] = await Promise.all([
+        supabase.from("grupos_articulo").select("codigo,nombre"),
+        supabase.from("materiales_modelo").select("codigo,nombre"),
+        supabase.from("marcas").select("codigo,nombre"),
+        supabase.from("fabricantes").select("codigo,nombre"),
+      ]);
+      setCat({ grupos: grupos || [], modelos: modelos || [], marcas: marcas || [], fabricantes: fabricantes || [] });
+    })();
+  }, []);
+
+  const importarExcel = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const wb = XLSX.read(ev.target.result, { type: "array" });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const raw = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" });
+      const dataRows = raw.slice(1).filter(r => r[0]);
+      const nuevos = dataRows.slice(0, 80).map(row => {
+        const s = emptySkuRow();
+        SKU_EXCEL_COLS.forEach(c => {
+          const val = String(row[c.col] ?? "").trim();
+          if (c.key.startsWith("_p_")) s.dim_primaria[c.key.slice(3)] = val;
+          else if (c.key.startsWith("_s_")) s.dim_secundaria[c.key.slice(3)] = val;
+          else if (c.key === "flag_planograma" || c.key === "flag_navegacion")
+            s[c.key] = val.toUpperCase() === "SI" || val === "1" || val.toUpperCase() === "TRUE";
+          else s[c.key] = val;
+        });
+        return s;
+      });
+      if (nuevos.length) setSkus(nuevos);
+    };
+    reader.readAsArrayBuffer(file);
+    e.target.value = "";
+  };
+
+  const descargarTemplate = () => {
+    const headers = SKU_EXCEL_COLS.map(c => c.label);
+    const ejemplo = ["Agua Mineral 500ml", "Agua mineral sin gas botella PET", "Retail", "BEB", "MAT001", "NESTLE", "FAB001", "SI", "SI", "22", "7", "7", "0.5", "0.55", "24", "8", "8", "12", "13.2"];
+    const ws = XLSX.utils.aoa_to_sheet([headers, ejemplo]);
+    ws["!cols"] = headers.map(h => ({ wch: Math.max(h.length + 2, 14) }));
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "SKUs");
+    XLSX.writeFile(wb, "template_nuevos_sku.xlsx");
+  };
+
+  const updateSku    = (id, k, v)      => setSkus(s => s.map(x => x._id === id ? { ...x, [k]: v } : x));
+  const updateSkuDim = (id, dim, k, v) => setSkus(s => s.map(x => x._id === id ? { ...x, [dim]: { ...x[dim], [k]: v } } : x));
+  const addSku       = () => { if (skus.length >= 80) return; setSkus(s => [...s, emptySkuRow()]); };
+  const removeSku    = (id) => setSkus(s => s.filter(x => x._id !== id));
+
+  const addInsumo    = (id)          => setSkus(s => s.map(x => x._id !== id ? x : { ...x, insumos: [...x.insumos, { sku: "", cantidad: "", unidad: "" }] }));
+  const removeInsumo = (id, i)       => setSkus(s => s.map(x => x._id !== id ? x : { ...x, insumos: x.insumos.filter((_, j) => j !== i) }));
+  const updateInsumo = (id, i, k, v) => setSkus(s => s.map(x => {
+    if (x._id !== id) return x;
+    const ins = x.insumos.map((r, j) => {
+      if (j !== i) return r;
+      const updated = { ...r, [k]: v };
+      if (k === "sku") updated.unidad = MAESTROS.skus?.[v]?.unidadVenta || "";
+      return updated;
+    });
+    return { ...x, insumos: ins };
+  }));
+
+  const addFotos   = (id, tipo, files) => setSkus(s => s.map(x => x._id !== id ? x : { ...x, [`fotos_${tipo}`]: [...x[`fotos_${tipo}`], ...Array.from(files)] }));
+  const removeFoto = (id, tipo, i)     => setSkus(s => s.map(x => x._id !== id ? x : { ...x, [`fotos_${tipo}`]: x[`fotos_${tipo}`].filter((_, j) => j !== i) }));
+
+  const descargarTemplateInsumos = () => {
+    const ws = XLSX.utils.aoa_to_sheet([["Codigo SKU", "Cantidad"], ["10047", "2.5"]]);
+    ws["!cols"] = [{ wch: 16 }, { wch: 12 }];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Insumos");
+    XLSX.writeFile(wb, "template_insumos_receta.xlsx");
+  };
+
+  const importarInsumos = (id, e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const wb = XLSX.read(ev.target.result, { type: "array" });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const raw = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" });
+      const nuevos = raw.slice(1)
+        .filter(r => r[0])
+        .map(r => {
+          const skuCod = String(r[0]).trim();
+          return { sku: skuCod, cantidad: String(r[1] ?? "").trim(), unidad: MAESTROS.skus?.[skuCod]?.unidadVenta || "" };
+        });
+      if (nuevos.length) setSkus(s => s.map(x => x._id !== id ? x : { ...x, insumos: nuevos }));
+    };
+    reader.readAsArrayBuffer(file);
+    e.target.value = "";
+  };
+
+  const validarTodo = () => {
+    let ok = true;
+    const updated = skus.map(sku => {
+      const errs = [];
+      if (!sku.nombre.trim())   errs.push("Nombre requerido");
+      if (!sku.tipo)            errs.push("Tipo requerido");
+      if (!sku.grupo_articulo)  errs.push("Grupo artículo requerido");
+      if (!sku.material_modelo) errs.push("Material modelo requerido");
+      if (!sku.marca)           errs.push("Marca requerida");
+      if (!sku.fabricante)      errs.push("Fabricante requerido");
+      if (!TIPOS_SIN_DIM.has(sku.tipo)) {
+        ["dim_primaria", "dim_secundaria"].forEach((dim, di) => {
+          DIM_CAMPOS.forEach(c => { if (!sku[dim][c.key]) errs.push(`${di === 0 ? "Primaria" : "Secundaria"}: ${c.label} requerido`); });
+        });
+      }
+      if (sku.tipo === "Receta" && sku.insumos.length === 0) errs.push("Debe tener al menos un insumo");
+      if (!TIPOS_SIN_FOTO.has(sku.tipo)) {
+        if (sku.fotos_planograma.length < 3) errs.push("Planograma: mínimo 3 fotos JPG");
+        if (sku.fotos_navegacion.length === 0) errs.push("Navegación: se requiere 1 foto PNG");
+      }
+      if (errs.length) ok = false;
+      return { ...sku, errores: errs };
+    });
+    setSkus(updated);
+    const firstErr = updated.find(s => s.errores.length);
+    if (firstErr) setExpandedRow(firstErr._id);
+    return ok;
+  };
+
+  const handleEnviar = async () => {
+    if (!validarTodo() || solicitante.trim().length < 3) return;
+    setEnviando(true);
+    const folio = "SKU-" + new Date().getFullYear() + "-" + String(Math.floor(100000 + Math.random() * 899999));
+    const filas = await Promise.all(skus.map(async (sku, idx) => {
+      const uploadDir = async (files, carpeta) => {
+        const paths = [];
+        for (const file of files) {
+          const path = `${folio}/${idx}/${carpeta}/${file.name}`;
+          const { error } = await supabase.storage.from("sku-fotos").upload(path, file, { upsert: true });
+          if (!error) paths.push(path);
+        }
+        return paths;
+      };
+      let fp = [], fn = [];
+      if (!TIPOS_SIN_FOTO.has(sku.tipo)) {
+        fp = await uploadDir(sku.fotos_planograma, "planograma");
+        fn = await uploadDir(sku.fotos_navegacion, "navegacion");
+      }
+      const { _id, errores, fotos_planograma, fotos_navegacion, ...data } = sku;
+      return { ...data, fotos_planograma_paths: fp, fotos_navegacion_paths: fn };
+    }));
+    const { error } = await supabase.from("solicitudes").insert({
+      folio,
+      solicitante_id:     session?.user?.id,
+      solicitante_nombre: solicitante,
+      solicitante_email:  session?.user?.email,
+      estado:    "Enviada",
+      planillas: [{ id: "creacion_sku", nombre: "Creación de SKU", filas }],
+      historial: [{ estado: "Enviada", fecha: new Date().toISOString() }],
+    });
+    setEnviando(false);
+    if (!error) setEnviado({ folio, total: skus.length });
+    else alert("Error al guardar: " + JSON.stringify(error));
+  };
+
+  if (enviado) return (
+    <AppShell vista={vista} setVista={setVista} perfil={perfil}>
+      <main className="success-wrap">
+        <div className="success-check"><CheckCircle2 size={64} strokeWidth={1.3} /></div>
+        <h1 className="success-title">Solicitud enviada.</h1>
+        <p className="success-sub">Folio <strong>{enviado.folio}</strong> · {enviado.total} SKU{enviado.total > 1 ? "s" : ""} a crear.</p>
+        <button className="btn-primary" style={{ marginTop: 24 }} onClick={() => { setEnviado(null); setSkus([emptySkuRow()]); }}>Nueva solicitud</button>
+      </main>
+    </AppShell>
+  );
+
+  const totalFotos   = skus.filter(s => !TIPOS_SIN_FOTO.has(s.tipo)).reduce((a, s) => a + s.fotos_planograma.length + s.fotos_navegacion.length, 0);
+  const skusConError = skus.filter(s => s.errores.length > 0);
+  const skuModal     = insumoModal ? skus.find(s => s._id === insumoModal) : null;
+  const NCOLS        = 12;
+
+  const panelDerecho = (
+    <div style={{ padding: "28px 20px", display: "flex", flexDirection: "column", gap: 16 }}>
+      <div>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "#3a3a3c", marginBottom: 12 }}>Resumen</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
+            <span style={{ color: "#636366" }}>SKUs</span>
+            <strong>{skus.length} / 80</strong>
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
+            <span style={{ color: "#636366" }}>Fotos adjuntas</span>
+            <strong>{totalFotos}</strong>
+          </div>
+          {skusConError.length > 0 && (
+            <div style={{ fontSize: 12, color: "#c2271c", background: "rgba(255,59,48,0.07)", borderRadius: 8, padding: "8px 10px", marginTop: 4 }}>
+              {skusConError.length} SKU{skusConError.length > 1 ? "s" : ""} con errores
+            </div>
+          )}
+        </div>
+      </div>
+      <div style={{ borderTop: "1px solid rgba(0,0,0,0.08)", paddingTop: 16 }}>
+        <div style={{ fontSize: 12, color: "#636366", marginBottom: 6 }}>Solicitante</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+          <User size={14} color="#636366" />
+          <input className="inp" style={{ flex: 1 }} value={solicitante} onChange={e => setSolicitante(e.target.value)} placeholder="Tu nombre completo" />
+        </div>
+        <button className="btn-primary" style={{ width: "100%", marginBottom: 8 }} disabled={solicitante.trim().length < 3 || enviando} onClick={handleEnviar}>
+          {enviando ? "Enviando…" : "Enviar solicitud"} <ArrowRight size={15} />
+        </button>
+      </div>
+      <div style={{ borderTop: "1px solid rgba(0,0,0,0.08)", paddingTop: 16 }}>
+        <p style={{ fontSize: 11, color: "#aeaeb2", lineHeight: 1.5 }}>Usa los grupos de columnas para navegar entre secciones. Las fotos e insumos están en el grupo "Fotos / Flags".</p>
+      </div>
+    </div>
+  );
+
+  const thSt = { padding: "8px 10px", textAlign: "left", fontSize: 11, fontWeight: 600, color: "#86868b", textTransform: "uppercase", letterSpacing: ".05em", borderBottom: "1px solid rgba(200,205,230,0.4)", background: "#f8f8fc", whiteSpace: "nowrap" };
+
+  const COL_GROUPS = [
+    { id: "basicos",     label: "Datos básicos" },
+    { id: "marcas",      label: "Marca / Prov." },
+    { id: "dimensiones", label: "Dimensiones" },
+    { id: "fotos",       label: "Fotos / Flags" },
+  ];
+
+  const dimNA = (key) => <td key={key} style={{ background: "#f8f8fa" }}><span style={{ color: "#d2d2d7", fontSize: 12, padding: "7px 8px", display: "block" }}>—</span></td>;
+
+  return (
+    <AppShell vista={vista} setVista={setVista} perfil={perfil} rightPanel={panelDerecho}>
+      <main className="sol-wrap">
+        <div className="bloque">
+          <div className="bloque-head">
+            <span className="card-icon sm"><Package size={18} strokeWidth={1.7} /></span>
+            <div className="bloque-tit">
+              <strong>Nuevo SKU</strong>
+              <span>{skusConError.length > 0 ? `${skusConError.length} SKU${skusConError.length > 1 ? "s" : ""} con error` : "Pendiente de validación"}</span>
+            </div>
+            <div className="bloque-acciones">
+              <button className="btn-ghost" onClick={descargarTemplate}><Download size={14} /> Plantilla</button>
+              <input type="file" accept=".xlsx,.xls" hidden ref={importRef} onChange={importarExcel} />
+              <button className="btn-ghost" onClick={() => importRef.current?.click()}><Upload size={14} /> Importar Excel</button>
+            </div>
+          </div>
+
+          {/* Selector de grupo de columnas */}
+          <div style={{ display: "flex", gap: 6, padding: "8px 12px", borderBottom: "1px solid rgba(0,0,0,0.06)", flexWrap: "wrap" }}>
+            {COL_GROUPS.map(g => (
+              <button key={g.id} onClick={() => setColGroup(g.id)} style={{
+                fontSize: 12, padding: "4px 14px", borderRadius: 980, border: "1px solid",
+                borderColor: colGroup === g.id ? "#5b8dee" : "rgba(0,0,0,0.12)",
+                background: colGroup === g.id ? "#5b8dee" : "transparent",
+                color: colGroup === g.id ? "#fff" : "#515154",
+                cursor: "pointer", fontWeight: colGroup === g.id ? 600 : 400, transition: "all .15s",
+              }}>{g.label}</button>
+            ))}
+          </div>
+
+          <div className="grilla-scroll">
+            <table className="grilla">
+              <thead>
+                <tr>
+                  <th className="th-n">#</th>
+                  <th style={{ minWidth: 140 }}>ID Creación</th>
+
+                  {colGroup === "basicos" && <>
+                    <th style={{ minWidth: 175 }}>Nombre</th>
+                    <th style={{ minWidth: 185 }}>Descripción</th>
+                    <th style={{ minWidth: 120 }}>Tipo</th>
+                    <th style={{ minWidth: 110 }}>Insumos</th>
+                  </>}
+
+                  {colGroup === "marcas" && <>
+                    <th style={{ minWidth: 140 }}>Grupo Art.</th>
+                    <th style={{ minWidth: 140 }}>Mat. Modelo</th>
+                    <th style={{ minWidth: 140 }}>Marca</th>
+                    <th style={{ minWidth: 140 }}>Fabricante</th>
+                  </>}
+
+                  {colGroup === "dimensiones" && <>
+                    <th style={{ minWidth: 80, borderLeft: "2px solid rgba(91,141,238,0.25)", background: "rgba(91,141,238,0.04)", color: "#5b8dee" }}>Unid. P</th>
+                    <th style={{ minWidth: 75, background: "rgba(91,141,238,0.04)" }}>Alto P</th>
+                    <th style={{ minWidth: 75, background: "rgba(91,141,238,0.04)" }}>Largo P</th>
+                    <th style={{ minWidth: 75, background: "rgba(91,141,238,0.04)" }}>Ancho P</th>
+                    <th style={{ minWidth: 85, background: "rgba(91,141,238,0.04)" }}>P.Neto P</th>
+                    <th style={{ minWidth: 85, background: "rgba(91,141,238,0.04)" }}>P.Bruto P</th>
+                    <th style={{ minWidth: 90, textAlign: "center" }}>Factor Conv.</th>
+                    <th style={{ minWidth: 80, borderLeft: "2px solid rgba(94,92,230,0.25)", background: "rgba(94,92,230,0.04)", color: "#5e5ce6" }}>Unid. S</th>
+                    <th style={{ minWidth: 75, background: "rgba(94,92,230,0.04)" }}>Alto S</th>
+                    <th style={{ minWidth: 75, background: "rgba(94,92,230,0.04)" }}>Largo S</th>
+                    <th style={{ minWidth: 75, background: "rgba(94,92,230,0.04)" }}>Ancho S</th>
+                    <th style={{ minWidth: 85, background: "rgba(94,92,230,0.04)" }}>P.Neto S</th>
+                    <th style={{ minWidth: 85, background: "rgba(94,92,230,0.04)" }}>P.Bruto S</th>
+                  </>}
+
+                  {colGroup === "fotos" && <>
+                    <th style={{ minWidth: 65, textAlign: "center" }}>Plan.</th>
+                    <th style={{ minWidth: 65, textAlign: "center" }}>Nav.</th>
+                    <th style={{ minWidth: 110 }}>Fotos</th>
+                  </>}
+
+                  <th className="th-x"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {skus.map((sku, idx) => {
+                  const sinDim   = TIPOS_SIN_DIM.has(sku.tipo);
+                  const sinFoto  = TIPOS_SIN_FOTO.has(sku.tipo);
+                  const esReceta = sku.tipo === "Receta";
+                  const hayError = sku.errores.length > 0;
+                  const expanded = expandedRow === sku._id;
+                  const NCOLS_NOW = colGroup === "basicos" ? 7 : colGroup === "marcas" ? 7 : colGroup === "dimensiones" ? 16 : 6;
+
+                  return (
+                    <React.Fragment key={sku._id}>
+                      <tr className={hayError ? "g-err" : ""}>
+                        <td className="td-n">
+                          {hayError ? <AlertTriangle size={13} className="ic-err" /> : <Pencil size={12} className="ic-dim" />}
+                        </td>
+                        <td>
+                          <span style={{ fontFamily: "monospace", fontSize: 11, background: "#f0f0f5", color: "#5e5ce6", borderRadius: 6, padding: "2px 7px", whiteSpace: "nowrap" }}>
+                            {sku.id_creacion}
+                          </span>
+                        </td>
+
+                        {colGroup === "basicos" && <>
+                          <td><input className="celda" value={sku.nombre} onChange={e => updateSku(sku._id, "nombre", e.target.value)} placeholder="Nombre del SKU" /></td>
+                          <td><input className="celda" value={sku.descripcion} onChange={e => updateSku(sku._id, "descripcion", e.target.value)} placeholder="Descripción" /></td>
+                          <td>
+                            <select className="celda" value={sku.tipo} onChange={e => updateSku(sku._id, "tipo", e.target.value)}>
+                              <option value="">—</option>
+                              {TIPOS_SKU.map(t => <option key={t}>{t}</option>)}
+                            </select>
+                          </td>
+                          <td>
+                            {esReceta ? (
+                              <button className="dz-clear dup" style={{ padding: "4px 8px", fontSize: 12, whiteSpace: "nowrap" }} onClick={() => setInsumoModal(sku._id)}>
+                                <Layers size={12} /> {sku.insumos.length > 0 ? `${sku.insumos.length} insumo${sku.insumos.length > 1 ? "s" : ""}` : "Insumos"}
+                              </button>
+                            ) : <span style={{ color: "#d2d2d7", fontSize: 12, padding: "7px 8px", display: "block" }}>—</span>}
+                          </td>
+                        </>}
+
+                        {colGroup === "marcas" && <>
+                          <td>
+                            <select className="celda" value={sku.grupo_articulo} onChange={e => updateSku(sku._id, "grupo_articulo", e.target.value)}>
+                              <option value="">—</option>
+                              {cat.grupos.map(g => <option key={g.codigo} value={g.codigo}>{g.codigo} — {g.nombre}</option>)}
+                            </select>
+                          </td>
+                          <td>
+                            <select className="celda" value={sku.material_modelo} onChange={e => updateSku(sku._id, "material_modelo", e.target.value)}>
+                              <option value="">—</option>
+                              {cat.modelos.map(m => <option key={m.codigo} value={m.codigo}>{m.codigo} — {m.nombre}</option>)}
+                            </select>
+                          </td>
+                          <td>
+                            <select className="celda" value={sku.marca} onChange={e => updateSku(sku._id, "marca", e.target.value)}>
+                              <option value="">—</option>
+                              {cat.marcas.map(m => <option key={m.codigo} value={m.codigo}>{m.codigo} — {m.nombre}</option>)}
+                              <option value="MARCA NO CREADA">NO CREADA</option>
+                            </select>
+                          </td>
+                          <td>
+                            <select className="celda" value={sku.fabricante} onChange={e => updateSku(sku._id, "fabricante", e.target.value)}>
+                              <option value="">—</option>
+                              {cat.fabricantes.map(f => <option key={f.codigo} value={f.codigo}>{f.codigo} — {f.nombre}</option>)}
+                              <option value="FABRICANTE NO CREADO">NO CREADO</option>
+                            </select>
+                          </td>
+                        </>}
+
+                        {colGroup === "dimensiones" && (sinDim ? <>
+                          {[...Array(13)].map((_, i) => dimNA(`d${i}`))}
+                        </> : <>
+                          <td style={{ borderLeft: "2px solid rgba(91,141,238,0.2)" }}>
+                            <select className="celda" value={sku.dim_primaria.unidad} onChange={e => updateSkuDim(sku._id, "dim_primaria", "unidad", e.target.value)}>
+                              <option value="">—</option>
+                              {UNIDADES_DIM.map(u => <option key={u}>{u}</option>)}
+                            </select>
+                          </td>
+                          {DIM_CAMPOS.map(c => (
+                            <td key={c.key}>
+                              <input className="celda" type="number" min="0" step="0.001" value={sku.dim_primaria[c.key]} onChange={e => updateSkuDim(sku._id, "dim_primaria", c.key, e.target.value)} placeholder="0" />
+                            </td>
+                          ))}
+                          <td>
+                            <input className="celda" type="number" min="0" step="0.001" value={sku.factor_conversion} onChange={e => updateSku(sku._id, "factor_conversion", e.target.value)} placeholder="1" />
+                          </td>
+                          <td style={{ borderLeft: "2px solid rgba(94,92,230,0.2)" }}>
+                            <select className="celda" value={sku.dim_secundaria.unidad} onChange={e => updateSkuDim(sku._id, "dim_secundaria", "unidad", e.target.value)}>
+                              <option value="">—</option>
+                              {UNIDADES_DIM.map(u => <option key={u}>{u}</option>)}
+                            </select>
+                          </td>
+                          {DIM_CAMPOS.map(c => (
+                            <td key={c.key}>
+                              <input className="celda" type="number" min="0" step="0.001" value={sku.dim_secundaria[c.key]} onChange={e => updateSkuDim(sku._id, "dim_secundaria", c.key, e.target.value)} placeholder="0" />
+                            </td>
+                          ))}
+                        </>)}
+
+                        {colGroup === "fotos" && <>
+                          <td style={{ textAlign: "center" }}>
+                            <input type="checkbox" checked={sku.flag_planograma} onChange={e => updateSku(sku._id, "flag_planograma", e.target.checked)} />
+                          </td>
+                          <td style={{ textAlign: "center" }}>
+                            <input type="checkbox" checked={sku.flag_navegacion} onChange={e => updateSku(sku._id, "flag_navegacion", e.target.checked)} />
+                          </td>
+                          <td>
+                            {sinFoto ? <span style={{ color: "#d2d2d7", fontSize: 12, padding: "7px 8px", display: "block" }}>—</span> : (
+                              <button className="dz-clear dup" style={{ padding: "4px 8px", fontSize: 12, whiteSpace: "nowrap" }} onClick={() => setExpandedRow(expanded ? null : sku._id)}>
+                                <Upload size={12} /> {sku.fotos_planograma.length + sku.fotos_navegacion.length > 0 ? `${sku.fotos_planograma.length + sku.fotos_navegacion.length} foto${sku.fotos_planograma.length + sku.fotos_navegacion.length > 1 ? "s" : ""}` : "Adjuntar"}
+                              </button>
+                            )}
+                          </td>
+                        </>}
+
+                        <td className="td-x">
+                          <span className="fila-btns">
+                            {skus.length > 1 && (
+                              <button className="dz-clear" onClick={() => removeSku(sku._id)} title="Eliminar"><Trash2 size={13} /></button>
+                            )}
+                          </span>
+                        </td>
+                      </tr>
+
+                      {hayError && (
+                        <tr className="g-err-detalle">
+                          <td></td>
+                          <td colSpan={NCOLS_NOW - 1}>{sku.errores.join(" · ")}</td>
+                        </tr>
+                      )}
+
+                      {/* Panel fotos expandido (solo grupo fotos) */}
+                      {expanded && colGroup === "fotos" && !sinFoto && (
+                        <tr>
+                          <td></td>
+                          <td colSpan={NCOLS_NOW - 1} style={{ padding: "14px 12px 18px", background: "#f8f8fc", borderBottom: "1px solid rgba(0,0,0,0.06)" }}>
+                            <div style={{ display: "flex", gap: 14 }}>
+                              <div style={{ flex: 1 }}>
+                                <div style={{ fontSize: 11, color: "#636366", marginBottom: 6 }}>Planograma · JPG (mín. 3)</div>
+                                <label style={{ display: "block", border: "1.5px dashed rgba(0,0,0,0.15)", borderRadius: 10, padding: "10px", cursor: "pointer", textAlign: "center", fontSize: 12, color: "#636366" }}>
+                                  <Upload size={14} style={{ display: "block", margin: "0 auto 4px" }} />
+                                  {sku.fotos_planograma.length > 0 ? `${sku.fotos_planograma.length} foto${sku.fotos_planograma.length > 1 ? "s" : ""}` : "Seleccionar"}
+                                  <input type="file" multiple accept="image/jpeg,image/jpg" style={{ display: "none" }} onChange={e => addFotos(sku._id, "planograma", e.target.files)} />
+                                </label>
+                                {sku.fotos_planograma.map((f, fi) => (
+                                  <div key={fi} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#636366", marginTop: 3 }}>
+                                    <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{f.name}</span>
+                                    <button onClick={() => removeFoto(sku._id, "planograma", fi)} style={{ background: "none", border: "none", cursor: "pointer", color: "#aeaeb2", padding: 0 }}><X size={11} /></button>
+                                  </div>
+                                ))}
+                              </div>
+                              <div style={{ flex: 1 }}>
+                                <div style={{ fontSize: 11, color: "#636366", marginBottom: 6 }}>Navegación · PNG 600×400</div>
+                                <label style={{ display: "block", border: "1.5px dashed rgba(0,0,0,0.15)", borderRadius: 10, padding: "10px", cursor: "pointer", textAlign: "center", fontSize: 12, color: "#636366" }}>
+                                  <Upload size={14} style={{ display: "block", margin: "0 auto 4px" }} />
+                                  {sku.fotos_navegacion.length > 0 ? "1 foto" : "Seleccionar"}
+                                  <input type="file" accept="image/png" style={{ display: "none" }} onChange={e => addFotos(sku._id, "navegacion", e.target.files)} />
+                                </label>
+                                {sku.fotos_navegacion.length > 0 && (
+                                  <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#636366", marginTop: 3 }}>
+                                    <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{sku.fotos_navegacion[0].name}</span>
+                                    <button onClick={() => removeFoto(sku._id, "navegacion", 0)} style={{ background: "none", border: "none", cursor: "pointer", color: "#aeaeb2", padding: 0 }}><X size={11} /></button>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <button className="btn-addrow" onClick={addSku} disabled={skus.length >= 80}>
+            <Plus size={14} /> Agregar SKU
+          </button>
+        </div>
+
+        {/* Modal insumos de receta */}
+        {skuModal && (
+          <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
+               onClick={e => { if (e.target === e.currentTarget) setInsumoModal(null); }}>
+            <div style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth: 660, maxHeight: "80vh", display: "flex", flexDirection: "column", overflow: "hidden", boxShadow: "0 20px 60px rgba(0,0,0,0.22)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "18px 22px", borderBottom: "1px solid rgba(0,0,0,0.07)" }}>
+                <Layers size={18} color="#5b8dee" />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 700, fontSize: 15 }}>Insumos de la receta</div>
+                  <div style={{ fontSize: 12, color: "#636366" }}>
+                    {skuModal.nombre || "SKU sin nombre"} ·{" "}
+                    <span style={{ fontFamily: "monospace", color: "#5e5ce6" }}>{skuModal.id_creacion}</span>
+                  </div>
+                </div>
+                <button onClick={() => setInsumoModal(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "#636366", padding: 4 }}><X size={20} /></button>
+              </div>
+
+              <div style={{ flex: 1, overflow: "auto", padding: "16px 22px" }}>
+                <div style={{ border: "1px solid rgba(0,0,0,0.07)", borderRadius: 12, overflow: "hidden" }}>
+                  <table style={{ borderCollapse: "collapse", width: "100%", fontSize: 14 }}>
+                    <thead>
+                      <tr>
+                        <th style={thSt}>Código SKU</th>
+                        <th style={thSt}>Nombre</th>
+                        <th style={{ ...thSt, width: 110 }}>Cantidad</th>
+                        <th style={{ ...thSt, width: 80 }}>Unidad</th>
+                        <th style={{ ...thSt, width: 36 }}></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {skuModal.insumos.length === 0 && (
+                        <tr><td colSpan={5} style={{ textAlign: "center", color: "#aeaeb2", padding: "22px 10px", fontSize: 13 }}>Sin insumos aún. Agrega el primero abajo.</td></tr>
+                      )}
+                      {skuModal.insumos.map((ins, iIdx) => {
+                        const skuInfo = MAESTROS.skus?.[ins.sku];
+                        return (
+                          <tr key={iIdx} style={{ borderBottom: "1px solid rgba(0,0,0,0.04)" }}>
+                            <td style={{ padding: "3px 6px" }}>
+                              <input className="celda" value={ins.sku} onChange={e => updateInsumo(skuModal._id, iIdx, "sku", e.target.value)} placeholder="Código" style={{ minWidth: 100 }} />
+                            </td>
+                            <td style={{ padding: "4px 10px" }}>
+                              {skuInfo ? <span style={{ fontSize: 13, color: "#5b8dee" }}>{skuInfo.nombre}</span>
+                               : ins.sku ? <span style={{ fontSize: 13, color: "#ff3b30" }}>No encontrado</span>
+                               : <span style={{ fontSize: 13, color: "#c7c7cc" }}>—</span>}
+                            </td>
+                            <td style={{ padding: "3px 6px" }}>
+                              <input className="celda" type="number" min="0" step="0.001" value={ins.cantidad} onChange={e => updateInsumo(skuModal._id, iIdx, "cantidad", e.target.value)} placeholder="0" style={{ minWidth: 80 }} />
+                            </td>
+                            <td style={{ padding: "4px 10px", fontSize: 13, color: "#636366" }}>
+                              {ins.unidad || skuInfo?.unidadVenta || "—"}
+                            </td>
+                            <td style={{ textAlign: "center", padding: "4px 6px" }}>
+                              <button onClick={() => removeInsumo(skuModal._id, iIdx)} style={{ background: "none", border: "none", cursor: "pointer", color: "#ff3b30" }}><X size={14} /></button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+                <button className="btn-addrow" style={{ marginTop: 10 }} onClick={() => addInsumo(skuModal._id)}>
+                  <Plus size={14} /> Agregar insumo
+                </button>
+              </div>
+
+              <div style={{ padding: "14px 22px", borderTop: "1px solid rgba(0,0,0,0.07)", display: "flex", alignItems: "center", gap: 8 }}>
+                <button className="btn-ghost" style={{ fontSize: 13 }} onClick={descargarTemplateInsumos}><Download size={13} /> Plantilla</button>
+                <label style={{ display: "inline-flex" }}>
+                  <span className="btn-ghost" style={{ fontSize: 13, cursor: "pointer" }}><Upload size={13} /> Importar Excel</span>
+                  <input ref={insumoImportRef} type="file" accept=".xlsx,.xls" style={{ display: "none" }} onChange={e => importarInsumos(skuModal._id, e)} />
+                </label>
+                <div style={{ flex: 1 }} />
+                <button className="btn-primary" style={{ fontSize: 14, padding: "9px 22px" }} onClick={() => setInsumoModal(null)}>Listo</button>
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+    </AppShell>
+  );
+}
+
+const SRC_DESC = {
+  "centro_nombre":      "centros → nombre",
+  "sku_desc":           "SKUs → descripción",
+  "sku_unidadVenta":    "SKUs → unidad de venta",
+  "sku_unidadCondicion":"SKUs → unidad de condición",
+  "centro_orgVenta":    "centros → org. de venta",
+  "prov_nombre":        "proveedores → nombre",
+  "status_signif":      "estado → significado",
+};
+
+function VistaMantenedorPlanillas() {
+  const [abierta, setAbierta] = useState(null);
+
+  return (
+    <main style={{ maxWidth: 900, margin: "0 auto", padding: "32px 20px" }}>
+      <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 6 }}>Mantenedor de Planillas</h1>
+      <p style={{ color: "#636366", fontSize: 14, marginBottom: 28 }}>
+        Estructura de cada planilla: datos que ingresa el usuario, datos auto-completados desde bases maestras y columnas de salida para carga LSMW en SAP.
+      </p>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {PLANILLAS.map(pl => {
+          const open = abierta === pl.id;
+          const Icon = pl.icon;
+          return (
+            <div key={pl.id} style={{ border: "1px solid rgba(0,0,0,0.1)", borderRadius: 14, overflow: "hidden", background: "#fff" }}>
+              <button
+                onClick={() => setAbierta(open ? null : pl.id)}
+                style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "16px 20px", background: "none", border: "none", cursor: "pointer", textAlign: "left" }}
+              >
+                <span style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(91,141,238,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <Icon size={18} color="#5b8dee" />
+                </span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 600, fontSize: 15 }}>{pl.nombre}</div>
+                  <div style={{ fontSize: 13, color: "#636366" }}>{pl.desc}</div>
+                </div>
+                <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+                  <span style={{ fontSize: 12, padding: "3px 8px", borderRadius: 20, background: "rgba(91,141,238,0.1)", color: "#5b8dee" }}>{pl.userCols.length} usuario</span>
+                  <span style={{ fontSize: 12, padding: "3px 8px", borderRadius: 20, background: "rgba(52,199,89,0.1)", color: "#248a3d" }}>{pl.autoCols.length} auto</span>
+                  <span style={{ fontSize: 12, padding: "3px 8px", borderRadius: 20, background: "rgba(255,149,0,0.12)", color: "#b25000" }}>{pl.salidaLabels.length} LSMW</span>
+                </div>
+                {open ? <ChevronDown size={16} color="#636366" /> : <ChevronRight size={16} color="#636366" />}
+              </button>
+
+              {open && (
+                <div style={{ padding: "0 20px 20px", borderTop: "1px solid rgba(0,0,0,0.06)" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginTop: 16 }}>
+
+                    {/* Columnas del usuario */}
+                    <div>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: "#5b8dee", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 10 }}>
+                        Ingresa el usuario
+                      </div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                        {pl.userCols.map(c => (
+                          <div key={c.key} style={{ background: "rgba(91,141,238,0.07)", border: "1px solid rgba(91,141,238,0.2)", borderRadius: 8, padding: "8px 12px" }}>
+                            <div style={{ fontWeight: 600, fontSize: 13 }}>{c.label}</div>
+                            <div style={{ fontSize: 12, color: "#636366" }}>
+                              {c.centro ? "Código de centro / cluster" : c.sku ? "Código SKU" : c.proveedor ? "Código proveedor" : c.fecha ? "Fecha DD-MM-AAAA" : c.num ? "Numérico" : "Texto"}
+                              {c.def ? <span style={{ marginLeft: 6, color: "#5b8dee" }}>def: {c.def}</span> : null}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Columnas auto */}
+                    <div>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: "#248a3d", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 10 }}>
+                        Auto-completado
+                      </div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                        {pl.autoCols.map(c => (
+                          <div key={c.key} style={{ background: "rgba(52,199,89,0.07)", border: "1px solid rgba(52,199,89,0.2)", borderRadius: 8, padding: "8px 12px" }}>
+                            <div style={{ fontWeight: 600, fontSize: 13 }}>{c.label}</div>
+                            <div style={{ fontSize: 12, color: "#636366" }}>{SRC_DESC[c.src] || c.src}</div>
+                          </div>
+                        ))}
+                        {(pl.agentCols || []).map(c => (
+                          <div key={c.key} style={{ background: "rgba(175,82,222,0.07)", border: "1px solid rgba(175,82,222,0.2)", borderRadius: 8, padding: "8px 12px" }}>
+                            <div style={{ fontWeight: 600, fontSize: 13 }}>{c.label}</div>
+                            <div style={{ fontSize: 12, color: "#636366" }}>Valor fijo: <strong>{c.def}</strong></div>
+                          </div>
+                        ))}
+                        {pl.autoCols.length === 0 && (pl.agentCols || []).length === 0 && (
+                          <div style={{ fontSize: 13, color: "#aeaeb2", fontStyle: "italic" }}>Sin columnas auto</div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Columnas LSMW */}
+                    <div>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: "#b25000", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 10 }}>
+                        Salida LSMW (SAP)
+                      </div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                        {pl.salidaLabels.map((lbl, i) => (
+                          <div key={i} style={{ background: "rgba(255,149,0,0.07)", border: "1px solid rgba(255,149,0,0.2)", borderRadius: 8, padding: "8px 12px" }}>
+                            <div style={{ fontWeight: 600, fontSize: 13 }}>{lbl}</div>
+                            <div style={{ fontSize: 12, color: "#aeaeb2", fontFamily: "monospace" }}>{pl.salida[i]}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
     </main>
   );
@@ -3038,14 +3821,16 @@ function Sidebar({ vista, setVista, perfil }) {
 
   const TABS = [
     { id: "inicio",      label: "Inicio",            icon: Home },
-    { id: "nueva",       label: "Nueva solicitud",  icon: Plus },
+    { id: "nuevo-sku",   label: "Nuevo SKU",        icon: Package },
+    { id: "nueva",       label: "Nueva solicitud",   icon: FileText },
     { id: "solicitudes", label: "Solicitudes",       icon: Inbox },
     { id: "clusters",    label: "Gestor de locales", icon: Boxes },
     { id: "cvp",         label: "Ciclo de Vida",     icon: Layers },
     { id: "ayuda",       label: "Centro de Ayuda",   icon: Lightbulb },
     ...(esDDMM ? [
-      { id: "maestros", label: "Bases Maestras", icon: Database },
-      { id: "admin",    label: "Admin",           icon: ShieldCheck },
+      { id: "maestros",   label: "Bases Maestras",  icon: Database },
+      { id: "planillas",  label: "Planillas",        icon: Table2 },
+      { id: "admin",      label: "Admin",            icon: ShieldCheck },
     ] : []),
   ];
 
@@ -3276,12 +4061,25 @@ function VistaSolicitudes({ perfil }) {
         },
       });
       if (est === "Aprobada") {
+        const attachments = (sol.planillas || []).map(p => {
+          const plConfig = PLANILLAS.find(x => x.id === p.id);
+          if (!plConfig) return null;
+          const aoa = [plConfig.salidaLabels];
+          p.filas.forEach(f => aoa.push(plConfig.salida.map(k => f.data[k] ?? f.auto[k] ?? "")));
+          const ws = XLSX.utils.aoa_to_sheet(aoa);
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, "Datos");
+          const base64 = XLSX.write(wb, { bookType: "xlsx", type: "base64" });
+          return { base64, filename: `${p.id}_SAP.xlsx` };
+        }).filter(Boolean);
+
         await supabase.functions.invoke("crear-ticket-freshdesk", {
           body: {
             folio: sol.folio,
             solicitante_nombre: sol.solicitante_nombre,
             solicitante_email: sol.solicitante_email,
             planillas: sol.planillas,
+            attachments,
           },
         });
       }
@@ -3292,11 +4090,13 @@ function VistaSolicitudes({ perfil }) {
     const actualizada = await cambiarEstado(folio, est, motivoRec);
     if (!actualizada) return;
     setSols(s => s.map(x => x.folio === folio ? actualizada : x));
-    if (est === "Aprobada" || est === "Rechazada") {
+    if (est === "En proceso" || est === "Aprobada" || est === "Rechazada") {
       notificar(actualizada, est, motivoRec);
-      setNotifMsg(est === "Aprobada"
-        ? "✓ Solicitud aprobada — se notificó al solicitante y se creó el ticket en Freshdesk."
-        : "✓ Solicitud rechazada — se notificó al solicitante.");
+      setNotifMsg(
+        est === "Aprobada"   ? "✓ Solicitud aprobada — se notificó al solicitante y se creó el ticket en Freshdesk." :
+        est === "Rechazada"  ? "✓ Solicitud rechazada — se notificó al solicitante." :
+                               "✓ Solicitud en proceso — se notificó al solicitante."
+      );
       setTimeout(() => setNotifMsg(null), 5000);
     }
   };
@@ -3462,20 +4262,20 @@ function Estilos() {
         display: flex; flex-direction: column; }
 
       /* ── Sidebar ── */
-      .sidebar { width: 230px; flex-shrink: 0; background: #1a1a2e; color: #fff;
+      .sidebar { width: 264px; flex-shrink: 0; background: #1a1a2e; color: #fff;
         display: flex; flex-direction: column; padding: 0; position: sticky; top: 0;
         height: 100vh; overflow-y: auto; }
-      .sidebar-logo { font-weight: 700; font-size: 16px; letter-spacing: -0.02em;
-        padding: 24px 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); }
-      .sidebar-nav { flex: 1; padding: 12px 10px; display: flex; flex-direction: column; gap: 2px; }
-      .sidebar-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px;
-        border-radius: 10px; border: none; background: none; color: rgba(255,255,255,0.6);
-        font: inherit; font-size: 14.5px; font-weight: 500; cursor: pointer; text-align: left;
+      .sidebar-logo { font-weight: 700; font-size: 17px; letter-spacing: -0.02em;
+        padding: 28px 22px 22px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+      .sidebar-nav { flex: 1; padding: 14px 12px; display: flex; flex-direction: column; gap: 3px; }
+      .sidebar-item { display: flex; align-items: center; gap: 11px; padding: 11px 14px;
+        border-radius: 11px; border: none; background: none; color: rgba(255,255,255,0.6);
+        font: inherit; font-size: 15px; font-weight: 500; cursor: pointer; text-align: left;
         width: 100%; transition: all .15s; }
       .sidebar-item:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.9); }
       .sidebar-item.on { background: rgba(255,255,255,0.13); color: #fff; font-weight: 600; }
-      .sidebar-footer { border-top: 1px solid rgba(255,255,255,0.08); padding: 16px 14px; }
-      .sidebar-subtitulo { font-size: 10.5px; font-weight: 400; color: rgba(255,255,255,0.4); margin-top: 4px; line-height: 1.35; }
+      .sidebar-footer { border-top: 1px solid rgba(255,255,255,0.08); padding: 18px 16px; }
+      .sidebar-subtitulo { font-size: 11px; font-weight: 400; color: rgba(255,255,255,0.4); margin-top: 4px; line-height: 1.4; }
       .content-header { margin-bottom: 24px; }
       .content-title { font-size: 26px; font-weight: 700; letter-spacing: 0.04em; color: #1d1d1f; text-transform: uppercase; }
       .content-sub { font-size: 14px; color: #86868b; margin-top: 3px; text-transform: capitalize; }
@@ -3540,7 +4340,7 @@ function Estilos() {
       .nav-tab.on { background: #fff; color: #1d1d1f; box-shadow: 0 1px 4px rgba(100,110,180,0.18); font-weight: 600; }
 
       /* VISTA SOLICITUDES */
-      .sol-wrap { max-width: 1060px; margin: 0 auto; padding: 48px 22px 60px; }
+      .sol-wrap { max-width: none; padding: 40px 32px 60px; }
       .sol-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; }
       .sol-title { font-size: 36px; font-weight: 800; letter-spacing: 0.04em; color: #14162a; text-transform: uppercase; }
       .sol-sub { color: #6e6e80; font-size: 16px; margin-top: 6px; max-width: 560px; line-height: 1.55; text-transform: capitalize; }
