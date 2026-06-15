@@ -5225,26 +5225,62 @@ function Sidebar({ vista, setVista, perfil }) {
   const cerrarSesion = async () => { await supabase.auth.signOut(); };
   const esDDMM = perfil?.rol === "datos_maestros";
 
+  const SKU_IDS = ["nuevo-sku", "nueva-receta", "nueva-combo", "mod-receta", "mod-combo"];
+  const skuActivo = SKU_IDS.includes(vista);
+  const [skuAbierto, setSkuAbierto] = useState(skuActivo);
+
+  const SKU_SUB = [
+    { id: "nuevo-sku",    label: "Nuevo SKU",        icon: Package },
+    { id: "nueva-receta", label: "Nueva Receta",      icon: Utensils },
+    { id: "nueva-combo",  label: "Nuevo Combo",       icon: Gift },
+    { id: "mod-receta",   label: "Modificar Receta",  icon: Pencil },
+    { id: "mod-combo",    label: "Modificar Combo",   icon: Pencil },
+  ];
+
   const TABS = [
-    { id: "inicio",        label: "Inicio",            icon: Home },
-    { id: "nuevo-sku",     label: "Nuevo SKU",         icon: Package },
-    { id: "nueva-receta",  label: "Nueva Receta",      icon: Utensils },
-    { id: "nueva-combo",   label: "Nuevo Combo",       icon: Gift },
-    { id: "mod-receta",    label: "Modificar Receta",  icon: Pencil },
-    { id: "mod-combo",     label: "Modificar Combo",   icon: Pencil },
-    { id: "nueva",         label: "Nueva solicitud",   icon: FileText },
-    { id: "solicitudes",   label: "Solicitudes",       icon: Inbox },
-    { id: "clusters",      label: "Gestor de locales", icon: Boxes },
-    { id: "cvp",           label: "Ciclo de Vida",     icon: Layers },
-    { id: "ayuda",         label: "Centro de Ayuda",   icon: Lightbulb },
+    { id: "inicio",      label: "Inicio",            icon: Home },
+    { id: "nueva",       label: "Nueva solicitud",   icon: FileText },
+    { id: "solicitudes", label: "Solicitudes",       icon: Inbox },
+    { id: "clusters",    label: "Gestor de locales", icon: Boxes },
+    { id: "cvp",         label: "Ciclo de Vida",     icon: Layers },
+    { id: "ayuda",       label: "Centro de Ayuda",   icon: Lightbulb },
     ...(esDDMM ? [
-      { id: "maestros",   label: "Bases Maestras",  icon: Database },
-      { id: "planillas",  label: "Planillas",        icon: Table2 },
-      { id: "admin",      label: "Admin",            icon: ShieldCheck },
+      { id: "maestros",  label: "Bases Maestras",    icon: Database },
+      { id: "planillas", label: "Planillas",          icon: Table2 },
+      { id: "admin",     label: "Admin",              icon: ShieldCheck },
     ] : []),
   ];
 
   const navegarA = id => { setVista(id); setMenuAbierto(false); };
+
+  const grupoSKU = (
+    <>
+      <button
+        className={"sidebar-item" + (skuActivo ? " on" : "")}
+        onClick={() => setSkuAbierto(o => !o)}
+        style={{ justifyContent: "space-between" }}
+      >
+        <span style={{ display: "flex", alignItems: "center", gap: 11 }}>
+          <Package size={16} strokeWidth={1.8} /><span>Creación SKU</span>
+        </span>
+        {skuAbierto ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+      </button>
+      {skuAbierto && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 1, marginLeft: 12, paddingLeft: 12, borderLeft: "2px solid rgba(255,255,255,0.1)" }}>
+          {SKU_SUB.map(t => {
+            const Icon = t.icon;
+            return (
+              <button key={t.id} className={"sidebar-item" + (vista === t.id ? " on" : "")}
+                style={{ fontSize: 13, padding: "8px 12px" }}
+                onClick={() => navegarA(t.id)}>
+                <Icon size={14} strokeWidth={1.8} /><span>{t.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </>
+  );
 
   return (
     <>
@@ -5255,7 +5291,11 @@ function Sidebar({ vista, setVista, perfil }) {
           <div className="sidebar-subtitulo">Gestor de Solicitudes y Ciclo de Vida del Producto</div>
         </div>
         <nav className="sidebar-nav">
-          {TABS.map(t => {
+          <button key="inicio" className={"sidebar-item" + (vista === "inicio" ? " on" : "")} onClick={() => navegarA("inicio")}>
+            <Home size={16} strokeWidth={1.8} /><span>Inicio</span>
+          </button>
+          {grupoSKU}
+          {TABS.filter(t => t.id !== "inicio").map(t => {
             const Icon = t.icon;
             return (
               <button key={t.id} className={"sidebar-item" + (vista === t.id ? " on" : "")} onClick={() => navegarA(t.id)}>
@@ -5283,7 +5323,14 @@ function Sidebar({ vista, setVista, perfil }) {
         <div className="nav-mobile-overlay" onClick={() => setMenuAbierto(false)}>
           <div className="nav-mobile-menu" onClick={e => e.stopPropagation()}>
             {perfil && <div className="nav-mobile-user">{perfil.nombre}</div>}
-            {TABS.map(t => (
+            <button className={"nav-mobile-item" + (vista === "inicio" ? " on" : "")} onClick={() => navegarA("inicio")}>Inicio</button>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.4)", padding: "8px 16px 4px", textTransform: "uppercase", letterSpacing: ".06em" }}>Creación SKU</div>
+            {SKU_SUB.map(t => (
+              <button key={t.id} className={"nav-mobile-item" + (vista === t.id ? " on" : "")} onClick={() => navegarA(t.id)} style={{ paddingLeft: 28 }}>
+                {t.label}
+              </button>
+            ))}
+            {TABS.filter(t => t.id !== "inicio").map(t => (
               <button key={t.id} className={"nav-mobile-item" + (vista === t.id ? " on" : "")} onClick={() => navegarA(t.id)}>
                 {t.label}
               </button>
