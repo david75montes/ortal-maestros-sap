@@ -961,6 +961,8 @@ export default function PortalSAP() {
   if (vista === "nuevo-sku")    return <VistaCreacionSKU    perfil={perfil} session={session} vista={vista} setVista={setVista} />;
   if (vista === "nueva-receta") return <VistaCreacionReceta perfil={perfil} session={session} vista={vista} setVista={setVista} />;
   if (vista === "nueva-combo")  return <VistaCreacionCombo  perfil={perfil} session={session} vista={vista} setVista={setVista} />;
+  if (vista === "mod-receta")   return <VistaModReceta      perfil={perfil} session={session} vista={vista} setVista={setVista} />;
+  if (vista === "mod-combo")    return <VistaModCombo       perfil={perfil} session={session} vista={vista} setVista={setVista} />;
   if (vista === "solicitudes") return <AppShell vista={vista} setVista={setVista} perfil={perfil}><VistaSolicitudes perfil={perfil} /></AppShell>;
   if (vista === "clusters")    return <AppShell vista={vista} setVista={setVista} perfil={perfil}><VistaClusters clusters={clusters} onChange={actualizarClusters} /></AppShell>;
   if (vista === "ayuda")       return <AppShell vista={vista} setVista={setVista} perfil={perfil}><VistaAyuda /></AppShell>;
@@ -4388,6 +4390,553 @@ function VistaMantenedorPlanillas() {
   );
 }
 
+/* ─── helpers modificación ─── */
+const emptyModReceta = () => ({ _id: Math.random().toString(36).slice(2), codigo_sap: "", nombre: "", insumos: [], errores: [] });
+const emptyModCombo  = () => ({ _id: Math.random().toString(36).slice(2), codigo_sap: "", nombre: "", pasos: [],   errores: [] });
+
+function VistaModReceta({ perfil, session, vista, setVista }) {
+  const [filas, setFilas]       = useState([emptyModReceta()]);
+  const [insumoModal, setInsumoModal] = useState(null);
+  const solicitante             = perfil?.nombre || "";
+  const [enviando, setEnviando] = useState(false);
+  const [enviado, setEnviado]   = useState(null);
+  const insumoImportRef         = useRef();
+
+  const updateFila   = (id, k, v) => setFilas(s => s.map(x => x._id === id ? { ...x, [k]: v } : x));
+  const addFila      = () => { if (filas.length >= 80) return; setFilas(s => [...s, emptyModReceta()]); };
+  const removeFila   = (id) => setFilas(s => s.filter(x => x._id !== id));
+
+  const addInsumo    = (id)          => setFilas(s => s.map(x => x._id !== id ? x : { ...x, insumos: [...x.insumos, { sku: "", cantidad: "", unidad: "" }] }));
+  const removeInsumo = (id, i)       => setFilas(s => s.map(x => x._id !== id ? x : { ...x, insumos: x.insumos.filter((_, j) => j !== i) }));
+  const updateInsumo = (id, i, k, v) => setFilas(s => s.map(x => {
+    if (x._id !== id) return x;
+    const ins = x.insumos.map((r, j) => {
+      if (j !== i) return r;
+      const u = { ...r, [k]: v };
+      if (k === "sku") u.unidad = MAESTROS.skus?.[v]?.unidadVenta || "";
+      return u;
+    });
+    return { ...x, insumos: ins };
+  }));
+
+  const descargarTemplateInsumos = () => {
+    const ws = XLSX.utils.aoa_to_sheet([["Codigo SKU", "Cantidad"], ["10047", "2.5"]]);
+    ws["!cols"] = [{ wch: 16 }, { wch: 12 }];
+    const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Insumos");
+    XLSX.writeFile(wb, "template_insumos_receta.xlsx");
+  };
+  const importarInsumos = (id, e) => {
+    const file = e.target.files?.[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const wb = XLSX.read(ev.target.result, { type: "array" });
+      const raw = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, defval: "" });
+      const nuevos = raw.slice(1).filter(r => r[0]).map(r => {
+        const skuCod = String(r[0]).trim();
+        return { sku: skuCod, cantidad: String(r[1] ?? "").trim(), unidad: MAESTROS.skus?.[skuCod]?.unidadVenta || "" };
+      });
+      if (nuevos.length) setFilas(s => s.map(x => x._id !== id ? x : { ...x, insumos: nuevos }));
+    };
+    reader.readAsArrayBuffer(file); e.target.value = "";
+  };
+
+  const validarTodo = () => {
+    let ok = true;
+    const updated = filas.map(f => {
+      const errs = [];
+      if (!f.codigo_sap.trim()) errs.push("Código SAP requerido");
+      if (!f.nombre.trim())     errs.push("Nombre requerido");
+      if (f.insumos.length === 0) errs.push("Debe tener al menos un insumo");
+      if (errs.length) ok = false;
+      return { ...f, errores: errs };
+    });
+    setFilas(updated); return ok;
+  };
+
+  const handleEnviar = async () => {
+    if (!validarTodo() || solicitante.trim().length < 3) return;
+    setEnviando(true);
+    const folio = "SAP-" + new Date().getFullYear() + "-" + String(Math.floor(100000 + Math.random() * 899999));
+    const { error } = await supabase.from("solicitudes").insert({
+      folio, solicitante_id: session?.user?.id, solicitante_nombre: solicitante,
+      solicitante_email: session?.user?.email, estado: "Enviada",
+      planillas: [{ id: "modificacion_receta", nombre: "Modificación de Receta", filas: filas.map(({ _id, errores, ...d }) => d) }],
+      historial: [{ estado: "Enviada", fecha: new Date().toISOString() }],
+    });
+    setEnviando(false);
+    if (!error) setEnviado({ folio, total: filas.length });
+    else alert("Error al guardar: " + JSON.stringify(error));
+  };
+
+  if (enviado) return (
+    <AppShell vista={vista} setVista={setVista} perfil={perfil}>
+      <main className="success-wrap">
+        <div className="success-check"><CheckCircle2 size={64} strokeWidth={1.3} /></div>
+        <h1 className="success-title">Solicitud enviada.</h1>
+        <p className="success-sub">Folio <strong>{enviado.folio}</strong> · {enviado.total} receta{enviado.total > 1 ? "s" : ""} a modificar.</p>
+        <button className="btn-primary" style={{ marginTop: 24 }} onClick={() => { setEnviado(null); setFilas([emptyModReceta()]); }}>Nueva solicitud</button>
+      </main>
+    </AppShell>
+  );
+
+  const conError  = filas.filter(f => f.errores.length > 0);
+  const recModal  = insumoModal ? filas.find(f => f._id === insumoModal) : null;
+  const thSt      = { padding: "8px 10px", textAlign: "left", fontSize: 11, fontWeight: 600, color: "#86868b", textTransform: "uppercase", letterSpacing: ".05em", borderBottom: "1px solid rgba(200,205,230,0.4)", background: "#f8f8fc", whiteSpace: "nowrap" };
+
+  const panelDerecho = (
+    <div style={{ padding: "28px 20px", display: "flex", flexDirection: "column", gap: 16 }}>
+      <div>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "#3a3a3c", marginBottom: 12 }}>Resumen</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
+            <span style={{ color: "#636366" }}>Recetas</span><strong>{filas.length}</strong>
+          </div>
+          {conError.length > 0 && (
+            <div style={{ fontSize: 12, color: "#c2271c", background: "rgba(255,59,48,0.07)", borderRadius: 8, padding: "8px 10px", marginTop: 4 }}>
+              {conError.length} con errores
+            </div>
+          )}
+        </div>
+      </div>
+      <div style={{ borderTop: "1px solid rgba(0,0,0,0.08)", paddingTop: 16 }}>
+        <div style={{ fontSize: 12, color: "#636366", marginBottom: 6 }}>Solicitante</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+          <User size={14} color="#636366" />
+          <span style={{ fontSize: 13, color: solicitante ? "#3a3a3c" : "#aeaeb2", fontWeight: solicitante ? 500 : 400 }}>
+            {solicitante || "Sin usuario autenticado"}
+          </span>
+        </div>
+        <button className="btn-primary" style={{ width: "100%", marginBottom: 8 }} disabled={solicitante.trim().length < 3 || enviando} onClick={handleEnviar}>
+          {enviando ? "Enviando…" : "Enviar solicitud"} <ArrowRight size={15} />
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <AppShell vista={vista} setVista={setVista} perfil={perfil} rightPanel={panelDerecho}>
+      <main className="sol-wrap">
+        <div className="bloque">
+          <div className="bloque-head">
+            <span className="card-icon sm"><Pencil size={18} strokeWidth={1.7} /></span>
+            <div className="bloque-tit">
+              <strong>Modificar Receta</strong>
+              <span>{conError.length > 0 ? `${conError.length} con error` : "Ingresa el código SAP y la nueva estructura de insumos"}</span>
+            </div>
+          </div>
+
+          <div className="grilla-scroll">
+            <table className="grilla">
+              <thead>
+                <tr>
+                  <th className="th-n">#</th>
+                  <th style={{ minWidth: 120 }}>Código SAP</th>
+                  <th style={{ minWidth: 175 }}>Nombre receta</th>
+                  <th style={{ minWidth: 110 }}>Insumos</th>
+                  <th className="th-x"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {filas.map((fila, idx) => {
+                  const hayError = fila.errores.length > 0;
+                  return (
+                    <React.Fragment key={fila._id}>
+                      <tr className={hayError ? "g-err" : ""}>
+                        <td className="td-n">{hayError ? <AlertTriangle size={13} className="ic-err" /> : <Pencil size={12} className="ic-dim" />}</td>
+                        <td><input className="celda" value={fila.codigo_sap} onChange={e => updateFila(fila._id, "codigo_sap", e.target.value)} placeholder="Ej: 132132" style={{ fontFamily: "monospace" }} /></td>
+                        <td><input className="celda" value={fila.nombre} onChange={e => updateFila(fila._id, "nombre", e.target.value)} placeholder="Nombre de la receta" /></td>
+                        <td>
+                          <button className="dz-clear dup" style={{ padding: "4px 8px", fontSize: 12, whiteSpace: "nowrap" }} onClick={() => setInsumoModal(fila._id)}>
+                            <Layers size={12} /> {fila.insumos.length > 0 ? `${fila.insumos.length} insumo${fila.insumos.length > 1 ? "s" : ""}` : "Insumos"}
+                          </button>
+                        </td>
+                        <td className="td-x">
+                          {filas.length > 1 && <button className="dz-clear" onClick={() => removeFila(fila._id)} title="Eliminar"><Trash2 size={13} /></button>}
+                        </td>
+                      </tr>
+                      {hayError && (
+                        <tr className="g-err-detalle">
+                          <td></td>
+                          <td colSpan={4}>{fila.errores.join(" · ")}</td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <button className="btn-addrow" onClick={addFila} disabled={filas.length >= 80}>
+            <Plus size={14} /> Agregar receta
+          </button>
+        </div>
+
+        {/* Modal insumos */}
+        {recModal && (
+          <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
+               onClick={e => { if (e.target === e.currentTarget) setInsumoModal(null); }}>
+            <div style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth: 660, maxHeight: "80vh", display: "flex", flexDirection: "column", overflow: "hidden", boxShadow: "0 20px 60px rgba(0,0,0,0.22)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "18px 22px", borderBottom: "1px solid rgba(0,0,0,0.07)" }}>
+                <Layers size={18} color="#34c759" />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 700, fontSize: 15 }}>Nueva estructura de insumos</div>
+                  <div style={{ fontSize: 12, color: "#636366" }}>
+                    {recModal.nombre || "Receta sin nombre"} · <span style={{ fontFamily: "monospace", color: "#5e5ce6" }}>SAP {recModal.codigo_sap || "—"}</span>
+                  </div>
+                </div>
+                <button onClick={() => setInsumoModal(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "#636366", padding: 4 }}><X size={20} /></button>
+              </div>
+              <div style={{ flex: 1, overflow: "auto", padding: "16px 22px" }}>
+                <div style={{ fontSize: 12, color: "#636366", background: "rgba(91,141,238,0.07)", borderRadius: 10, padding: "10px 14px", marginBottom: 12 }}>
+                  Define la nueva lista completa de insumos tal como debe quedar en SAP.
+                </div>
+                <div style={{ border: "1px solid rgba(0,0,0,0.07)", borderRadius: 12, overflow: "hidden" }}>
+                  <table style={{ borderCollapse: "collapse", width: "100%", fontSize: 14 }}>
+                    <thead>
+                      <tr>
+                        <th style={thSt}>Código SKU</th>
+                        <th style={thSt}>Nombre</th>
+                        <th style={{ ...thSt, width: 110 }}>Cantidad</th>
+                        <th style={{ ...thSt, width: 80 }}>Unidad</th>
+                        <th style={{ ...thSt, width: 36 }}></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {recModal.insumos.length === 0 && (
+                        <tr><td colSpan={5} style={{ textAlign: "center", color: "#aeaeb2", padding: "22px 10px", fontSize: 13 }}>Sin insumos. Agrega el primero abajo.</td></tr>
+                      )}
+                      {recModal.insumos.map((ins, iIdx) => {
+                        const skuInfo = MAESTROS.skus?.[ins.sku];
+                        return (
+                          <tr key={iIdx} style={{ borderBottom: "1px solid rgba(0,0,0,0.04)" }}>
+                            <td style={{ padding: "3px 6px" }}><input className="celda" value={ins.sku} onChange={e => updateInsumo(recModal._id, iIdx, "sku", e.target.value)} placeholder="Código" style={{ minWidth: 100 }} /></td>
+                            <td style={{ padding: "4px 10px" }}>
+                              {skuInfo ? <span style={{ fontSize: 13, color: "#34c759" }}>{skuInfo.nombre}</span>
+                               : ins.sku ? <span style={{ fontSize: 13, color: "#ff3b30" }}>No encontrado</span>
+                               : <span style={{ fontSize: 13, color: "#c7c7cc" }}>—</span>}
+                            </td>
+                            <td style={{ padding: "3px 6px" }}><input className="celda" type="number" min="0" step="0.001" value={ins.cantidad} onChange={e => updateInsumo(recModal._id, iIdx, "cantidad", e.target.value)} placeholder="0" style={{ minWidth: 80 }} /></td>
+                            <td style={{ padding: "4px 10px", fontSize: 13, color: "#636366" }}>{ins.unidad || skuInfo?.unidadVenta || "—"}</td>
+                            <td style={{ textAlign: "center", padding: "4px 6px" }}><button onClick={() => removeInsumo(recModal._id, iIdx)} style={{ background: "none", border: "none", cursor: "pointer", color: "#ff3b30" }}><X size={14} /></button></td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+                <button className="btn-addrow" style={{ marginTop: 10 }} onClick={() => addInsumo(recModal._id)}><Plus size={14} /> Agregar insumo</button>
+              </div>
+              <div style={{ padding: "14px 22px", borderTop: "1px solid rgba(0,0,0,0.07)", display: "flex", alignItems: "center", gap: 8 }}>
+                <button className="btn-ghost" style={{ fontSize: 13 }} onClick={descargarTemplateInsumos}><Download size={13} /> Plantilla</button>
+                <label style={{ display: "inline-flex" }}>
+                  <span className="btn-ghost" style={{ fontSize: 13, cursor: "pointer" }}><Upload size={13} /> Importar Excel</span>
+                  <input ref={insumoImportRef} type="file" accept=".xlsx,.xls" style={{ display: "none" }} onChange={e => importarInsumos(recModal._id, e)} />
+                </label>
+                <div style={{ flex: 1 }} />
+                <button className="btn-primary" style={{ fontSize: 14, padding: "9px 22px" }} onClick={() => setInsumoModal(null)}>Listo</button>
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+    </AppShell>
+  );
+}
+
+function VistaModCombo({ perfil, session, vista, setVista }) {
+  const [filas, setFilas]         = useState([emptyModCombo()]);
+  const [comboModal, setComboModal] = useState(null);
+  const [comboError, setComboError] = useState("");
+  const solicitante               = perfil?.nombre || "";
+  const [enviando, setEnviando]   = useState(false);
+  const [enviado, setEnviado]     = useState(null);
+  const comboImportRef            = useRef();
+
+  const updateFila = (id, k, v) => setFilas(s => s.map(x => x._id === id ? { ...x, [k]: v } : x));
+  const addFila    = () => { if (filas.length >= 80) return; setFilas(s => [...s, emptyModCombo()]); };
+  const removeFila = (id) => setFilas(s => s.filter(x => x._id !== id));
+
+  const addPaso         = (skuId)              => setFilas(s => s.map(x => x._id !== skuId ? x : { ...x, pasos: [...x.pasos, emptyPaso()] }));
+  const removePaso      = (skuId, pid)         => setFilas(s => s.map(x => x._id !== skuId ? x : { ...x, pasos: x.pasos.filter(p => p._id !== pid) }));
+  const updatePaso      = (skuId, pid, k, v)   => setFilas(s => s.map(x => x._id !== skuId ? x : { ...x, pasos: x.pasos.map(p => p._id !== pid ? p : { ...p, [k]: v }) }));
+  const addProd         = (skuId, pid)         => setFilas(s => s.map(x => x._id !== skuId ? x : { ...x, pasos: x.pasos.map(p => p._id !== pid ? p : { ...p, productos: [...p.productos, emptyProductoCombo()] }) }));
+  const removeProd      = (skuId, pid, prodId) => setFilas(s => s.map(x => x._id !== skuId ? x : { ...x, pasos: x.pasos.map(p => p._id !== pid ? p : { ...p, productos: p.productos.filter(pr => pr._id !== prodId) }) }));
+  const updateProd      = (skuId, pid, prodId, k, v) => setFilas(s => s.map(x => x._id !== skuId ? x : { ...x, pasos: x.pasos.map(p => p._id !== pid ? p : { ...p, productos: p.productos.map(pr => pr._id !== prodId ? pr : { ...pr, [k]: v }) }) }));
+
+  const descargarTemplateCombo = () => {
+    const ws = XLSX.utils.aoa_to_sheet([
+      ["Paso Nombre", "Obligatorio", "% Beneficio", "SKU", "Delta Precio"],
+      ["Paso 1", "Si", 50, "132132", 0], ["Paso 1", "Si", 50, "133133", 200], ["Paso 2", "Si", 50, "135400", 0],
+    ]);
+    ws["!cols"] = [{ wch: 14 }, { wch: 12 }, { wch: 13 }, { wch: 12 }, { wch: 12 }];
+    const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Pasos");
+    XLSX.writeFile(wb, "template_pasos_combo.xlsx");
+  };
+  const importarCombo = (skuId, e) => {
+    const file = e.target.files?.[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const wb = XLSX.read(ev.target.result, { type: "array" });
+      const raw = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, defval: "" });
+      const pasoMap = {}; const pasoOrder = [];
+      raw.slice(1).filter(r => r[3]).forEach(r => {
+        const nombre = String(r[0] ?? "").trim();
+        const key = nombre || `Paso ${pasoOrder.length + 1}`;
+        if (!pasoMap[key]) { pasoMap[key] = { ...emptyPaso(), nombre: key, obligatorio: String(r[1] ?? "Si").trim() === "No" ? "No" : "Si", pct_beneficio: String(r[2] ?? "").trim(), productos: [] }; pasoOrder.push(key); }
+        pasoMap[key].productos.push({ _id: Math.random().toString(36).slice(2), sku: String(r[3]).trim(), delta_precio: String(r[4] ?? "").trim() });
+      });
+      const pasos = pasoOrder.map(k => pasoMap[k]);
+      if (pasos.length) setFilas(s => s.map(x => x._id !== skuId ? x : { ...x, pasos }));
+    };
+    reader.readAsArrayBuffer(file); e.target.value = "";
+  };
+
+  const validarTodo = () => {
+    let ok = true;
+    const updated = filas.map(f => {
+      const errs = [];
+      if (!f.codigo_sap.trim()) errs.push("Código SAP requerido");
+      if (!f.nombre.trim())     errs.push("Nombre requerido");
+      if (f.pasos.length === 0) errs.push("Debe tener al menos un paso");
+      const sumOblig = f.pasos.filter(p => p.obligatorio === "Si").reduce((a, p) => a + (parseFloat(p.pct_beneficio) || 0), 0);
+      if (f.pasos.some(p => p.obligatorio === "Si") && Math.round(sumOblig) !== 100) errs.push(`Pasos obligatorios suman ${sumOblig}% (debe ser 100%)`);
+      if (errs.length) ok = false;
+      return { ...f, errores: errs };
+    });
+    setFilas(updated); return ok;
+  };
+
+  const handleEnviar = async () => {
+    if (!validarTodo() || solicitante.trim().length < 3) return;
+    setEnviando(true);
+    const folio = "SAP-" + new Date().getFullYear() + "-" + String(Math.floor(100000 + Math.random() * 899999));
+    const { error } = await supabase.from("solicitudes").insert({
+      folio, solicitante_id: session?.user?.id, solicitante_nombre: solicitante,
+      solicitante_email: session?.user?.email, estado: "Enviada",
+      planillas: [{ id: "modificacion_combo", nombre: "Modificación de Combo", filas: filas.map(({ _id, errores, ...d }) => d) }],
+      historial: [{ estado: "Enviada", fecha: new Date().toISOString() }],
+    });
+    setEnviando(false);
+    if (!error) setEnviado({ folio, total: filas.length });
+    else alert("Error al guardar: " + JSON.stringify(error));
+  };
+
+  if (enviado) return (
+    <AppShell vista={vista} setVista={setVista} perfil={perfil}>
+      <main className="success-wrap">
+        <div className="success-check"><CheckCircle2 size={64} strokeWidth={1.3} /></div>
+        <h1 className="success-title">Solicitud enviada.</h1>
+        <p className="success-sub">Folio <strong>{enviado.folio}</strong> · {enviado.total} combo{enviado.total > 1 ? "s" : ""} a modificar.</p>
+        <button className="btn-primary" style={{ marginTop: 24 }} onClick={() => { setEnviado(null); setFilas([emptyModCombo()]); }}>Nueva solicitud</button>
+      </main>
+    </AppShell>
+  );
+
+  const conError = filas.filter(f => f.errores.length > 0);
+  const thSt     = { padding: "8px 10px", textAlign: "left", fontSize: 11, fontWeight: 600, color: "#86868b", textTransform: "uppercase", letterSpacing: ".05em", borderBottom: "1px solid rgba(200,205,230,0.4)", background: "#f8f8fc", whiteSpace: "nowrap" };
+
+  const panelDerecho = (
+    <div style={{ padding: "28px 20px", display: "flex", flexDirection: "column", gap: 16 }}>
+      <div>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "#3a3a3c", marginBottom: 12 }}>Resumen</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
+            <span style={{ color: "#636366" }}>Combos</span><strong>{filas.length}</strong>
+          </div>
+          {conError.length > 0 && (
+            <div style={{ fontSize: 12, color: "#c2271c", background: "rgba(255,59,48,0.07)", borderRadius: 8, padding: "8px 10px", marginTop: 4 }}>
+              {conError.length} con errores
+            </div>
+          )}
+        </div>
+      </div>
+      <div style={{ borderTop: "1px solid rgba(0,0,0,0.08)", paddingTop: 16 }}>
+        <div style={{ fontSize: 12, color: "#636366", marginBottom: 6 }}>Solicitante</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+          <User size={14} color="#636366" />
+          <span style={{ fontSize: 13, color: solicitante ? "#3a3a3c" : "#aeaeb2", fontWeight: solicitante ? 500 : 400 }}>
+            {solicitante || "Sin usuario autenticado"}
+          </span>
+        </div>
+        <button className="btn-primary" style={{ width: "100%", marginBottom: 8 }} disabled={solicitante.trim().length < 3 || enviando} onClick={handleEnviar}>
+          {enviando ? "Enviando…" : "Enviar solicitud"} <ArrowRight size={15} />
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <AppShell vista={vista} setVista={setVista} perfil={perfil} rightPanel={panelDerecho}>
+      <main className="sol-wrap">
+        <div className="bloque">
+          <div className="bloque-head">
+            <span className="card-icon sm"><Pencil size={18} strokeWidth={1.7} /></span>
+            <div className="bloque-tit">
+              <strong>Modificar Combo</strong>
+              <span>{conError.length > 0 ? `${conError.length} con error` : "Ingresa el código SAP y la nueva estructura de pasos"}</span>
+            </div>
+          </div>
+
+          <div className="grilla-scroll">
+            <table className="grilla">
+              <thead>
+                <tr>
+                  <th className="th-n">#</th>
+                  <th style={{ minWidth: 120 }}>Código SAP</th>
+                  <th style={{ minWidth: 175 }}>Nombre combo</th>
+                  <th style={{ minWidth: 110 }}>Pasos</th>
+                  <th className="th-x"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {filas.map((fila) => {
+                  const hayError = fila.errores.length > 0;
+                  return (
+                    <React.Fragment key={fila._id}>
+                      <tr className={hayError ? "g-err" : ""}>
+                        <td className="td-n">{hayError ? <AlertTriangle size={13} className="ic-err" /> : <Pencil size={12} className="ic-dim" />}</td>
+                        <td><input className="celda" value={fila.codigo_sap} onChange={e => updateFila(fila._id, "codigo_sap", e.target.value)} placeholder="Ej: 132132" style={{ fontFamily: "monospace" }} /></td>
+                        <td><input className="celda" value={fila.nombre} onChange={e => updateFila(fila._id, "nombre", e.target.value)} placeholder="Nombre del combo" /></td>
+                        <td>
+                          <button className="dz-clear dup" style={{ padding: "4px 8px", fontSize: 12, whiteSpace: "nowrap", borderColor: "rgba(175,82,222,0.35)", color: "#af52de" }}
+                            onClick={() => { setComboError(""); setComboModal(fila._id); }}>
+                            <Layers size={12} /> {fila.pasos.length > 0 ? `${fila.pasos.length} paso${fila.pasos.length > 1 ? "s" : ""}` : "Pasos"}
+                          </button>
+                        </td>
+                        <td className="td-x">
+                          {filas.length > 1 && <button className="dz-clear" onClick={() => removeFila(fila._id)} title="Eliminar"><Trash2 size={13} /></button>}
+                        </td>
+                      </tr>
+                      {hayError && (
+                        <tr className="g-err-detalle">
+                          <td></td>
+                          <td colSpan={4}>{fila.errores.join(" · ")}</td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <button className="btn-addrow" onClick={addFila} disabled={filas.length >= 80}>
+            <Plus size={14} /> Agregar combo
+          </button>
+        </div>
+
+        {/* Modal pasos combo */}
+        {comboModal && (() => {
+          const filaC = filas.find(f => f._id === comboModal);
+          if (!filaC) return null;
+          const sumOblig = filaC.pasos.filter(p => p.obligatorio === "Si").reduce((a, p) => a + (parseFloat(p.pct_beneficio) || 0), 0);
+          const hayOblig = filaC.pasos.some(p => p.obligatorio === "Si");
+          const pctOk    = !hayOblig || Math.round(sumOblig) === 100;
+          return (
+            <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
+                 onClick={e => { if (e.target === e.currentTarget) { setComboError(""); setComboModal(null); } }}>
+              <div style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth: 800, maxHeight: "85vh", display: "flex", flexDirection: "column", overflow: "hidden", boxShadow: "0 20px 60px rgba(0,0,0,0.22)" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "18px 22px", borderBottom: "1px solid rgba(0,0,0,0.07)" }}>
+                  <Layers size={18} color="#af52de" />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 700, fontSize: 15 }}>Nueva estructura de pasos</div>
+                    <div style={{ fontSize: 12, color: "#636366" }}>
+                      {filaC.nombre || "Combo sin nombre"} · <span style={{ fontFamily: "monospace", color: "#5e5ce6" }}>SAP {filaC.codigo_sap || "—"}</span>
+                    </div>
+                  </div>
+                  {hayOblig && (
+                    <span style={{ fontSize: 12, fontWeight: 600, padding: "3px 10px", borderRadius: 980, background: pctOk ? "rgba(52,199,89,0.12)" : "rgba(255,59,48,0.1)", color: pctOk ? "#34c759" : "#ff3b30" }}>
+                      Oblig.: {sumOblig}% {pctOk ? "✓" : "≠ 100%"}
+                    </span>
+                  )}
+                  <button onClick={() => { setComboError(""); setComboModal(null); }} style={{ background: "none", border: "none", cursor: "pointer", color: "#636366", padding: 4 }}><X size={20} /></button>
+                </div>
+                <div style={{ flex: 1, overflow: "auto", padding: "16px 22px" }}>
+                  <div style={{ fontSize: 12, color: "#636366", background: "rgba(175,82,222,0.07)", borderRadius: 10, padding: "10px 14px", marginBottom: 12 }}>
+                    Define la nueva estructura completa de pasos y productos tal como debe quedar en SAP.
+                  </div>
+                  {filaC.pasos.length === 0 && (
+                    <div style={{ textAlign: "center", color: "#aeaeb2", padding: "32px 0", fontSize: 14 }}>Sin pasos. Agrega el primero abajo.</div>
+                  )}
+                  {filaC.pasos.map((paso, pIdx) => (
+                    <div key={paso._id} style={{ border: "1px solid rgba(0,0,0,0.09)", borderRadius: 12, overflow: "hidden", marginBottom: 12 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", background: "#f8f8fc", borderBottom: "1px solid rgba(0,0,0,0.06)" }}>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: "#af52de", minWidth: 52 }}>PASO {pIdx + 1}</span>
+                        <input className="celda" value={paso.nombre} onChange={e => updatePaso(filaC._id, paso._id, "nombre", e.target.value)} placeholder="Nombre del paso" style={{ flex: 1, fontSize: 13 }} />
+                        <label style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, color: "#3a3a3c", whiteSpace: "nowrap" }}>
+                          Obligatorio:
+                          <select className="celda" value={paso.obligatorio} onChange={e => updatePaso(filaC._id, paso._id, "obligatorio", e.target.value)} style={{ width: 60 }}>
+                            <option>Si</option><option>No</option>
+                          </select>
+                        </label>
+                        {paso.obligatorio === "Si" && (
+                          <label style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, color: "#3a3a3c", whiteSpace: "nowrap" }}>
+                            % Beneficio:
+                            <input className="celda" type="number" min="0" max="100" step="1" value={paso.pct_beneficio} onChange={e => updatePaso(filaC._id, paso._id, "pct_beneficio", e.target.value)} placeholder="0" style={{ width: 58, textAlign: "right" }} />
+                          </label>
+                        )}
+                        <button onClick={() => removePaso(filaC._id, paso._id)} style={{ background: "none", border: "none", cursor: "pointer", color: "#ff3b30", padding: "2px 4px", marginLeft: 4 }}><X size={15} /></button>
+                      </div>
+                      <table style={{ borderCollapse: "collapse", width: "100%", fontSize: 13 }}>
+                        <thead>
+                          <tr>
+                            <th style={{ ...thSt, width: 120 }}>SKU</th>
+                            <th style={thSt}>Nombre</th>
+                            <th style={{ ...thSt, width: 110, textAlign: "right" }}>Delta Precio</th>
+                            <th style={{ ...thSt, width: 36 }}></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {paso.productos.map(prod => {
+                            const skuInfo = MAESTROS.skus?.[prod.sku];
+                            return (
+                              <tr key={prod._id} style={{ borderBottom: "1px solid rgba(0,0,0,0.04)" }}>
+                                <td style={{ padding: "3px 6px" }}><input className="celda" value={prod.sku} onChange={e => updateProd(filaC._id, paso._id, prod._id, "sku", e.target.value)} placeholder="Código SKU" style={{ minWidth: 100 }} /></td>
+                                <td style={{ padding: "4px 10px" }}>
+                                  {skuInfo ? <span style={{ color: "#5b8dee" }}>{skuInfo.nombre}</span>
+                                   : prod.sku ? <span style={{ color: "#ff3b30" }}>No encontrado</span>
+                                   : <span style={{ color: "#c7c7cc" }}>—</span>}
+                                </td>
+                                <td style={{ padding: "3px 6px" }}><input className="celda" type="number" step="0.01" value={prod.delta_precio} onChange={e => updateProd(filaC._id, paso._id, prod._id, "delta_precio", e.target.value)} placeholder="0" style={{ minWidth: 80, textAlign: "right" }} /></td>
+                                <td style={{ textAlign: "center", padding: "4px 6px" }}><button onClick={() => removeProd(filaC._id, paso._id, prod._id)} style={{ background: "none", border: "none", cursor: "pointer", color: "#ff3b30" }}><X size={14} /></button></td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                      <button className="btn-addrow" style={{ margin: "6px 10px 10px" }} onClick={() => addProd(filaC._id, paso._id)}><Plus size={13} /> Agregar SKU</button>
+                    </div>
+                  ))}
+                  <button className="btn-addrow" onClick={() => addPaso(filaC._id)}><Plus size={14} /> Agregar paso</button>
+                </div>
+                <div style={{ borderTop: "1px solid rgba(0,0,0,0.07)" }}>
+                  {comboError && (
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 22px", background: "rgba(255,59,48,0.07)", borderBottom: "1px solid rgba(255,59,48,0.12)" }}>
+                      <AlertTriangle size={14} color="#ff3b30" />
+                      <span style={{ fontSize: 13, color: "#ff3b30", fontWeight: 500 }}>{comboError}</span>
+                    </div>
+                  )}
+                  <div style={{ padding: "14px 22px", display: "flex", alignItems: "center", gap: 8 }}>
+                    <button className="btn-ghost" style={{ fontSize: 13 }} onClick={descargarTemplateCombo}><Download size={13} /> Plantilla</button>
+                    <label style={{ display: "inline-flex" }}>
+                      <span className="btn-ghost" style={{ fontSize: 13, cursor: "pointer" }}><Upload size={13} /> Importar Excel</span>
+                      <input ref={comboImportRef} type="file" accept=".xlsx,.xls" style={{ display: "none" }} onChange={e => importarCombo(filaC._id, e)} />
+                    </label>
+                    <div style={{ flex: 1 }} />
+                    <button className="btn-primary" style={{ fontSize: 14, padding: "9px 22px" }} onClick={() => {
+                      if (hayOblig && !pctOk) { setComboError(`Los pasos obligatorios suman ${sumOblig}% — deben sumar exactamente 100%.`); return; }
+                      setComboError(""); setComboModal(null);
+                    }}>Listo</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+      </main>
+    </AppShell>
+  );
+}
+
 function VistaAdmin() {
   const [usuarios, setUsuarios] = useState([]);
   const [cargando, setCargando] = useState(true);
@@ -4681,6 +5230,8 @@ function Sidebar({ vista, setVista, perfil }) {
     { id: "nuevo-sku",     label: "Nuevo SKU",         icon: Package },
     { id: "nueva-receta",  label: "Nueva Receta",      icon: Utensils },
     { id: "nueva-combo",   label: "Nuevo Combo",       icon: Gift },
+    { id: "mod-receta",    label: "Modificar Receta",  icon: Pencil },
+    { id: "mod-combo",     label: "Modificar Combo",   icon: Pencil },
     { id: "nueva",         label: "Nueva solicitud",   icon: FileText },
     { id: "solicitudes",   label: "Solicitudes",       icon: Inbox },
     { id: "clusters",      label: "Gestor de locales", icon: Boxes },
