@@ -8,7 +8,8 @@ import {
   Plus, Trash2, ShieldCheck, Pencil, Copy, ClipboardList, Clock, User, Inbox,
   Layers, ArrowLeftRight, Check, Save, Unlock,
   ShoppingCart, FileText, Truck, Percent, TicketPercent,
-  Lightbulb, ArrowDown, ChevronUp, Menu, Home, Table2, Package
+  Lightbulb, ArrowDown, ChevronUp, Menu, Home, Table2, Package,
+  Utensils, Gift
 } from "lucide-react";
 
 const CENTROS = {"2003": "Pronto Pargua", "2549": "Pronto Rosario Norte", "2626": "Pronto Metro Quilicura", "2004": "Pronto Sierra Gorda", "2005": "Pronto Laguna Chicureo", "2006": "Pronto Manuel Rodriguez", "2615": "Pronto UAI Peñalolen", "2766": "Pronto Metro Pedro de Valdivia", "2778": "Pronto Carretera Longitudinal Austral", "2788": "Pronto Vicuña Mackenna", "2783": "Pronto Baquedano", "2100": "Pronto Antonio Rendic", "2101": "Pronto Pedro Aguirre Cerda", "2582": "Pronto Chañaral", "2102": "Pronto Diego Portales", "2796": "Pronto Ruta 27", "2103": "Punto Teniente Merino", "2510": "Pronto Antofagasta", "2722": "Punto Francisco Bilbao", "2105": "Pronto Vivar", "2106": "Pronto Ruta A-16", "2009": "Pronto Pozo Al Monte", "2107": "Punto Arturo Merino Correa", "2502": "Pronto Perez Zujovic", "2108": "Punto Granaderos", "2109": "Punto Panamericana Sur", "2110": "Pronto Luis Valente Rossi", "2111": "Pronto Angamos", "2112": "ProntoRuta 5 Norte", "2113": "Pronto Av Argentina I", "2758": "ProntoAntonio Rendic Esq.", "2114": "Pronto Barrio Industrial", "2115": "Pronto Pedro Prado", "2116": "Punto Abaroa", "2581": "Pronto Av Argentina II", "2118": "Punto 11 de Septiembre", "2119": "Pronto 18 de Septiembre", "2120": "Pronto Alto Hospicio", "2121": "Pronto Edmundo Perez Zujovic", "2122": "Punto Balmaceda", "2777": "Punto Diego Portales II", "2779": "Punto 27 de Abril", "2770": "Punto República de Croacia", "2514": "Pronto Iquique", "2123": "Pronto Santiago Arata", "2720": "Punto Anibal Pinto", "2124": "Punto Ruta 5 Sur", "2125": "Pronto Sotomayor", "2013": "Pronto San Rafael", "2012": "Pronto San Carlos", "2017": "Pronto Cosmito", "2540": "Pronto Paicaví", "2544": "Pronto Pedro De Valdivia", "2128": "Punto Rudecindo Ortega", "2737": "Punto Condell", "2053": "Pronto San José De La Mariquina", "2129": "Pronto Calle 8 Oriente", "2803": "Punto Camino Alerce", "2713": "Punto O'Higgins Chiguayante", "2131": "Punto Salvador Allende II", "2132": "Pronto Prat San Martin", "2133": "Punto Los Notros", "2134": "Punto Almirante La Torre", "2797": "Punto Pedro Aguirre Cerda II", "2135": "Pronto Vicente Mendez", "2056": "Pronto Puerto Varas", "2052": "Pronto Parral", "2055": "Pronto Trafun Poniente", "2059": "Pronto Victoria", "2063": "Pronto San Javier", "2136": "Pronto Futaleufu", "2705": "Pronto Rio Tranquilo", "2786": "Punto Maipu San Martin", "2137": "Pronto Ecuador O'Higgins", "2749": "Pronto Colin", "2138": "Punto Cardonal", "2757": "Punto Galvarino Riveros", "2139": "Pronto Prat II", "2140": "Pronto Kurt Moller", "2743": "Punto Lastarria", "2043": "Pronto Los Angeles Centro", "2721": "Punto O'Higgins III", "2142": "Punto Walker Martinez", "2143": "Punto Fresia Brasil", "2593": "Punto Rudecindo Ortega II", "2144": "Pronto Valdivia", "2145": "Punto San Martin Benavente", "2146": "Punto Av Mackenna", "2773": "Punto Arturo Alessandri", "2594": "Punto M. Rozas", "2719": "Pronto Sargento Aldea", "2148": "Pronto Balmaceda II", "2712": "Punto Bernardo O'Higgins", "2015": "Pronto Puerto Montt", "2794": "Pronto 2 Sur", "2150": "Punto Libertad", "2151": "Punto Picarte", "2152": "Punto Comercio", "2014": "Punto Jose Puchi", "2723": "Pronto Balmaceda", "2155": "Punto Mac-Iver", "2156": "Punto Caupolican", "2537": "Pronto Los Carrera", "2157": "Pronto Cristobal Colon", "2064": "Pronto Palomares", "2811": "Pronto Ladrilleros", "2159": "Punto Republica Victoria", "2048": "Pronto Chillán Oriente", "2160": "Pronto Presidente Frei", "2161": "Punto Geronimo De Alderete", "2162": "Punto Panamericana", "2163": "Pronto Manuel Rodriguez Chigu", "2164": "Pronto Pedro Aguirre Cerda", "2726": "Pronto 21 de Mayo", "2517": "Pronto Michimalonco", "2166": "Pronto 2 Norte", "2167": "Punto Picarte Simpson", "2168": "Punto Camino A Coñaripe", "2731": "Punto Los Carreras", "2590": "Punto Andres Bello", "2724": "Pronto Juan Antonio Rios", "2170": "Pronto Calle 5 Norte", "2171": "Punto Balmaceda III", "2065": "Pronto Cabrero", "2733": "Pronto Gabriela Mistral", "2173": "Punto Panamericana Sur II", "2030": "Pronto Horcones", "2706": "Pronto Alemania", "2175": "Pronto Lircay", "2176": "Punto Rene Soriano", "2177": "Pronto Vicuña Mackenna II", "2178": "Pronto Maraton", "2179": "Pronto Ruta S-30", "2180": "Pronto Camino Internacional", "2747": "Pronto La Junta", "2181": "Pronto Camino Internacional II", "2774": "Pronto Daniel Vera", "2182": "Pronto Av Argentina III", "2183": "Punto Vicente Perez Rosales", "2021": "Pronto Trafún Oriente", "2023": "Pronto Freire", "2020": "Pronto Loncoche", "2022": "Pronto Los Angeles Poniente", "2184": "Punto O'Higgins IV", "2185": "Punto Bulnes", "2186": "Punto Bulnes II", "2187": "Punto Bulnes III", "2188": "Punto Don Bosco", "2189": "Punto Ruta 5 Sur II", "2190": "Punto Los Rios", "2024": "Pronto Lautaro", "2191": "Pronto Los Carrera Lautaro", "2709": "Punto Castellon", "2018": "Pronto Eusebio Ibar", "2802": "Pronto Ogana", "2542": "Pronto Av Alemania", "2193": "Pronto Latorre", "2554": "Pronto Carlos Schorr", "2522": "Pronto Talcahuano", "2050": "Pronto Los Angeles Oriente", "2194": "Pronto Camino Coronel", "2195": "Punto O'Higgins Alemania", "2031": "Pronto Penco", "2800": "Punto Sargento Candelaria", "2196": "Punto Anibal Pinto II", "2197": "Punto Presidente Ibañez", "2730": "Punto Maipu 895", "2199": "Pronto Americo Vespucio", "2200": "Punto San Martin Uruguay", "2201": "Pronto Ercilla", "2202": "Punto Abate Molina", "2047": "Pronto Chillán Poniente", "2028": "Pronto Maule", "2203": "Punto Prat", "2204": "Pronto Calle B-20", "2205": "Pronto Los Carrera II", "2206": "Pronto Libertad", "2207": "Pronto Ruta 60-C", "2208": "Pronto Ruta F-30-E", "2209": "Pronto Lauro Barros", "2210": "Pronto Normandie", "2587": "Pronto Portales", "2211": "Pronto Colo Colo", "2051": "Pronto Hijuelas", "2784": "Punto Los Loros", "2212": "Pronto Sta. Teresita Peñablanca", "2213": "Pronto Agua Santa", "2214": "Pronto Valparaiso", "2543": "Pronto Bosques de Montemar", "2215": "Pronto Bernardo O'Higgins II", "2742": "Pronto Esmeralda Santa Teresa", "2217": "Pronto Humeres", "2058": "Pronto Palo Colorado", "2218": "Punto O'Higgins V", "2219": "Pronto Palmira Romano Norte", "2060": "Pronto Marbella", "2220": "Pronto Marga Marga", "2221": "Pronto Teniente Cruz Martinez", "2519": "Pronto Las Salinas", "2746": "Pronto Carretera Panamericana Norte", "2222": "Pronto Freire Echeverria", "2223": "Pronto Freire Gomez Carreño", "2703": "Pronto Jose Joaquin Perez", "2225": "Pronto Constitucion", "2069": "Pronto Placilla", "2226": "Punto Panamericana Norte II", "2567": "Punto Brasil I", "2228": "Punto Ignacio De La Carrera", "2229": "Punto Panamericana Norte Fco. Aguirre", "2230": "Pronto Balmaceda IV", "2231": "Punto Ariztia", "2057": "Pronto Socos", "2232": "Pronto El Peral", "2233": "Pronto Lusitania", "2234": "Pronto Los Carrera III", "2235": "Pronto Irarrazaval O'Higgins", "2236": "Pronto Borgoño", "2237": "Pronto Playa Ancha", "2577": "Pronto Alessandri", "2239": "Pronto Irarrazaval", "2240": "Pronto Las Delicias Sargento Aldea", "2241": "Pronto Balmaceda Paradero", "2242": "Pronto Vicuña Mackenna III", "2243": "Pronto Chacabuco General Cruz", "2244": "Punto Alessandri Norte", "2245": "Pronto San Martin 2510", "2246": "Pronto El Arrayan", "2044": "Pronto Los Vilos", "2247": "Pronto Marga Marga II", "2716": "Pronto Camino Internacional Oriente", "2805": "Pronto Rafael Ariztia", "2249": "Pronto Matta Cerro Placeres", "2250": "Pronto Colo Colo", "2251": "Pronto Circunvalacion Ariztia", "2252": "Pronto Tocornal", "2253": "Pronto Adolfo Eastman", "2254": "Punto Merino Jarpa", "2255": "Pronto La Cantera I", "2256": "Pronto Ruta F30", "2257": "Pronto Camino Troncal", "2258": "Pronto Curauma Sur", "2259": "Pronto Isidoro Dubournais", "2260": "Pronto Jose M. Balmaceda", "2708": "Pronto Emilio Valle", "2262": "Pronto Juan Rusque", "2263": "Pronto Palmira Romano Sur", "2771": "Pronto Gabriel Gonzalez Videla", "2732": "Pronto Av Argentina , Las Juntas", "2025": "Pronto Los Vilos Oriente", "2265": "Pronto La Cantera II", "2266": "Pronto Calle Larga", "2267": "Punto Socos Victoria", "2268": "Pronto Tarcicio Valderrama", "2269": "Pronto Januario Ovalle", "2270": "Punto Carretera Panamericana III", "2096": "Pronto Copiapo Km 811", "2271": "Punto Copayapu", "2089": "Pronto Copiapo Km 838", "2272": "Pronto El Islon", "2273": "Pronto Alessandri II", "2595": "Pronto 4 Esquinas", "2534": "Pronto Parcela 20", "2275": "Pronto Ambrosio Ohiggins", "2045": "Pronto Coquimbo", "2276": "Pronto Camino Internacional II", "2277": "Pronto Los Carrera N° 01050", "2810": "Pronto Nicaragua", "2041": "Pronto Llay Llay", "2278": "Punto Camino Tuqui", "2040": "Pronto La Serena", "2046": "Pronto Tabolango", "2545": "Pronto Troncal Sur", "2279": "Pronto Los Copihues", "2280": "Pronto Juan Bautista Alberdi", "2011": "Pronto Puente Ruta 78", "2536": "Pronto Isidora", "2612": "Pronto Plaza Peru", "2614": "Pronto UDD Concepción", "2616": "Pronto UAI Viña Del Mar", "2618": "Pronto Metro Vicuña Mackenna", "2619": "Pronto USS Cede Los Leones", "2621": "Pronto Casino UNAB", "2622": "Pronto Casino UAI Peñalolen", "2624": "Pronto DUOC Vina Del Mar", "2775": "Pronto Lyon", "2761": "Pronto Plaza Sucre", "2763": "Pronto Plaza de Armas Temuco", "2764": "Pronto Mall Plaza El Trebol", "2765": "Pronto Metro Cal Y Canto", "2767": "Pronto Valparaiso", "2768": "Pronto Bellavista Pio Nono", "2780": "Pronto Luis Thayer Ojeda", "2789": "Pronto UAI Viña Del Mar Casino", "2790": "Pronto UAI Peñalolén Casino Edif. A", "2791": "Pronto UAI Peñalolén Casino Edif. E", "2792": "Pronto UAI Peñaloles Cafetería Edif. C", "3014": "Pronto CIUC Piso 1", "2762": "Pronto Huérfanos 815", "8201": "Pronto Metro U De Chile", "2500": "Pronto Pedro Fontova", "2532": "Pronto Chamisero", "2010": "Pronto Nos", "2281": "Pronto Balmaceda Malloco", "2282": "Pronto General San Martin", "2283": "Pronto Alcalde Lopez", "2617": "Pronto Macul", "2782": "Pronto Americo Vespucio II", "2284": "Punto Errazuriz", "2285": "Pronto Pedro Aguirre Cerda II", "2062": "Pronto Ruta 78 Poniente", "2061": "Pronto Ruta 78 Oriente", "2287": "Pronto Bilbao", "2288": "Pronto Vitacura", "2289": "Pronto Macul", "2290": "Punto San Martin N° 401", "2291": "Pronto Ecuador", "2292": "Pronto General Prieto", "2293": "Pronto Balmaceda II", "2509": "Pronto Vitacura 5579", "2511": "Pronto Av La Florida", "2294": "Pronto Blanco Encalada", "2531": "Pronto Cantagallo", "2296": "Pronto Pedro Aguirre Cerda III", "2812": "Pronto Ruta G16 Arco Iris", "2298": "Pronto Irarrazaval II", "2299": "Punto Chicureo", "2801": "Pronto Panamericana Norte", "2300": "Pronto San Ramon", "2539": "Pronto Pajaritos 5200", "2301": "Pronto Irarrazaval III", "2054": "Pronto San Fernando", "2302": "Pronto San Pablo Bismark", "2541": "Pronto Costanera E0", "2303": "Pronto Bernardo O'Higgins I", "2578": "Pronto Camino Melipilla II", "2305": "Pronto Camino Nos", "2306": "Pronto Eliodoro Yañez", "2307": "Pronto Concha Y Toro I", "2308": "Pronto Oriental", "2813": "Pronto El Rosal", "2310": "Pronto Salvador", "2311": "Pronto Membrillar", "2312": "Pronto Lota", "2513": "Pronto Portal La Dehesa", "2019": "Pronto Nos Km 27", "2313": "Pronto Vicuña Mackenna IV", "2717": "Pronto Colon", "2754": "Pronto Pedro De Valdivia", "2315": "Pronto Ossa", "2515": "Pronto Principe De Gales", "2704": "Pronto Santa Rosa II", "2317": "Punto Gran Avenida", "2318": "Pronto San Pablo II", "2586": "Pronto Mapocho Brasil", "2320": "Punto Jose Miguel Carrera", "2321": "Pronto Americo Vespucio III", "2707": "Pronto General San Martin", "2323": "Pronto Departamental", "2324": "Pronto Av San Juan", "2325": "Pronto España", "2326": "Pronto O'Higgins Lote B-5A", "2327": "Pronto Arturo Pratt", "2002": "Pronto Sagrada Familia", "2328": "Pronto Circunvalacion Norte", "2714": "Pronto Alberto Llona", "2330": "Pronto Concha Y Toro II", "2331": "Pronto Recoleta", "2769": "Pronto San Pablo Brasil", "2575": "Pronto Lia Aguirre", "2333": "Pronto Bernardo O'Higgins III", "2334": "Punto Salvador Gutierrez", "2335": "Pronto Longitudinal Sur", "2336": "Punto Carrascal", "2337": "Pronto El Valle", "2338": "Punto Mapocho", "2339": "Pronto Manso De Velasco", "2340": "Pronto Carretera El Cobre", "2772": "Punto Irarrazabal II", "2341": "Pronto Recoleta", "2342": "Pronto Vespucio", "2343": "Pronto 18 De Septiembre", "2344": "Pronto 5 De Abril", "2345": "Pronto Libertador Bernardo O'Higgins", "2346": "Pronto Walker Martinez", "2793": "Pronto Tobalaba", "2347": "Pronto Bernardo O'Higgins II", "2503": "Pronto Pajaritos 3333", "2049": "Pronto Ruta 68", "2348": "Pronto Alameda", "2349": "Pronto Riesgo", "2566": "Pronto Ignacio Carrera Pinto", "2351": "Punto Orlandi", "2088": "Pronto Chimbarongo", "2352": "Pronto Longitudinal Sur II", "2715": "Pronto Carmen Camilo Henriquez", "2745": "Pronto Independencia", "2354": "Pronto Longitudinal Sur III", "2355": "Punto Argomedo", "2356": "Pronto Viel", "2785": "Pronto Bustamante", "2357": "Pronto Freire II", "2358": "Pronto Camino Melipilla II", "2359": "Punto San Martin M. Solis", "2360": "Pronto Bascuñan Guerrero", "2807": "Pronto Manuel Montt", "2361": "Pronto Cachapoal", "2565": "Pronto Manquehue", "2362": "Pronto Departamental II", "2363": "Pronto Las Condes", "2729": "Pronto Vicuña Mackenna V", "2365": "Pronto Los Leones", "2727": "Pronto Carmen", "2367": "Pronto Consistorial", "2368": "Pronto Calera De Tango", "2711": "Pronto Arturo Prat II", "2370": "Punto San Eugenio", "2806": "Pronto Camino Lo Sierra", "2371": "Punto Jose Pedro Alessandri", "2372": "Pronto Francisco Bilbao II", "2804": "Pronto Diagonal Oriente", "2373": "Punto Alberto Edwards", "2718": "Pronto Camino El Alba", "2776": "Pronto Ortuzar", "2374": "Pronto Trinidad", "2728": "Pronto Providencia", "2026": "Pronto San Fco Mostazal Poniente", "2027": "Pronto San Fco Mostazal Oriente", "2376": "Pronto San Jose", "2548": "Pronto Trapenses", "2377": "Pronto Camino Lonquen", "2505": "Pronto Lord Cochrane", "2378": "Pronto Americo Vespucio", "2787": "Pronto Virginia Subercaseaux", "2379": "Punto Jose Joaquin Perez II", "2556": "Pronto Vitacura 4207", "2530": "Pronto Vicuña Mackenna 1990", "2380": "Pronto Bascuñan Guerrero II", "2381": "Pronto Camino Lo Ovalle", "2576": "Pronto Apoquindo", "2504": "Pronto Vicuña Mackenna 5700", "2506": "Pronto La Dehesa", "2016": "Pronto Lampa", "2525": "Pronto Costanera E1", "2526": "Pronto Costanera E2", "2029": "Pronto Costanera E6", "2507": "Pronto San Pablo", "2568": "Pronto Carmen III", "2512": "Pronto Santa Maria", "2086": "Pronto Requinoa", "2087": "Pronto Romeral", "2384": "Pronto 21 De Mayo", "2385": "Pronto Mexico El Peñon", "2508": "Pronto Las Condes 10912", "2599": "Pronto Americo Vespucio IV", "2387": "Pronto Recreo", "2589": "Pronto Gabriela", "2518": "Pronto C Henriquez", "2521": "Pronto Los Libertadores", "2388": "Pronto Leonardo Murialdo", "2781": "Pronto Comercio", "2389": "Pronto Concha Y Toro III", "2390": "Pronto Santa Rosa III", "2538": "Pronto Tobalaba", "2795": "Pronto Austral", "2391": "Punto Henriquez", "2392": "Pronto Manzano", "2799": "Pronto Ruta 215", "2798": "Pronto Matta III", "2007": "Pronto Panamericana Norte II", "2633": "Pronto Irarrazaval Brown Sur", "2637": "Pronto Antonio Bellet", "2394": "Pronto General Velasquez", "2630": "Pronto Colo Colo", "2808": "Pronto Padre Las Casas", "2809": "Pronto Tijerales", "2638": "Pronto San Carlos de Apoquindo", "2396": "Pronto Mejillones", "2634": "Pronto Holanda", "2648": "Pronto Mall Plaza Alameda", "2631": "Pronto Agustinas San Antonio", "2397": "Pronto Quillon", "2641": "Pronto Antofagasta Arauco Express", "2645": "Pronto Agustinas Morande", "2405": "Pronto San Diego", "2643": "Pronto Padre Mariano", "2104": "Pronto Tinuche", "2639": "Pronto La Florida El Membrillar", "2651": "Sbarro Mall Plaza Norte", "2650": "Sbarro Mall Plaza Egaña", "2635": "Pronto Bulnes-Portales Temuco", "2652": "Sbarro Mall Costanera Center", "2552": "Pronto Quilin", "2066": "Pronto Monterilla", "2036": "Pronto Vallenar", "2130": "Pronto Villarrica", "2141": "Pronto Colegio Ingles talca", "2147": "Pronto Huamachuco", "2117": "Pronto Los Carrera", "2149": "Pronto Lorca", "2127": "Pronto San Carlos Sur", "2814": "Pronto Pichilemu Comercio", "2153": "Pronto Laura Pizarro", "7002": "Juan Valdez Providencia", "7003": "Juan Valdez M Pza Dominicos", "7004": "Juan Valdez MUT", "7005": "Juan Valdez M Plaza La Serena", "7006": "Juan Valdez M Plaza Los Ríos", "7007": "Juan Valdez Clínica Las Condes", "7008": "Juan Valdez M Plaza Trebol", "7009": "Juan Valdez M Portal Osorno", "7010": "Juan Valdez M Costanera PM", "7011": "Juan Valdez Aires Vespucio", "7012": "Juan Valdez M Arauco Maipu", "7013": "Juan Valdez M Pza Egana Corn", "7014": "Juan Valdez Rosario Norte", "7015": "Juan Valdez M Marina Arauco", "7016": "Juan Valdez Catedral", "7017": "Juan Valdez M Independencia", "7018": "Juan Valdez Open Kennedy", "7019": "Juan Valdez Apto Espigon C", "7020": "Juan Valdez Apto Espigon E", "7021": "Juan Valdez M P Arauco Corn", "7022": "Juan Valdez M Parque Arauco", "7023": "Juan Valdez M Costanera Ctr", "7024": "Juan Valdez M Plaza Egana", "7025": "Juan Valdez Open Pza Rancagua", "7026": "Juan Valdez M Alto Las Condes", "7027": "Juan Valdez M Pza Antofagasta", "7028": "Juan Valdez M Plaza Tobalaba", "7029": "Juan Valdez Lider Puente Nuevo", "9005": "Juan Valdez Darkstore Wallmart", "9008": "Juan Valdez Darkstore Justo", "9003": "Centro Distribucion Bluex", "9002": "Centro Distribucion 3PL"};
@@ -615,7 +616,8 @@ const filaVacia = planilla => Object.fromEntries(planilla.userCols.map(c => [c.k
 const PREFIJO = "solicitudes:";
 
 /* ---- Creación SKU ---- */
-const TIPOS_SKU      = ["Retail", "Insumo", "Receta", "Combos", "Menaje", "Packaging"];
+const TIPOS_SKU      = ["Retail", "Insumo", "Receta", "Combos", "Menaje", "Packaging"]; // lista completa (ref)
+const TIPOS_SKU_BASE = ["Retail", "Insumo", "Menaje", "Packaging"]; // sin Receta ni Combos
 const TIPOS_SIN_DIM  = new Set(["Receta", "Combos"]);
 const TIPOS_SIN_FOTO = new Set(["Insumo", "Packaging"]);
 const UNIDADES_DIM   = ["UN", "CJ", "DSP", "BL", "KG", "LT", "DOC", "PAR", "PAQ"];
@@ -626,7 +628,9 @@ const DIM_CAMPOS = [
   { key: "peso_neto",  label: "Peso neto" },
   { key: "peso_bruto", label: "Peso bruto" },
 ];
-const emptyDim    = () => ({ unidad: "", alto: "", largo: "", ancho: "", peso_neto: "", peso_bruto: "" });
+const emptyDim          = () => ({ unidad: "", alto: "", largo: "", ancho: "", peso_neto: "", peso_bruto: "" });
+const emptyProductoCombo = () => ({ _id: Math.random().toString(36).slice(2), sku: "", delta_precio: "" });
+const emptyPaso          = () => ({ _id: Math.random().toString(36).slice(2), nombre: "", obligatorio: "Si", pct_beneficio: "", productos: [emptyProductoCombo()] });
 const emptySkuRow = () => ({
   _id: Math.random().toString(36).slice(2),
   id_creacion: "CSKU-" + new Date().toISOString().slice(0, 10).replace(/-/g, "") + "-" + Math.random().toString(36).slice(2, 6).toUpperCase(),
@@ -637,6 +641,7 @@ const emptySkuRow = () => ({
   factor_conversion: "",
   dim_primaria: emptyDim(), dim_secundaria: emptyDim(),
   insumos: [],
+  pasos: [],
   fotos_planograma: [], fotos_navegacion: [],
   errores: [],
 });
@@ -695,7 +700,7 @@ export default function PortalSAP() {
   const [session, setSession] = useState(undefined); // undefined = cargando
   const [perfil, setPerfil] = useState(null);
   const [vista, setVista] = useState("inicio"); // 'inicio' | 'nueva' | 'solicitudes' | 'clusters'
-  const [solicitante, setSolicitante] = useState("");
+
   const [clusters, setClusters] = useState({});
   const [seleccion, setSeleccion] = useState([]);
   const [authFlow, setAuthFlow] = useState(null); // null | 'set-password'
@@ -882,14 +887,15 @@ export default function PortalSAP() {
   const totalOk = totales.reduce((a, t) => a + t.ok, 0);
   const totalErr = totales.reduce((a, t) => a + t.err, 0);
   const todoValidado = plSel.length > 0 && totales.every(t => t.validado);
-  const puedeEnviar = todoValidado && totalErr === 0 && totalOk > 0 && norm(solicitante).length >= 3;
+  const nombreSolicitante = norm(perfil?.nombre || "");
+  const puedeEnviar = todoValidado && totalErr === 0 && totalOk > 0 && nombreSolicitante.length >= 3;
 
   const enviar = async () => {
     const folio = "SAP-" + new Date().getFullYear() + "-" + String(Math.floor(100000 + Math.random() * 899999));
     const sol = {
       folio,
       fecha: new Date().toISOString(),
-      solicitante: norm(solicitante),
+      solicitante: nombreSolicitante,
       user_id: session?.user?.id,
       email: session?.user?.email,
       estado: "Enviada",
@@ -952,7 +958,9 @@ export default function PortalSAP() {
   if (vista === "maestros")    return <AppShell vista={vista} setVista={setVista} perfil={perfil}><VistaMaestros /></AppShell>;
   if (vista === "admin")       return <AppShell vista={vista} setVista={setVista} perfil={perfil}><VistaAdmin /></AppShell>;
   if (vista === "planillas")   return <AppShell vista={vista} setVista={setVista} perfil={perfil}><VistaMantenedorPlanillas /></AppShell>;
-  if (vista === "nuevo-sku")   return <VistaCreacionSKU perfil={perfil} session={session} vista={vista} setVista={setVista} />;
+  if (vista === "nuevo-sku")    return <VistaCreacionSKU    perfil={perfil} session={session} vista={vista} setVista={setVista} />;
+  if (vista === "nueva-receta") return <VistaCreacionReceta perfil={perfil} session={session} vista={vista} setVista={setVista} />;
+  if (vista === "nueva-combo")  return <VistaCreacionCombo  perfil={perfil} session={session} vista={vista} setVista={setVista} />;
   if (vista === "solicitudes") return <AppShell vista={vista} setVista={setVista} perfil={perfil}><VistaSolicitudes perfil={perfil} /></AppShell>;
   if (vista === "clusters")    return <AppShell vista={vista} setVista={setVista} perfil={perfil}><VistaClusters clusters={clusters} onChange={actualizarClusters} /></AppShell>;
   if (vista === "ayuda")       return <AppShell vista={vista} setVista={setVista} perfil={perfil}><VistaAyuda /></AppShell>;
@@ -963,7 +971,7 @@ export default function PortalSAP() {
     <PanelValidacion
       plSel={plSel} totales={totales} totalOk={totalOk} totalErr={totalErr}
       todoValidado={todoValidado} puedeEnviar={puedeEnviar}
-      solicitante={solicitante} setSolicitante={setSolicitante}
+      perfil={perfil} puedeEnviar={puedeEnviar}
       enviar={enviar} estado={estado}
     />
   );
@@ -2842,14 +2850,12 @@ const SKU_EXCEL_COLS = [
 function VistaCreacionSKU({ perfil, session, vista, setVista }) {
   const [skus, setSkus] = useState([emptySkuRow()]);
   const [expandedRow, setExpandedRow] = useState(null);
-  const [insumoModal, setInsumoModal] = useState(null);
   const [colGroup, setColGroup] = useState("basicos");
-  const [solicitante, setSolicitante] = useState(perfil?.nombre || "");
+  const solicitante = perfil?.nombre || "";
   const [enviando, setEnviando] = useState(false);
   const [enviado, setEnviado] = useState(null);
   const [cat, setCat] = useState({ grupos: [], modelos: [], marcas: [], fabricantes: [] });
   const importRef = useRef();
-  const insumoImportRef = useRef();
 
   useEffect(() => {
     (async () => {
@@ -2905,49 +2911,8 @@ function VistaCreacionSKU({ perfil, session, vista, setVista }) {
   const addSku       = () => { if (skus.length >= 80) return; setSkus(s => [...s, emptySkuRow()]); };
   const removeSku    = (id) => setSkus(s => s.filter(x => x._id !== id));
 
-  const addInsumo    = (id)          => setSkus(s => s.map(x => x._id !== id ? x : { ...x, insumos: [...x.insumos, { sku: "", cantidad: "", unidad: "" }] }));
-  const removeInsumo = (id, i)       => setSkus(s => s.map(x => x._id !== id ? x : { ...x, insumos: x.insumos.filter((_, j) => j !== i) }));
-  const updateInsumo = (id, i, k, v) => setSkus(s => s.map(x => {
-    if (x._id !== id) return x;
-    const ins = x.insumos.map((r, j) => {
-      if (j !== i) return r;
-      const updated = { ...r, [k]: v };
-      if (k === "sku") updated.unidad = MAESTROS.skus?.[v]?.unidadVenta || "";
-      return updated;
-    });
-    return { ...x, insumos: ins };
-  }));
-
   const addFotos   = (id, tipo, files) => setSkus(s => s.map(x => x._id !== id ? x : { ...x, [`fotos_${tipo}`]: [...x[`fotos_${tipo}`], ...Array.from(files)] }));
   const removeFoto = (id, tipo, i)     => setSkus(s => s.map(x => x._id !== id ? x : { ...x, [`fotos_${tipo}`]: x[`fotos_${tipo}`].filter((_, j) => j !== i) }));
-
-  const descargarTemplateInsumos = () => {
-    const ws = XLSX.utils.aoa_to_sheet([["Codigo SKU", "Cantidad"], ["10047", "2.5"]]);
-    ws["!cols"] = [{ wch: 16 }, { wch: 12 }];
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Insumos");
-    XLSX.writeFile(wb, "template_insumos_receta.xlsx");
-  };
-
-  const importarInsumos = (id, e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = ev => {
-      const wb = XLSX.read(ev.target.result, { type: "array" });
-      const ws = wb.Sheets[wb.SheetNames[0]];
-      const raw = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" });
-      const nuevos = raw.slice(1)
-        .filter(r => r[0])
-        .map(r => {
-          const skuCod = String(r[0]).trim();
-          return { sku: skuCod, cantidad: String(r[1] ?? "").trim(), unidad: MAESTROS.skus?.[skuCod]?.unidadVenta || "" };
-        });
-      if (nuevos.length) setSkus(s => s.map(x => x._id !== id ? x : { ...x, insumos: nuevos }));
-    };
-    reader.readAsArrayBuffer(file);
-    e.target.value = "";
-  };
 
   const validarTodo = () => {
     let ok = true;
@@ -2964,7 +2929,6 @@ function VistaCreacionSKU({ perfil, session, vista, setVista }) {
           DIM_CAMPOS.forEach(c => { if (!sku[dim][c.key]) errs.push(`${di === 0 ? "Primaria" : "Secundaria"}: ${c.label} requerido`); });
         });
       }
-      if (sku.tipo === "Receta" && sku.insumos.length === 0) errs.push("Debe tener al menos un insumo");
       if (!TIPOS_SIN_FOTO.has(sku.tipo)) {
         if (sku.fotos_planograma.length < 3) errs.push("Planograma: mínimo 3 fotos JPG");
         if (sku.fotos_navegacion.length === 0) errs.push("Navegación: se requiere 1 foto PNG");
@@ -3027,8 +2991,6 @@ function VistaCreacionSKU({ perfil, session, vista, setVista }) {
 
   const totalFotos   = skus.filter(s => !TIPOS_SIN_FOTO.has(s.tipo)).reduce((a, s) => a + s.fotos_planograma.length + s.fotos_navegacion.length, 0);
   const skusConError = skus.filter(s => s.errores.length > 0);
-  const skuModal     = insumoModal ? skus.find(s => s._id === insumoModal) : null;
-  const NCOLS        = 12;
 
   const panelDerecho = (
     <div style={{ padding: "28px 20px", display: "flex", flexDirection: "column", gap: 16 }}>
@@ -3054,14 +3016,16 @@ function VistaCreacionSKU({ perfil, session, vista, setVista }) {
         <div style={{ fontSize: 12, color: "#636366", marginBottom: 6 }}>Solicitante</div>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
           <User size={14} color="#636366" />
-          <input className="inp" style={{ flex: 1 }} value={solicitante} onChange={e => setSolicitante(e.target.value)} placeholder="Tu nombre completo" />
+          <span style={{ fontSize: 13, color: solicitante ? "#3a3a3c" : "#aeaeb2", fontWeight: solicitante ? 500 : 400 }}>
+            {solicitante || "Sin usuario autenticado"}
+          </span>
         </div>
         <button className="btn-primary" style={{ width: "100%", marginBottom: 8 }} disabled={solicitante.trim().length < 3 || enviando} onClick={handleEnviar}>
           {enviando ? "Enviando…" : "Enviar solicitud"} <ArrowRight size={15} />
         </button>
       </div>
       <div style={{ borderTop: "1px solid rgba(0,0,0,0.08)", paddingTop: 16 }}>
-        <p style={{ fontSize: 11, color: "#aeaeb2", lineHeight: 1.5 }}>Usa los grupos de columnas para navegar entre secciones. Las fotos e insumos están en el grupo "Fotos / Flags".</p>
+        <p style={{ fontSize: 11, color: "#aeaeb2", lineHeight: 1.5 }}>Usa los grupos de columnas para navegar entre secciones. Las fotos están en el grupo "Fotos / Flags".</p>
       </div>
     </div>
   );
@@ -3118,7 +3082,6 @@ function VistaCreacionSKU({ perfil, session, vista, setVista }) {
                     <th style={{ minWidth: 175 }}>Nombre</th>
                     <th style={{ minWidth: 185 }}>Descripción</th>
                     <th style={{ minWidth: 120 }}>Tipo</th>
-                    <th style={{ minWidth: 110 }}>Insumos</th>
                   </>}
 
                   {colGroup === "marcas" && <>
@@ -3157,10 +3120,9 @@ function VistaCreacionSKU({ perfil, session, vista, setVista }) {
                 {skus.map((sku, idx) => {
                   const sinDim   = TIPOS_SIN_DIM.has(sku.tipo);
                   const sinFoto  = TIPOS_SIN_FOTO.has(sku.tipo);
-                  const esReceta = sku.tipo === "Receta";
                   const hayError = sku.errores.length > 0;
                   const expanded = expandedRow === sku._id;
-                  const NCOLS_NOW = colGroup === "basicos" ? 7 : colGroup === "marcas" ? 7 : colGroup === "dimensiones" ? 16 : 6;
+                  const NCOLS_NOW = colGroup === "basicos" ? 6 : colGroup === "marcas" ? 7 : colGroup === "dimensiones" ? 16 : 6;
 
                   return (
                     <React.Fragment key={sku._id}>
@@ -3180,15 +3142,8 @@ function VistaCreacionSKU({ perfil, session, vista, setVista }) {
                           <td>
                             <select className="celda" value={sku.tipo} onChange={e => updateSku(sku._id, "tipo", e.target.value)}>
                               <option value="">—</option>
-                              {TIPOS_SKU.map(t => <option key={t}>{t}</option>)}
+                              {TIPOS_SKU_BASE.map(t => <option key={t}>{t}</option>)}
                             </select>
-                          </td>
-                          <td>
-                            {esReceta ? (
-                              <button className="dz-clear dup" style={{ padding: "4px 8px", fontSize: 12, whiteSpace: "nowrap" }} onClick={() => setInsumoModal(sku._id)}>
-                                <Layers size={12} /> {sku.insumos.length > 0 ? `${sku.insumos.length} insumo${sku.insumos.length > 1 ? "s" : ""}` : "Insumos"}
-                              </button>
-                            ) : <span style={{ color: "#d2d2d7", fontSize: 12, padding: "7px 8px", display: "block" }}>—</span>}
                           </td>
                         </>}
 
@@ -3332,23 +3287,400 @@ function VistaCreacionSKU({ perfil, session, vista, setVista }) {
           </button>
         </div>
 
-        {/* Modal insumos de receta */}
-        {skuModal && (
+      </main>
+    </AppShell>
+  );
+}
+
+function VistaCreacionReceta({ perfil, session, vista, setVista }) {
+  const [recetas, setRecetas] = useState([emptySkuRow()]);
+  const [expandedRow, setExpandedRow] = useState(null);
+  const [insumoModal, setInsumoModal] = useState(null);
+  const [colGroup, setColGroup] = useState("basicos");
+  const solicitante = perfil?.nombre || "";
+  const [enviando, setEnviando] = useState(false);
+  const [enviado, setEnviado] = useState(null);
+  const [cat, setCat] = useState({ grupos: [], modelos: [], marcas: [], fabricantes: [] });
+  const importRef = useRef();
+  const insumoImportRef = useRef();
+
+  useEffect(() => {
+    (async () => {
+      const [{ data: grupos }, { data: modelos }, { data: marcas }, { data: fabricantes }] = await Promise.all([
+        supabase.from("grupos_articulo").select("codigo,nombre"),
+        supabase.from("materiales_modelo").select("codigo,nombre"),
+        supabase.from("marcas").select("codigo,nombre"),
+        supabase.from("fabricantes").select("codigo,nombre"),
+      ]);
+      setCat({ grupos: grupos || [], modelos: modelos || [], marcas: marcas || [], fabricantes: fabricantes || [] });
+    })();
+  }, []);
+
+  const updateRec    = (id, k, v) => setRecetas(s => s.map(x => x._id === id ? { ...x, [k]: v } : x));
+  const addRec       = () => { if (recetas.length >= 80) return; setRecetas(s => [...s, emptySkuRow()]); };
+  const removeRec    = (id) => setRecetas(s => s.filter(x => x._id !== id));
+
+  const addInsumo    = (id)          => setRecetas(s => s.map(x => x._id !== id ? x : { ...x, insumos: [...x.insumos, { sku: "", cantidad: "", unidad: "" }] }));
+  const removeInsumo = (id, i)       => setRecetas(s => s.map(x => x._id !== id ? x : { ...x, insumos: x.insumos.filter((_, j) => j !== i) }));
+  const updateInsumo = (id, i, k, v) => setRecetas(s => s.map(x => {
+    if (x._id !== id) return x;
+    const ins = x.insumos.map((r, j) => {
+      if (j !== i) return r;
+      const updated = { ...r, [k]: v };
+      if (k === "sku") updated.unidad = MAESTROS.skus?.[v]?.unidadVenta || "";
+      return updated;
+    });
+    return { ...x, insumos: ins };
+  }));
+
+  const addFotos   = (id, tipo, files) => setRecetas(s => s.map(x => x._id !== id ? x : { ...x, [`fotos_${tipo}`]: [...x[`fotos_${tipo}`], ...Array.from(files)] }));
+  const removeFoto = (id, tipo, i)     => setRecetas(s => s.map(x => x._id !== id ? x : { ...x, [`fotos_${tipo}`]: x[`fotos_${tipo}`].filter((_, j) => j !== i) }));
+
+  const descargarTemplateInsumos = () => {
+    const ws = XLSX.utils.aoa_to_sheet([["Codigo SKU", "Cantidad"], ["10047", "2.5"]]);
+    ws["!cols"] = [{ wch: 16 }, { wch: 12 }];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Insumos");
+    XLSX.writeFile(wb, "template_insumos_receta.xlsx");
+  };
+  const importarInsumos = (id, e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const wb = XLSX.read(ev.target.result, { type: "array" });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const raw = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" });
+      const nuevos = raw.slice(1).filter(r => r[0]).map(r => {
+        const skuCod = String(r[0]).trim();
+        return { sku: skuCod, cantidad: String(r[1] ?? "").trim(), unidad: MAESTROS.skus?.[skuCod]?.unidadVenta || "" };
+      });
+      if (nuevos.length) setRecetas(s => s.map(x => x._id !== id ? x : { ...x, insumos: nuevos }));
+    };
+    reader.readAsArrayBuffer(file);
+    e.target.value = "";
+  };
+
+  const importarExcel = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const wb = XLSX.read(ev.target.result, { type: "array" });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const raw = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" });
+      const nuevas = raw.slice(1).filter(r => r[0]).slice(0, 80).map(row => {
+        const s = emptySkuRow();
+        s.nombre           = String(row[0] ?? "").trim();
+        s.descripcion      = String(row[1] ?? "").trim();
+        s.grupo_articulo   = String(row[2] ?? "").trim();
+        s.material_modelo  = String(row[3] ?? "").trim();
+        s.marca            = String(row[4] ?? "").trim();
+        s.fabricante       = String(row[5] ?? "").trim();
+        return s;
+      });
+      if (nuevas.length) setRecetas(nuevas);
+    };
+    reader.readAsArrayBuffer(file);
+    e.target.value = "";
+  };
+  const descargarTemplate = () => {
+    const ws = XLSX.utils.aoa_to_sheet([
+      ["Nombre", "Descripcion", "Grupo Articulo", "Material Modelo", "Marca", "Fabricante"],
+      ["Sandwich Pollo", "Sandwich pollo grillado con lechuga", "SND", "MAT001", "MARCA01", "FAB001"],
+    ]);
+    ws["!cols"] = [{ wch: 22 }, { wch: 28 }, { wch: 16 }, { wch: 16 }, { wch: 16 }, { wch: 16 }];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Recetas");
+    XLSX.writeFile(wb, "template_nuevas_recetas.xlsx");
+  };
+
+  const validarTodo = () => {
+    let ok = true;
+    const updated = recetas.map(rec => {
+      const errs = [];
+      if (!rec.nombre.trim())    errs.push("Nombre requerido");
+      if (!rec.grupo_articulo)   errs.push("Grupo artículo requerido");
+      if (!rec.material_modelo)  errs.push("Material modelo requerido");
+      if (!rec.marca)            errs.push("Marca requerida");
+      if (!rec.fabricante)       errs.push("Fabricante requerido");
+      if (rec.insumos.length === 0) errs.push("Debe tener al menos un insumo");
+      if (errs.length) ok = false;
+      return { ...rec, errores: errs };
+    });
+    setRecetas(updated);
+    return ok;
+  };
+
+  const handleEnviar = async () => {
+    if (!validarTodo() || solicitante.trim().length < 3) return;
+    setEnviando(true);
+    const folio = "SAP-" + new Date().getFullYear() + "-" + String(Math.floor(100000 + Math.random() * 899999));
+    const filas = recetas.map(({ _id, errores, fotos_planograma, fotos_navegacion, ...data }) => data);
+    const { error } = await supabase.from("solicitudes").insert({
+      folio,
+      solicitante_id:     session?.user?.id,
+      solicitante_nombre: solicitante,
+      solicitante_email:  session?.user?.email,
+      estado:    "Enviada",
+      planillas: [{ id: "creacion_receta", nombre: "Creación de Receta", filas }],
+      historial: [{ estado: "Enviada", fecha: new Date().toISOString() }],
+    });
+    setEnviando(false);
+    if (!error) setEnviado({ folio, total: recetas.length });
+    else alert("Error al guardar: " + JSON.stringify(error));
+  };
+
+  if (enviado) return (
+    <AppShell vista={vista} setVista={setVista} perfil={perfil}>
+      <main className="success-wrap">
+        <div className="success-check"><CheckCircle2 size={64} strokeWidth={1.3} /></div>
+        <h1 className="success-title">Solicitud enviada.</h1>
+        <p className="success-sub">Folio <strong>{enviado.folio}</strong> · {enviado.total} receta{enviado.total > 1 ? "s" : ""} a crear.</p>
+        <button className="btn-primary" style={{ marginTop: 24 }} onClick={() => { setEnviado(null); setRecetas([emptySkuRow()]); }}>Nueva solicitud</button>
+      </main>
+    </AppShell>
+  );
+
+  const recetasConError = recetas.filter(r => r.errores.length > 0);
+  const recModal = insumoModal ? recetas.find(r => r._id === insumoModal) : null;
+
+  const thSt = { padding: "8px 10px", textAlign: "left", fontSize: 11, fontWeight: 600, color: "#86868b", textTransform: "uppercase", letterSpacing: ".05em", borderBottom: "1px solid rgba(200,205,230,0.4)", background: "#f8f8fc", whiteSpace: "nowrap" };
+
+  const COL_GROUPS = [
+    { id: "basicos", label: "Datos básicos" },
+    { id: "marcas",  label: "Marca / Prov." },
+    { id: "fotos",   label: "Fotos / Flags" },
+  ];
+
+  const panelDerecho = (
+    <div style={{ padding: "28px 20px", display: "flex", flexDirection: "column", gap: 16 }}>
+      <div>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "#3a3a3c", marginBottom: 12 }}>Resumen</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
+            <span style={{ color: "#636366" }}>Recetas</span>
+            <strong>{recetas.length} / 80</strong>
+          </div>
+          {recetasConError.length > 0 && (
+            <div style={{ fontSize: 12, color: "#c2271c", background: "rgba(255,59,48,0.07)", borderRadius: 8, padding: "8px 10px", marginTop: 4 }}>
+              {recetasConError.length} receta{recetasConError.length > 1 ? "s" : ""} con errores
+            </div>
+          )}
+        </div>
+      </div>
+      <div style={{ borderTop: "1px solid rgba(0,0,0,0.08)", paddingTop: 16 }}>
+        <div style={{ fontSize: 12, color: "#636366", marginBottom: 6 }}>Solicitante</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+          <User size={14} color="#636366" />
+          <span style={{ fontSize: 13, color: solicitante ? "#3a3a3c" : "#aeaeb2", fontWeight: solicitante ? 500 : 400 }}>
+            {solicitante || "Sin usuario autenticado"}
+          </span>
+        </div>
+        <button className="btn-primary" style={{ width: "100%", marginBottom: 8 }} disabled={solicitante.trim().length < 3 || enviando} onClick={handleEnviar}>
+          {enviando ? "Enviando…" : "Enviar solicitud"} <ArrowRight size={15} />
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <AppShell vista={vista} setVista={setVista} perfil={perfil} rightPanel={panelDerecho}>
+      <main className="sol-wrap">
+        <div className="bloque">
+          <div className="bloque-head">
+            <span className="card-icon sm"><Utensils size={18} strokeWidth={1.7} /></span>
+            <div className="bloque-tit">
+              <strong>Nueva Receta</strong>
+              <span>{recetasConError.length > 0 ? `${recetasConError.length} con error` : "Pendiente de validación"}</span>
+            </div>
+            <div className="bloque-acciones">
+              <button className="btn-ghost" onClick={descargarTemplate}><Download size={14} /> Plantilla</button>
+              <input type="file" accept=".xlsx,.xls" hidden ref={importRef} onChange={importarExcel} />
+              <button className="btn-ghost" onClick={() => importRef.current?.click()}><Upload size={14} /> Importar Excel</button>
+            </div>
+          </div>
+
+          <div style={{ display: "flex", gap: 6, padding: "8px 12px", borderBottom: "1px solid rgba(0,0,0,0.06)", flexWrap: "wrap" }}>
+            {COL_GROUPS.map(g => (
+              <button key={g.id} onClick={() => setColGroup(g.id)} style={{
+                fontSize: 12, padding: "4px 14px", borderRadius: 980, border: "1px solid",
+                borderColor: colGroup === g.id ? "#34c759" : "rgba(0,0,0,0.12)",
+                background: colGroup === g.id ? "#34c759" : "transparent",
+                color: colGroup === g.id ? "#fff" : "#515154",
+                cursor: "pointer", fontWeight: colGroup === g.id ? 600 : 400, transition: "all .15s",
+              }}>{g.label}</button>
+            ))}
+          </div>
+
+          <div className="grilla-scroll">
+            <table className="grilla">
+              <thead>
+                <tr>
+                  <th className="th-n">#</th>
+                  <th style={{ minWidth: 140 }}>ID Creación</th>
+                  {colGroup === "basicos" && <>
+                    <th style={{ minWidth: 175 }}>Nombre</th>
+                    <th style={{ minWidth: 185 }}>Descripción</th>
+                    <th style={{ minWidth: 110 }}>Insumos</th>
+                  </>}
+                  {colGroup === "marcas" && <>
+                    <th style={{ minWidth: 140 }}>Grupo Art.</th>
+                    <th style={{ minWidth: 140 }}>Mat. Modelo</th>
+                    <th style={{ minWidth: 140 }}>Marca</th>
+                    <th style={{ minWidth: 140 }}>Fabricante</th>
+                  </>}
+                  {colGroup === "fotos" && <>
+                    <th style={{ minWidth: 65, textAlign: "center" }}>Plan.</th>
+                    <th style={{ minWidth: 65, textAlign: "center" }}>Nav.</th>
+                    <th style={{ minWidth: 110 }}>Fotos</th>
+                  </>}
+                  <th className="th-x"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {recetas.map((rec, idx) => {
+                  const hayError = rec.errores.length > 0;
+                  const expanded = expandedRow === rec._id;
+                  const NCOLS_NOW = colGroup === "basicos" ? 6 : colGroup === "marcas" ? 7 : 6;
+                  return (
+                    <React.Fragment key={rec._id}>
+                      <tr className={hayError ? "g-err" : ""}>
+                        <td className="td-n">
+                          {hayError ? <AlertTriangle size={13} className="ic-err" /> : <Pencil size={12} className="ic-dim" />}
+                        </td>
+                        <td>
+                          <span style={{ fontFamily: "monospace", fontSize: 11, background: "#f0f0f5", color: "#5e5ce6", borderRadius: 6, padding: "2px 7px", whiteSpace: "nowrap" }}>
+                            {rec.id_creacion}
+                          </span>
+                        </td>
+                        {colGroup === "basicos" && <>
+                          <td><input className="celda" value={rec.nombre} onChange={e => updateRec(rec._id, "nombre", e.target.value)} placeholder="Nombre de la receta" /></td>
+                          <td><input className="celda" value={rec.descripcion} onChange={e => updateRec(rec._id, "descripcion", e.target.value)} placeholder="Descripción" /></td>
+                          <td>
+                            <button className="dz-clear dup" style={{ padding: "4px 8px", fontSize: 12, whiteSpace: "nowrap" }} onClick={() => setInsumoModal(rec._id)}>
+                              <Layers size={12} /> {rec.insumos.length > 0 ? `${rec.insumos.length} insumo${rec.insumos.length > 1 ? "s" : ""}` : "Insumos"}
+                            </button>
+                          </td>
+                        </>}
+                        {colGroup === "marcas" && <>
+                          <td>
+                            <select className="celda" value={rec.grupo_articulo} onChange={e => updateRec(rec._id, "grupo_articulo", e.target.value)}>
+                              <option value="">—</option>
+                              {cat.grupos.map(g => <option key={g.codigo} value={g.codigo}>{g.codigo} — {g.nombre}</option>)}
+                            </select>
+                          </td>
+                          <td>
+                            <select className="celda" value={rec.material_modelo} onChange={e => updateRec(rec._id, "material_modelo", e.target.value)}>
+                              <option value="">—</option>
+                              {cat.modelos.map(m => <option key={m.codigo} value={m.codigo}>{m.codigo} — {m.nombre}</option>)}
+                            </select>
+                          </td>
+                          <td>
+                            <select className="celda" value={rec.marca} onChange={e => updateRec(rec._id, "marca", e.target.value)}>
+                              <option value="">—</option>
+                              {cat.marcas.map(m => <option key={m.codigo} value={m.codigo}>{m.codigo} — {m.nombre}</option>)}
+                              <option value="MARCA NO CREADA">NO CREADA</option>
+                            </select>
+                          </td>
+                          <td>
+                            <select className="celda" value={rec.fabricante} onChange={e => updateRec(rec._id, "fabricante", e.target.value)}>
+                              <option value="">—</option>
+                              {cat.fabricantes.map(f => <option key={f.codigo} value={f.codigo}>{f.codigo} — {f.nombre}</option>)}
+                              <option value="FABRICANTE NO CREADO">NO CREADO</option>
+                            </select>
+                          </td>
+                        </>}
+                        {colGroup === "fotos" && <>
+                          <td style={{ textAlign: "center" }}>
+                            <input type="checkbox" checked={rec.flag_planograma} onChange={e => updateRec(rec._id, "flag_planograma", e.target.checked)} />
+                          </td>
+                          <td style={{ textAlign: "center" }}>
+                            <input type="checkbox" checked={rec.flag_navegacion} onChange={e => updateRec(rec._id, "flag_navegacion", e.target.checked)} />
+                          </td>
+                          <td>
+                            <button className="dz-clear dup" style={{ padding: "4px 8px", fontSize: 12, whiteSpace: "nowrap" }} onClick={() => setExpandedRow(expanded ? null : rec._id)}>
+                              <Upload size={12} /> {rec.fotos_planograma.length + rec.fotos_navegacion.length > 0 ? `${rec.fotos_planograma.length + rec.fotos_navegacion.length} foto${rec.fotos_planograma.length + rec.fotos_navegacion.length > 1 ? "s" : ""}` : "Adjuntar"}
+                            </button>
+                          </td>
+                        </>}
+                        <td className="td-x">
+                          <span className="fila-btns">
+                            {recetas.length > 1 && (
+                              <button className="dz-clear" onClick={() => removeRec(rec._id)} title="Eliminar"><Trash2 size={13} /></button>
+                            )}
+                          </span>
+                        </td>
+                      </tr>
+                      {hayError && (
+                        <tr className="g-err-detalle">
+                          <td></td>
+                          <td colSpan={NCOLS_NOW - 1}>{rec.errores.join(" · ")}</td>
+                        </tr>
+                      )}
+                      {expanded && colGroup === "fotos" && (
+                        <tr>
+                          <td></td>
+                          <td colSpan={NCOLS_NOW - 1} style={{ padding: "14px 12px 18px", background: "#f8f8fc", borderBottom: "1px solid rgba(0,0,0,0.06)" }}>
+                            <div style={{ display: "flex", gap: 14 }}>
+                              <div style={{ flex: 1 }}>
+                                <div style={{ fontSize: 11, color: "#636366", marginBottom: 6 }}>Planograma · JPG (mín. 3)</div>
+                                <label style={{ display: "block", border: "1.5px dashed rgba(0,0,0,0.15)", borderRadius: 10, padding: "10px", cursor: "pointer", textAlign: "center", fontSize: 12, color: "#636366" }}>
+                                  <Upload size={14} style={{ display: "block", margin: "0 auto 4px" }} />
+                                  {rec.fotos_planograma.length > 0 ? `${rec.fotos_planograma.length} foto${rec.fotos_planograma.length > 1 ? "s" : ""}` : "Seleccionar"}
+                                  <input type="file" multiple accept="image/jpeg,image/jpg" style={{ display: "none" }} onChange={e => addFotos(rec._id, "planograma", e.target.files)} />
+                                </label>
+                                {rec.fotos_planograma.map((f, fi) => (
+                                  <div key={fi} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#636366", marginTop: 3 }}>
+                                    <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{f.name}</span>
+                                    <button onClick={() => removeFoto(rec._id, "planograma", fi)} style={{ background: "none", border: "none", cursor: "pointer", color: "#ff3b30", padding: 0 }}><X size={12} /></button>
+                                  </div>
+                                ))}
+                              </div>
+                              <div style={{ flex: 1 }}>
+                                <div style={{ fontSize: 11, color: "#636366", marginBottom: 6 }}>Navegación · JPG (mín. 3)</div>
+                                <label style={{ display: "block", border: "1.5px dashed rgba(0,0,0,0.15)", borderRadius: 10, padding: "10px", cursor: "pointer", textAlign: "center", fontSize: 12, color: "#636366" }}>
+                                  <Upload size={14} style={{ display: "block", margin: "0 auto 4px" }} />
+                                  {rec.fotos_navegacion.length > 0 ? `${rec.fotos_navegacion.length} foto${rec.fotos_navegacion.length > 1 ? "s" : ""}` : "Seleccionar"}
+                                  <input type="file" multiple accept="image/jpeg,image/jpg" style={{ display: "none" }} onChange={e => addFotos(rec._id, "navegacion", e.target.files)} />
+                                </label>
+                                {rec.fotos_navegacion.map((f, fi) => (
+                                  <div key={fi} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#636366", marginTop: 3 }}>
+                                    <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{f.name}</span>
+                                    <button onClick={() => removeFoto(rec._id, "navegacion", fi)} style={{ background: "none", border: "none", cursor: "pointer", color: "#ff3b30", padding: 0 }}><X size={12} /></button>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <button className="btn-addrow" onClick={addRec} disabled={recetas.length >= 80}>
+            <Plus size={14} /> Agregar receta
+          </button>
+        </div>
+
+        {/* Modal insumos */}
+        {recModal && (
           <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
                onClick={e => { if (e.target === e.currentTarget) setInsumoModal(null); }}>
             <div style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth: 660, maxHeight: "80vh", display: "flex", flexDirection: "column", overflow: "hidden", boxShadow: "0 20px 60px rgba(0,0,0,0.22)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "18px 22px", borderBottom: "1px solid rgba(0,0,0,0.07)" }}>
-                <Layers size={18} color="#5b8dee" />
+                <Layers size={18} color="#34c759" />
                 <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: 700, fontSize: 15 }}>Insumos de la receta</div>
                   <div style={{ fontSize: 12, color: "#636366" }}>
-                    {skuModal.nombre || "SKU sin nombre"} ·{" "}
-                    <span style={{ fontFamily: "monospace", color: "#5e5ce6" }}>{skuModal.id_creacion}</span>
+                    {recModal.nombre || "Receta sin nombre"} · <span style={{ fontFamily: "monospace", color: "#5e5ce6" }}>{recModal.id_creacion}</span>
                   </div>
                 </div>
                 <button onClick={() => setInsumoModal(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "#636366", padding: 4 }}><X size={20} /></button>
               </div>
-
               <div style={{ flex: 1, overflow: "auto", padding: "16px 22px" }}>
                 <div style={{ border: "1px solid rgba(0,0,0,0.07)", borderRadius: 12, overflow: "hidden" }}>
                   <table style={{ borderCollapse: "collapse", width: "100%", fontSize: 14 }}>
@@ -3362,29 +3694,29 @@ function VistaCreacionSKU({ perfil, session, vista, setVista }) {
                       </tr>
                     </thead>
                     <tbody>
-                      {skuModal.insumos.length === 0 && (
+                      {recModal.insumos.length === 0 && (
                         <tr><td colSpan={5} style={{ textAlign: "center", color: "#aeaeb2", padding: "22px 10px", fontSize: 13 }}>Sin insumos aún. Agrega el primero abajo.</td></tr>
                       )}
-                      {skuModal.insumos.map((ins, iIdx) => {
+                      {recModal.insumos.map((ins, iIdx) => {
                         const skuInfo = MAESTROS.skus?.[ins.sku];
                         return (
                           <tr key={iIdx} style={{ borderBottom: "1px solid rgba(0,0,0,0.04)" }}>
                             <td style={{ padding: "3px 6px" }}>
-                              <input className="celda" value={ins.sku} onChange={e => updateInsumo(skuModal._id, iIdx, "sku", e.target.value)} placeholder="Código" style={{ minWidth: 100 }} />
+                              <input className="celda" value={ins.sku} onChange={e => updateInsumo(recModal._id, iIdx, "sku", e.target.value)} placeholder="Código" style={{ minWidth: 100 }} />
                             </td>
                             <td style={{ padding: "4px 10px" }}>
-                              {skuInfo ? <span style={{ fontSize: 13, color: "#5b8dee" }}>{skuInfo.nombre}</span>
+                              {skuInfo ? <span style={{ fontSize: 13, color: "#34c759" }}>{skuInfo.nombre}</span>
                                : ins.sku ? <span style={{ fontSize: 13, color: "#ff3b30" }}>No encontrado</span>
                                : <span style={{ fontSize: 13, color: "#c7c7cc" }}>—</span>}
                             </td>
                             <td style={{ padding: "3px 6px" }}>
-                              <input className="celda" type="number" min="0" step="0.001" value={ins.cantidad} onChange={e => updateInsumo(skuModal._id, iIdx, "cantidad", e.target.value)} placeholder="0" style={{ minWidth: 80 }} />
+                              <input className="celda" type="number" min="0" step="0.001" value={ins.cantidad} onChange={e => updateInsumo(recModal._id, iIdx, "cantidad", e.target.value)} placeholder="0" style={{ minWidth: 80 }} />
                             </td>
                             <td style={{ padding: "4px 10px", fontSize: 13, color: "#636366" }}>
                               {ins.unidad || skuInfo?.unidadVenta || "—"}
                             </td>
                             <td style={{ textAlign: "center", padding: "4px 6px" }}>
-                              <button onClick={() => removeInsumo(skuModal._id, iIdx)} style={{ background: "none", border: "none", cursor: "pointer", color: "#ff3b30" }}><X size={14} /></button>
+                              <button onClick={() => removeInsumo(recModal._id, iIdx)} style={{ background: "none", border: "none", cursor: "pointer", color: "#ff3b30" }}><X size={14} /></button>
                             </td>
                           </tr>
                         );
@@ -3392,16 +3724,15 @@ function VistaCreacionSKU({ perfil, session, vista, setVista }) {
                     </tbody>
                   </table>
                 </div>
-                <button className="btn-addrow" style={{ marginTop: 10 }} onClick={() => addInsumo(skuModal._id)}>
+                <button className="btn-addrow" style={{ marginTop: 10 }} onClick={() => addInsumo(recModal._id)}>
                   <Plus size={14} /> Agregar insumo
                 </button>
               </div>
-
               <div style={{ padding: "14px 22px", borderTop: "1px solid rgba(0,0,0,0.07)", display: "flex", alignItems: "center", gap: 8 }}>
                 <button className="btn-ghost" style={{ fontSize: 13 }} onClick={descargarTemplateInsumos}><Download size={13} /> Plantilla</button>
                 <label style={{ display: "inline-flex" }}>
                   <span className="btn-ghost" style={{ fontSize: 13, cursor: "pointer" }}><Upload size={13} /> Importar Excel</span>
-                  <input ref={insumoImportRef} type="file" accept=".xlsx,.xls" style={{ display: "none" }} onChange={e => importarInsumos(skuModal._id, e)} />
+                  <input ref={insumoImportRef} type="file" accept=".xlsx,.xls" style={{ display: "none" }} onChange={e => importarInsumos(recModal._id, e)} />
                 </label>
                 <div style={{ flex: 1 }} />
                 <button className="btn-primary" style={{ fontSize: 14, padding: "9px 22px" }} onClick={() => setInsumoModal(null)}>Listo</button>
@@ -3409,6 +3740,532 @@ function VistaCreacionSKU({ perfil, session, vista, setVista }) {
             </div>
           </div>
         )}
+      </main>
+    </AppShell>
+  );
+}
+
+function VistaCreacionCombo({ perfil, session, vista, setVista }) {
+  const [combos, setCombos] = useState([emptySkuRow()]);
+  const [expandedRow, setExpandedRow] = useState(null);
+  const [comboModal, setComboModal] = useState(null);
+  const [comboError, setComboError] = useState("");
+  const [colGroup, setColGroup] = useState("basicos");
+  const solicitante = perfil?.nombre || "";
+  const [enviando, setEnviando] = useState(false);
+  const [enviado, setEnviado] = useState(null);
+  const [cat, setCat] = useState({ grupos: [], modelos: [], marcas: [], fabricantes: [] });
+  const importRef = useRef();
+  const comboImportRef = useRef();
+
+  useEffect(() => {
+    (async () => {
+      const [{ data: grupos }, { data: modelos }, { data: marcas }, { data: fabricantes }] = await Promise.all([
+        supabase.from("grupos_articulo").select("codigo,nombre"),
+        supabase.from("materiales_modelo").select("codigo,nombre"),
+        supabase.from("marcas").select("codigo,nombre"),
+        supabase.from("fabricantes").select("codigo,nombre"),
+      ]);
+      setCat({ grupos: grupos || [], modelos: modelos || [], marcas: marcas || [], fabricantes: fabricantes || [] });
+    })();
+  }, []);
+
+  const updateCombo  = (id, k, v) => setCombos(s => s.map(x => x._id === id ? { ...x, [k]: v } : x));
+  const addCombo     = () => { if (combos.length >= 80) return; setCombos(s => [...s, emptySkuRow()]); };
+  const removeCombo  = (id) => setCombos(s => s.filter(x => x._id !== id));
+
+  const addFotos   = (id, tipo, files) => setCombos(s => s.map(x => x._id !== id ? x : { ...x, [`fotos_${tipo}`]: [...x[`fotos_${tipo}`], ...Array.from(files)] }));
+  const removeFoto = (id, tipo, i)     => setCombos(s => s.map(x => x._id !== id ? x : { ...x, [`fotos_${tipo}`]: x[`fotos_${tipo}`].filter((_, j) => j !== i) }));
+
+  const addPaso         = (comboId)               => setCombos(s => s.map(x => x._id !== comboId ? x : { ...x, pasos: [...x.pasos, emptyPaso()] }));
+  const removePaso      = (comboId, pid)           => setCombos(s => s.map(x => x._id !== comboId ? x : { ...x, pasos: x.pasos.filter(p => p._id !== pid) }));
+  const updatePaso      = (comboId, pid, k, v)     => setCombos(s => s.map(x => x._id !== comboId ? x : { ...x, pasos: x.pasos.map(p => p._id !== pid ? p : { ...p, [k]: v }) }));
+  const addProductoComboP   = (comboId, pid)           => setCombos(s => s.map(x => x._id !== comboId ? x : { ...x, pasos: x.pasos.map(p => p._id !== pid ? p : { ...p, productos: [...p.productos, emptyProductoCombo()] }) }));
+  const removeProductoCombo = (comboId, pid, prodId)   => setCombos(s => s.map(x => x._id !== comboId ? x : { ...x, pasos: x.pasos.map(p => p._id !== pid ? p : { ...p, productos: p.productos.filter(pr => pr._id !== prodId) }) }));
+  const updateProductoCombo = (comboId, pid, prodId, k, v) => setCombos(s => s.map(x => x._id !== comboId ? x : { ...x, pasos: x.pasos.map(p => p._id !== pid ? p : { ...p, productos: p.productos.map(pr => pr._id !== prodId ? pr : { ...pr, [k]: v }) }) }));
+
+  const descargarTemplateCombo = () => {
+    const ws = XLSX.utils.aoa_to_sheet([
+      ["Paso Nombre", "Obligatorio", "% Beneficio", "SKU", "Delta Precio"],
+      ["Paso 1", "Si", 50, "132132", 0],
+      ["Paso 1", "Si", 50, "133133", 200],
+      ["Paso 2", "Si", 25, "135400", 1000],
+    ]);
+    ws["!cols"] = [{ wch: 14 }, { wch: 12 }, { wch: 13 }, { wch: 12 }, { wch: 12 }];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Pasos");
+    XLSX.writeFile(wb, "template_pasos_combo.xlsx");
+  };
+
+  const importarCombo = (comboId, e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const wb = XLSX.read(ev.target.result, { type: "array" });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const raw = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" });
+      const pasoMap = {};
+      const pasoOrder = [];
+      raw.slice(1).filter(r => r[3]).forEach(r => {
+        const nombre = String(r[0] ?? "").trim();
+        const key = nombre || `Paso ${pasoOrder.length + 1}`;
+        if (!pasoMap[key]) {
+          const p = { ...emptyPaso(), nombre: key, obligatorio: String(r[1] ?? "Si").trim() === "No" ? "No" : "Si", pct_beneficio: String(r[2] ?? "").trim(), productos: [] };
+          pasoMap[key] = p;
+          pasoOrder.push(key);
+        }
+        pasoMap[key].productos.push({ _id: Math.random().toString(36).slice(2), sku: String(r[3]).trim(), delta_precio: String(r[4] ?? "").trim() });
+      });
+      const pasos = pasoOrder.map(k => pasoMap[k]);
+      if (pasos.length) setCombos(s => s.map(x => x._id !== comboId ? x : { ...x, pasos }));
+    };
+    reader.readAsArrayBuffer(file);
+    e.target.value = "";
+  };
+
+  const importarExcel = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const wb = XLSX.read(ev.target.result, { type: "array" });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const raw = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" });
+      const nuevos = raw.slice(1).filter(r => r[0]).slice(0, 80).map(row => {
+        const s = emptySkuRow();
+        s.nombre          = String(row[0] ?? "").trim();
+        s.descripcion     = String(row[1] ?? "").trim();
+        s.grupo_articulo  = String(row[2] ?? "").trim();
+        s.material_modelo = String(row[3] ?? "").trim();
+        s.marca           = String(row[4] ?? "").trim();
+        s.fabricante      = String(row[5] ?? "").trim();
+        return s;
+      });
+      if (nuevos.length) setCombos(nuevos);
+    };
+    reader.readAsArrayBuffer(file);
+    e.target.value = "";
+  };
+  const descargarTemplate = () => {
+    const ws = XLSX.utils.aoa_to_sheet([
+      ["Nombre", "Descripcion", "Grupo Articulo", "Material Modelo", "Marca", "Fabricante"],
+      ["Combo Almuerzo", "Combo almuerzo con bebida", "CMB", "MAT001", "MARCA01", "FAB001"],
+    ]);
+    ws["!cols"] = [{ wch: 22 }, { wch: 28 }, { wch: 16 }, { wch: 16 }, { wch: 16 }, { wch: 16 }];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Combos");
+    XLSX.writeFile(wb, "template_nuevos_combos.xlsx");
+  };
+
+  const validarTodo = () => {
+    let ok = true;
+    const updated = combos.map(combo => {
+      const errs = [];
+      if (!combo.nombre.trim())    errs.push("Nombre requerido");
+      if (!combo.grupo_articulo)   errs.push("Grupo artículo requerido");
+      if (!combo.material_modelo)  errs.push("Material modelo requerido");
+      if (!combo.marca)            errs.push("Marca requerida");
+      if (!combo.fabricante)       errs.push("Fabricante requerido");
+      if (combo.pasos.length === 0) errs.push("Debe tener al menos un paso");
+      const sumOblig = combo.pasos.filter(p => p.obligatorio === "Si").reduce((acc, p) => acc + (parseFloat(p.pct_beneficio) || 0), 0);
+      if (combo.pasos.some(p => p.obligatorio === "Si") && Math.round(sumOblig) !== 100) errs.push(`Pasos obligatorios suman ${sumOblig}% (debe ser 100%)`);
+      if (errs.length) ok = false;
+      return { ...combo, errores: errs };
+    });
+    setCombos(updated);
+    return ok;
+  };
+
+  const handleEnviar = async () => {
+    if (!validarTodo() || solicitante.trim().length < 3) return;
+    setEnviando(true);
+    const folio = "SAP-" + new Date().getFullYear() + "-" + String(Math.floor(100000 + Math.random() * 899999));
+    const filas = combos.map(({ _id, errores, fotos_planograma, fotos_navegacion, ...data }) => data);
+    const { error } = await supabase.from("solicitudes").insert({
+      folio,
+      solicitante_id:     session?.user?.id,
+      solicitante_nombre: solicitante,
+      solicitante_email:  session?.user?.email,
+      estado:    "Enviada",
+      planillas: [{ id: "creacion_combo", nombre: "Creación de Combo", filas }],
+      historial: [{ estado: "Enviada", fecha: new Date().toISOString() }],
+    });
+    setEnviando(false);
+    if (!error) setEnviado({ folio, total: combos.length });
+    else alert("Error al guardar: " + JSON.stringify(error));
+  };
+
+  if (enviado) return (
+    <AppShell vista={vista} setVista={setVista} perfil={perfil}>
+      <main className="success-wrap">
+        <div className="success-check"><CheckCircle2 size={64} strokeWidth={1.3} /></div>
+        <h1 className="success-title">Solicitud enviada.</h1>
+        <p className="success-sub">Folio <strong>{enviado.folio}</strong> · {enviado.total} combo{enviado.total > 1 ? "s" : ""} a crear.</p>
+        <button className="btn-primary" style={{ marginTop: 24 }} onClick={() => { setEnviado(null); setCombos([emptySkuRow()]); }}>Nueva solicitud</button>
+      </main>
+    </AppShell>
+  );
+
+  const combosConError = combos.filter(c => c.errores.length > 0);
+
+  const thSt = { padding: "8px 10px", textAlign: "left", fontSize: 11, fontWeight: 600, color: "#86868b", textTransform: "uppercase", letterSpacing: ".05em", borderBottom: "1px solid rgba(200,205,230,0.4)", background: "#f8f8fc", whiteSpace: "nowrap" };
+
+  const COL_GROUPS = [
+    { id: "basicos", label: "Datos básicos" },
+    { id: "marcas",  label: "Marca / Prov." },
+    { id: "fotos",   label: "Fotos / Flags" },
+  ];
+
+  const panelDerecho = (
+    <div style={{ padding: "28px 20px", display: "flex", flexDirection: "column", gap: 16 }}>
+      <div>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "#3a3a3c", marginBottom: 12 }}>Resumen</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
+            <span style={{ color: "#636366" }}>Combos</span>
+            <strong>{combos.length} / 80</strong>
+          </div>
+          {combosConError.length > 0 && (
+            <div style={{ fontSize: 12, color: "#c2271c", background: "rgba(255,59,48,0.07)", borderRadius: 8, padding: "8px 10px", marginTop: 4 }}>
+              {combosConError.length} combo{combosConError.length > 1 ? "s" : ""} con errores
+            </div>
+          )}
+        </div>
+      </div>
+      <div style={{ borderTop: "1px solid rgba(0,0,0,0.08)", paddingTop: 16 }}>
+        <div style={{ fontSize: 12, color: "#636366", marginBottom: 6 }}>Solicitante</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+          <User size={14} color="#636366" />
+          <span style={{ fontSize: 13, color: solicitante ? "#3a3a3c" : "#aeaeb2", fontWeight: solicitante ? 500 : 400 }}>
+            {solicitante || "Sin usuario autenticado"}
+          </span>
+        </div>
+        <button className="btn-primary" style={{ width: "100%", marginBottom: 8 }} disabled={solicitante.trim().length < 3 || enviando} onClick={handleEnviar}>
+          {enviando ? "Enviando…" : "Enviar solicitud"} <ArrowRight size={15} />
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <AppShell vista={vista} setVista={setVista} perfil={perfil} rightPanel={panelDerecho}>
+      <main className="sol-wrap">
+        <div className="bloque">
+          <div className="bloque-head">
+            <span className="card-icon sm"><Gift size={18} strokeWidth={1.7} /></span>
+            <div className="bloque-tit">
+              <strong>Nuevo Combo</strong>
+              <span>{combosConError.length > 0 ? `${combosConError.length} con error` : "Pendiente de validación"}</span>
+            </div>
+            <div className="bloque-acciones">
+              <button className="btn-ghost" onClick={descargarTemplate}><Download size={14} /> Plantilla</button>
+              <input type="file" accept=".xlsx,.xls" hidden ref={importRef} onChange={importarExcel} />
+              <button className="btn-ghost" onClick={() => importRef.current?.click()}><Upload size={14} /> Importar Excel</button>
+            </div>
+          </div>
+
+          <div style={{ display: "flex", gap: 6, padding: "8px 12px", borderBottom: "1px solid rgba(0,0,0,0.06)", flexWrap: "wrap" }}>
+            {COL_GROUPS.map(g => (
+              <button key={g.id} onClick={() => setColGroup(g.id)} style={{
+                fontSize: 12, padding: "4px 14px", borderRadius: 980, border: "1px solid",
+                borderColor: colGroup === g.id ? "#af52de" : "rgba(0,0,0,0.12)",
+                background: colGroup === g.id ? "#af52de" : "transparent",
+                color: colGroup === g.id ? "#fff" : "#515154",
+                cursor: "pointer", fontWeight: colGroup === g.id ? 600 : 400, transition: "all .15s",
+              }}>{g.label}</button>
+            ))}
+          </div>
+
+          <div className="grilla-scroll">
+            <table className="grilla">
+              <thead>
+                <tr>
+                  <th className="th-n">#</th>
+                  <th style={{ minWidth: 140 }}>ID Creación</th>
+                  {colGroup === "basicos" && <>
+                    <th style={{ minWidth: 175 }}>Nombre</th>
+                    <th style={{ minWidth: 185 }}>Descripción</th>
+                    <th style={{ minWidth: 110 }}>Pasos</th>
+                  </>}
+                  {colGroup === "marcas" && <>
+                    <th style={{ minWidth: 140 }}>Grupo Art.</th>
+                    <th style={{ minWidth: 140 }}>Mat. Modelo</th>
+                    <th style={{ minWidth: 140 }}>Marca</th>
+                    <th style={{ minWidth: 140 }}>Fabricante</th>
+                  </>}
+                  {colGroup === "fotos" && <>
+                    <th style={{ minWidth: 65, textAlign: "center" }}>Plan.</th>
+                    <th style={{ minWidth: 65, textAlign: "center" }}>Nav.</th>
+                    <th style={{ minWidth: 110 }}>Fotos</th>
+                  </>}
+                  <th className="th-x"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {combos.map((combo, idx) => {
+                  const hayError = combo.errores.length > 0;
+                  const expanded = expandedRow === combo._id;
+                  const NCOLS_NOW = colGroup === "basicos" ? 6 : colGroup === "marcas" ? 7 : 6;
+                  return (
+                    <React.Fragment key={combo._id}>
+                      <tr className={hayError ? "g-err" : ""}>
+                        <td className="td-n">
+                          {hayError ? <AlertTriangle size={13} className="ic-err" /> : <Pencil size={12} className="ic-dim" />}
+                        </td>
+                        <td>
+                          <span style={{ fontFamily: "monospace", fontSize: 11, background: "#f0f0f5", color: "#5e5ce6", borderRadius: 6, padding: "2px 7px", whiteSpace: "nowrap" }}>
+                            {combo.id_creacion}
+                          </span>
+                        </td>
+                        {colGroup === "basicos" && <>
+                          <td><input className="celda" value={combo.nombre} onChange={e => updateCombo(combo._id, "nombre", e.target.value)} placeholder="Nombre del combo" /></td>
+                          <td><input className="celda" value={combo.descripcion} onChange={e => updateCombo(combo._id, "descripcion", e.target.value)} placeholder="Descripción" /></td>
+                          <td>
+                            <button className="dz-clear dup" style={{ padding: "4px 8px", fontSize: 12, whiteSpace: "nowrap", borderColor: "rgba(175,82,222,0.35)", color: "#af52de" }} onClick={() => { setComboError(""); setComboModal(combo._id); }}>
+                              <Layers size={12} /> {combo.pasos.length > 0 ? `${combo.pasos.length} paso${combo.pasos.length > 1 ? "s" : ""}` : "Pasos"}
+                            </button>
+                          </td>
+                        </>}
+                        {colGroup === "marcas" && <>
+                          <td>
+                            <select className="celda" value={combo.grupo_articulo} onChange={e => updateCombo(combo._id, "grupo_articulo", e.target.value)}>
+                              <option value="">—</option>
+                              {cat.grupos.map(g => <option key={g.codigo} value={g.codigo}>{g.codigo} — {g.nombre}</option>)}
+                            </select>
+                          </td>
+                          <td>
+                            <select className="celda" value={combo.material_modelo} onChange={e => updateCombo(combo._id, "material_modelo", e.target.value)}>
+                              <option value="">—</option>
+                              {cat.modelos.map(m => <option key={m.codigo} value={m.codigo}>{m.codigo} — {m.nombre}</option>)}
+                            </select>
+                          </td>
+                          <td>
+                            <select className="celda" value={combo.marca} onChange={e => updateCombo(combo._id, "marca", e.target.value)}>
+                              <option value="">—</option>
+                              {cat.marcas.map(m => <option key={m.codigo} value={m.codigo}>{m.codigo} — {m.nombre}</option>)}
+                              <option value="MARCA NO CREADA">NO CREADA</option>
+                            </select>
+                          </td>
+                          <td>
+                            <select className="celda" value={combo.fabricante} onChange={e => updateCombo(combo._id, "fabricante", e.target.value)}>
+                              <option value="">—</option>
+                              {cat.fabricantes.map(f => <option key={f.codigo} value={f.codigo}>{f.codigo} — {f.nombre}</option>)}
+                              <option value="FABRICANTE NO CREADO">NO CREADO</option>
+                            </select>
+                          </td>
+                        </>}
+                        {colGroup === "fotos" && <>
+                          <td style={{ textAlign: "center" }}>
+                            <input type="checkbox" checked={combo.flag_planograma} onChange={e => updateCombo(combo._id, "flag_planograma", e.target.checked)} />
+                          </td>
+                          <td style={{ textAlign: "center" }}>
+                            <input type="checkbox" checked={combo.flag_navegacion} onChange={e => updateCombo(combo._id, "flag_navegacion", e.target.checked)} />
+                          </td>
+                          <td>
+                            <button className="dz-clear dup" style={{ padding: "4px 8px", fontSize: 12, whiteSpace: "nowrap" }} onClick={() => setExpandedRow(expanded ? null : combo._id)}>
+                              <Upload size={12} /> {combo.fotos_planograma.length + combo.fotos_navegacion.length > 0 ? `${combo.fotos_planograma.length + combo.fotos_navegacion.length} foto${combo.fotos_planograma.length + combo.fotos_navegacion.length > 1 ? "s" : ""}` : "Adjuntar"}
+                            </button>
+                          </td>
+                        </>}
+                        <td className="td-x">
+                          <span className="fila-btns">
+                            {combos.length > 1 && (
+                              <button className="dz-clear" onClick={() => removeCombo(combo._id)} title="Eliminar"><Trash2 size={13} /></button>
+                            )}
+                          </span>
+                        </td>
+                      </tr>
+                      {hayError && (
+                        <tr className="g-err-detalle">
+                          <td></td>
+                          <td colSpan={NCOLS_NOW - 1}>{combo.errores.join(" · ")}</td>
+                        </tr>
+                      )}
+                      {expanded && colGroup === "fotos" && (
+                        <tr>
+                          <td></td>
+                          <td colSpan={NCOLS_NOW - 1} style={{ padding: "14px 12px 18px", background: "#f8f8fc", borderBottom: "1px solid rgba(0,0,0,0.06)" }}>
+                            <div style={{ display: "flex", gap: 14 }}>
+                              <div style={{ flex: 1 }}>
+                                <div style={{ fontSize: 11, color: "#636366", marginBottom: 6 }}>Planograma · JPG (mín. 3)</div>
+                                <label style={{ display: "block", border: "1.5px dashed rgba(0,0,0,0.15)", borderRadius: 10, padding: "10px", cursor: "pointer", textAlign: "center", fontSize: 12, color: "#636366" }}>
+                                  <Upload size={14} style={{ display: "block", margin: "0 auto 4px" }} />
+                                  {combo.fotos_planograma.length > 0 ? `${combo.fotos_planograma.length} foto${combo.fotos_planograma.length > 1 ? "s" : ""}` : "Seleccionar"}
+                                  <input type="file" multiple accept="image/jpeg,image/jpg" style={{ display: "none" }} onChange={e => addFotos(combo._id, "planograma", e.target.files)} />
+                                </label>
+                                {combo.fotos_planograma.map((f, fi) => (
+                                  <div key={fi} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#636366", marginTop: 3 }}>
+                                    <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{f.name}</span>
+                                    <button onClick={() => removeFoto(combo._id, "planograma", fi)} style={{ background: "none", border: "none", cursor: "pointer", color: "#ff3b30", padding: 0 }}><X size={12} /></button>
+                                  </div>
+                                ))}
+                              </div>
+                              <div style={{ flex: 1 }}>
+                                <div style={{ fontSize: 11, color: "#636366", marginBottom: 6 }}>Navegación · JPG (mín. 3)</div>
+                                <label style={{ display: "block", border: "1.5px dashed rgba(0,0,0,0.15)", borderRadius: 10, padding: "10px", cursor: "pointer", textAlign: "center", fontSize: 12, color: "#636366" }}>
+                                  <Upload size={14} style={{ display: "block", margin: "0 auto 4px" }} />
+                                  {combo.fotos_navegacion.length > 0 ? `${combo.fotos_navegacion.length} foto${combo.fotos_navegacion.length > 1 ? "s" : ""}` : "Seleccionar"}
+                                  <input type="file" multiple accept="image/jpeg,image/jpg" style={{ display: "none" }} onChange={e => addFotos(combo._id, "navegacion", e.target.files)} />
+                                </label>
+                                {combo.fotos_navegacion.map((f, fi) => (
+                                  <div key={fi} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#636366", marginTop: 3 }}>
+                                    <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{f.name}</span>
+                                    <button onClick={() => removeFoto(combo._id, "navegacion", fi)} style={{ background: "none", border: "none", cursor: "pointer", color: "#ff3b30", padding: 0 }}><X size={12} /></button>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <button className="btn-addrow" onClick={addCombo} disabled={combos.length >= 80}>
+            <Plus size={14} /> Agregar combo
+          </button>
+        </div>
+
+        {/* Modal pasos de combo */}
+        {comboModal && (() => {
+          const comboC = combos.find(c => c._id === comboModal);
+          if (!comboC) return null;
+          const sumOblig = comboC.pasos.filter(p => p.obligatorio === "Si").reduce((acc, p) => acc + (parseFloat(p.pct_beneficio) || 0), 0);
+          const hayOblig = comboC.pasos.some(p => p.obligatorio === "Si");
+          const pctOk    = !hayOblig || Math.round(sumOblig) === 100;
+          return (
+            <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
+                 onClick={e => { if (e.target === e.currentTarget) { setComboError(""); setComboModal(null); } }}>
+              <div style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth: 800, maxHeight: "85vh", display: "flex", flexDirection: "column", overflow: "hidden", boxShadow: "0 20px 60px rgba(0,0,0,0.22)" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "18px 22px", borderBottom: "1px solid rgba(0,0,0,0.07)" }}>
+                  <Layers size={18} color="#af52de" />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 700, fontSize: 15 }}>Pasos del combo</div>
+                    <div style={{ fontSize: 12, color: "#636366" }}>
+                      {comboC.nombre || "Combo sin nombre"} · <span style={{ fontFamily: "monospace", color: "#5e5ce6" }}>{comboC.id_creacion}</span>
+                    </div>
+                  </div>
+                  {hayOblig && (
+                    <span style={{ fontSize: 12, fontWeight: 600, padding: "3px 10px", borderRadius: 980, background: pctOk ? "rgba(52,199,89,0.12)" : "rgba(255,59,48,0.1)", color: pctOk ? "#34c759" : "#ff3b30" }}>
+                      Oblig.: {sumOblig}% {pctOk ? "✓" : "≠ 100%"}
+                    </span>
+                  )}
+                  <button onClick={() => { setComboError(""); setComboModal(null); }} style={{ background: "none", border: "none", cursor: "pointer", color: "#636366", padding: 4 }}><X size={20} /></button>
+                </div>
+                <div style={{ flex: 1, overflow: "auto", padding: "16px 22px" }}>
+                  {comboC.pasos.length === 0 && (
+                    <div style={{ textAlign: "center", color: "#aeaeb2", padding: "32px 0", fontSize: 14 }}>Sin pasos aún. Agrega el primero abajo.</div>
+                  )}
+                  {comboC.pasos.map((paso, pIdx) => (
+                    <div key={paso._id} style={{ border: "1px solid rgba(0,0,0,0.09)", borderRadius: 12, overflow: "hidden", marginBottom: 12 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", background: "#f8f8fc", borderBottom: "1px solid rgba(0,0,0,0.06)" }}>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: "#af52de", minWidth: 52 }}>PASO {pIdx + 1}</span>
+                        <input
+                          className="celda" value={paso.nombre}
+                          onChange={e => updatePaso(comboC._id, paso._id, "nombre", e.target.value)}
+                          placeholder="Nombre del paso (ej: Principal, Bebida…)"
+                          style={{ flex: 1, fontSize: 13 }}
+                        />
+                        <label style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, color: "#3a3a3c", whiteSpace: "nowrap" }}>
+                          Obligatorio:
+                          <select className="celda" value={paso.obligatorio} onChange={e => updatePaso(comboC._id, paso._id, "obligatorio", e.target.value)} style={{ width: 60 }}>
+                            <option>Si</option>
+                            <option>No</option>
+                          </select>
+                        </label>
+                        {paso.obligatorio === "Si" && (
+                          <label style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, color: "#3a3a3c", whiteSpace: "nowrap" }}>
+                            % Beneficio:
+                            <input
+                              className="celda" type="number" min="0" max="100" step="1"
+                              value={paso.pct_beneficio}
+                              onChange={e => updatePaso(comboC._id, paso._id, "pct_beneficio", e.target.value)}
+                              placeholder="0"
+                              style={{ width: 58, textAlign: "right" }}
+                            />
+                          </label>
+                        )}
+                        <button onClick={() => removePaso(comboC._id, paso._id)} style={{ background: "none", border: "none", cursor: "pointer", color: "#ff3b30", padding: "2px 4px", marginLeft: 4 }}><X size={15} /></button>
+                      </div>
+                      <table style={{ borderCollapse: "collapse", width: "100%", fontSize: 13 }}>
+                        <thead>
+                          <tr>
+                            <th style={{ ...thSt, width: 120 }}>SKU</th>
+                            <th style={thSt}>Nombre</th>
+                            <th style={{ ...thSt, width: 110, textAlign: "right" }}>Delta Precio</th>
+                            <th style={{ ...thSt, width: 36 }}></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {paso.productos.map(prod => {
+                            const skuInfo = MAESTROS.skus?.[prod.sku];
+                            return (
+                              <tr key={prod._id} style={{ borderBottom: "1px solid rgba(0,0,0,0.04)" }}>
+                                <td style={{ padding: "3px 6px" }}>
+                                  <input className="celda" value={prod.sku}
+                                    onChange={e => updateProductoCombo(comboC._id, paso._id, prod._id, "sku", e.target.value)}
+                                    placeholder="Código SKU" style={{ minWidth: 100 }} />
+                                </td>
+                                <td style={{ padding: "4px 10px" }}>
+                                  {skuInfo ? <span style={{ color: "#af52de" }}>{skuInfo.nombre}</span>
+                                   : prod.sku ? <span style={{ color: "#ff3b30" }}>No encontrado</span>
+                                   : <span style={{ color: "#c7c7cc" }}>—</span>}
+                                </td>
+                                <td style={{ padding: "3px 6px" }}>
+                                  <input className="celda" type="number" step="0.01" value={prod.delta_precio}
+                                    onChange={e => updateProductoCombo(comboC._id, paso._id, prod._id, "delta_precio", e.target.value)}
+                                    placeholder="0" style={{ minWidth: 80, textAlign: "right" }} />
+                                </td>
+                                <td style={{ textAlign: "center", padding: "4px 6px" }}>
+                                  <button onClick={() => removeProductoCombo(comboC._id, paso._id, prod._id)}
+                                    style={{ background: "none", border: "none", cursor: "pointer", color: "#ff3b30" }}><X size={14} /></button>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                      <button className="btn-addrow" style={{ margin: "6px 10px 10px" }} onClick={() => addProductoComboP(comboC._id, paso._id)}>
+                        <Plus size={13} /> Agregar SKU
+                      </button>
+                    </div>
+                  ))}
+                  <button className="btn-addrow" onClick={() => addPaso(comboC._id)}>
+                    <Plus size={14} /> Agregar paso
+                  </button>
+                </div>
+                <div style={{ borderTop: "1px solid rgba(0,0,0,0.07)" }}>
+                  {comboError && (
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 22px", background: "rgba(255,59,48,0.07)", borderBottom: "1px solid rgba(255,59,48,0.12)" }}>
+                      <AlertTriangle size={14} color="#ff3b30" />
+                      <span style={{ fontSize: 13, color: "#ff3b30", fontWeight: 500 }}>{comboError}</span>
+                    </div>
+                  )}
+                  <div style={{ padding: "14px 22px", display: "flex", alignItems: "center", gap: 8 }}>
+                    <button className="btn-ghost" style={{ fontSize: 13 }} onClick={descargarTemplateCombo}><Download size={13} /> Plantilla</button>
+                    <label style={{ display: "inline-flex" }}>
+                      <span className="btn-ghost" style={{ fontSize: 13, cursor: "pointer" }}><Upload size={13} /> Importar Excel</span>
+                      <input ref={comboImportRef} type="file" accept=".xlsx,.xls" style={{ display: "none" }} onChange={e => importarCombo(comboC._id, e)} />
+                    </label>
+                    <div style={{ flex: 1 }} />
+                    <button className="btn-primary" style={{ fontSize: 14, padding: "9px 22px" }} onClick={() => {
+                      if (hayOblig && !pctOk) {
+                        setComboError(`Los pasos obligatorios suman ${sumOblig}% — deben sumar exactamente 100%.`);
+                        return;
+                      }
+                      setComboError("");
+                      setComboModal(null);
+                    }}>Listo</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
       </main>
     </AppShell>
   );
@@ -3820,13 +4677,15 @@ function Sidebar({ vista, setVista, perfil }) {
   const esDDMM = perfil?.rol === "datos_maestros";
 
   const TABS = [
-    { id: "inicio",      label: "Inicio",            icon: Home },
-    { id: "nuevo-sku",   label: "Nuevo SKU",        icon: Package },
-    { id: "nueva",       label: "Nueva solicitud",   icon: FileText },
-    { id: "solicitudes", label: "Solicitudes",       icon: Inbox },
-    { id: "clusters",    label: "Gestor de locales", icon: Boxes },
-    { id: "cvp",         label: "Ciclo de Vida",     icon: Layers },
-    { id: "ayuda",       label: "Centro de Ayuda",   icon: Lightbulb },
+    { id: "inicio",        label: "Inicio",            icon: Home },
+    { id: "nuevo-sku",     label: "Nuevo SKU",         icon: Package },
+    { id: "nueva-receta",  label: "Nueva Receta",      icon: Utensils },
+    { id: "nueva-combo",   label: "Nuevo Combo",       icon: Gift },
+    { id: "nueva",         label: "Nueva solicitud",   icon: FileText },
+    { id: "solicitudes",   label: "Solicitudes",       icon: Inbox },
+    { id: "clusters",      label: "Gestor de locales", icon: Boxes },
+    { id: "cvp",           label: "Ciclo de Vida",     icon: Layers },
+    { id: "ayuda",         label: "Centro de Ayuda",   icon: Lightbulb },
     ...(esDDMM ? [
       { id: "maestros",   label: "Bases Maestras",  icon: Database },
       { id: "planillas",  label: "Planillas",        icon: Table2 },
@@ -3886,7 +4745,8 @@ function Sidebar({ vista, setVista, perfil }) {
   );
 }
 
-function PanelValidacion({ plSel, totales, totalOk, totalErr, todoValidado, puedeEnviar, solicitante, setSolicitante, enviar, estado }) {
+function PanelValidacion({ plSel, totales, totalOk, totalErr, todoValidado, puedeEnviar, perfil, enviar, estado }) {
+  const solicitante = perfil?.nombre || "";
   if (plSel.length === 0) {
     return (
       <div className="panel-vacio">
@@ -3948,13 +4808,14 @@ function PanelValidacion({ plSel, totales, totalOk, totalErr, todoValidado, pued
 
       <div className="panel-footer">
         <div className="panel-sol-row">
-          <User size={14} />
-          <input className="inp-solicitante" style={{ flex: 1 }} value={solicitante} onChange={e => setSolicitante(e.target.value)} placeholder="Tu nombre completo" />
+          <User size={14} color="#636366" />
+          <span style={{ flex: 1, fontSize: 13, color: solicitante ? "#3a3a3c" : "#aeaeb2", fontWeight: solicitante ? 500 : 400 }}>
+            {solicitante || "Sin usuario autenticado"}
+          </span>
         </div>
         <p className="panel-hint">
           {!todoValidado ? "Valida cada planilla para continuar"
             : totalErr > 0 ? "Corrige los errores y vuelve a validar"
-            : norm(solicitante).length < 3 ? "Escribe tu nombre para registrar"
             : "Todo listo. Revisa y envía."}
         </p>
         <button className="btn-primary" style={{ width: "100%" }} disabled={!puedeEnviar} onClick={enviar}>
@@ -3971,11 +4832,13 @@ function NavBar({ info, vista, setVista, perfil }) {
   const esDDMM = perfil?.rol === "datos_maestros";
 
   const TABS = [
-    { id: "nueva", label: "Nueva solicitud" },
-    { id: "solicitudes", label: "Solicitudes" },
-    { id: "clusters", label: "Gestor de locales" },
-    { id: "cvp", label: "Ciclo de Vida" },
-    { id: "ayuda", label: "Centro de Ayuda" },
+    { id: "nueva",        label: "Nueva solicitud" },
+    { id: "nueva-receta", label: "Nueva Receta" },
+    { id: "nueva-combo",  label: "Nuevo Combo" },
+    { id: "solicitudes",  label: "Solicitudes" },
+    { id: "clusters",     label: "Gestor de locales" },
+    { id: "cvp",          label: "Ciclo de Vida" },
+    { id: "ayuda",        label: "Centro de Ayuda" },
     ...(esDDMM ? [{ id: "maestros", label: "Bases Maestras" }, { id: "admin", label: "Admin" }] : []),
   ];
 
