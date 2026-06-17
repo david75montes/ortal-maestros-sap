@@ -2670,11 +2670,11 @@ const TABLAS_CONFIG = [
         const insumo_sku = String(r[4] || "").trim();
         if (insumo_sku) {
           map[cod].insumos.push({
-            sku: insumo_sku,
-            nombre: String(r[5] || "").trim(),
-            unidad_medida: String(r[6] || "").trim(),
-            cantidad_numerador: Number(r[8]) || 0,
-            cantidad_denominador: Number(r[7]) || 0,
+            receta_sku: insumo_sku,
+            receta_nombre_sku: String(r[5] || "").trim(),
+            receta_unidad_medida: String(r[6] || "").trim(),
+            receta_cantidad_base_denominador: Number(r[7]) || 0,
+            receta_cantidad_base_numerador: Number(r[8]) || 0,
           });
         }
       }
@@ -4563,9 +4563,9 @@ function VistaModReceta({ perfil, session, vista, setVista }) {
       ...x,
       nombre: data.nombre,
       insumos: (data.insumos || []).map(ins => ({
-        sku: String(ins.sku),
-        cantidad: ins.cantidad_numerador + (ins.cantidad_denominador && ins.cantidad_denominador !== 1 ? "/" + ins.cantidad_denominador : ""),
-        unidad: ins.unidad_medida || "",
+        sku: String(ins.receta_sku ?? ins.sku ?? ""),
+        cantidad: String(ins.receta_cantidad_base_numerador ?? ins.cantidad_numerador ?? ""),
+        unidad: String(ins.receta_unidad_medida ?? ins.unidad_medida ?? ""),
       })),
       errores: [],
     }));
