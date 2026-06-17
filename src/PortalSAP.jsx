@@ -4543,14 +4543,18 @@ function VistaModReceta({ perfil, session, vista, setVista }) {
   const addFila      = () => { if (filas.length >= 80) return; setFilas(s => [...s, emptyModReceta()]); };
   const removeFila   = (id) => setFilas(s => s.filter(x => x._id !== id));
 
-  const addInsumo    = (id)          => setFilas(s => s.map(x => x._id !== id ? x : { ...x, insumos: [...x.insumos, { sku: "", nombre_sku: "", cantidad_numerador: "", cantidad_denominador: "", unidad: "" }] }));
+  const addInsumo    = (id)          => setFilas(s => s.map(x => x._id !== id ? x : { ...x, insumos: [...x.insumos, { sku: "", nombre_sku: "", cantidad_numerador: "", cantidad_denominador: "", unidad: "", accion: "Agregar" }] }));
   const removeInsumo = (id, i)       => setFilas(s => s.map(x => x._id !== id ? x : { ...x, insumos: x.insumos.filter((_, j) => j !== i) }));
   const updateInsumo = (id, i, k, v) => setFilas(s => s.map(x => {
     if (x._id !== id) return x;
     const ins = x.insumos.map((r, j) => {
       if (j !== i) return r;
       const u = { ...r, [k]: v };
-      if (k === "sku") u.unidad = MAESTROS.skus?.[v]?.unidadVenta || "";
+      if (k === "sku") {
+        const info = MAESTROS.skus?.[v.trim()];
+        u.unidad    = info?.unidadVenta || r.unidad || "";
+        u.nombre_sku = info?.nombre || (v.trim() ? r.nombre_sku : "");
+      }
       return u;
     });
     return { ...x, insumos: ins };
@@ -4574,6 +4578,7 @@ function VistaModReceta({ perfil, session, vista, setVista }) {
         cantidad_numerador:   String(ins.receta_cantidad_base_numerador   ?? ins.cantidad_numerador   ?? ""),
         cantidad_denominador: String(ins.receta_cantidad_base_denominador ?? ins.cantidad_denominador ?? ""),
         unidad:               String(ins.receta_unidad_medida ?? ins.unidad_medida ?? ""),
+        accion:               "Modificar",
       })),
       errores: [],
     }));
@@ -4767,23 +4772,41 @@ function VistaModReceta({ perfil, session, vista, setVista }) {
                   <table style={{ borderCollapse: "collapse", width: "100%", fontSize: 14 }}>
                     <thead>
                       <tr>
+                        <th style={{ ...thSt, width: 100 }}>Acción</th>
                         <th style={thSt}>Código SKU</th>
                         <th style={thSt}>Nombre</th>
                         <th style={{ ...thSt, width: 90 }}>Numerador</th>
                         <th style={{ ...thSt, width: 90 }}>Denominador</th>
                         <th style={{ ...thSt, width: 80 }}>Unidad</th>
-                        <th style={{ ...thSt, width: 36 }}></th>
                       </tr>
                     </thead>
                     <tbody>
                       {recModal.insumos.length === 0 && (
                         <tr><td colSpan={6} style={{ textAlign: "center", color: "#aeaeb2", padding: "22px 10px", fontSize: 13 }}>Sin insumos. Agrega el primero abajo.</td></tr>
+
                       )}
-                      {recModal.insumos.map((ins, iIdx) => {
-                        const skuInfo = MAESTROS.skus?.[ins.sku];
+                      {(() => {
+                        const skuCount = {};
+                        recModal.insumos.forEach(ins => { if (ins.sku.trim()) skuCount[ins.sku.trim()] = (skuCount[ins.sku.trim()] || 0) + 1; });
+                        return recModal.insumos.map((ins, iIdx) => {
+                        const skuInfo     = MAESTROS.skus?.[ins.sku.trim()];
+                        const esDupl      = ins.sku.trim() && skuCount[ins.sku.trim()] > 1;
+                        const ac          = ins.accion || "Agregar";
+                        const accionColor = { Agregar: "#34c759", Modificar: "#5b8dee", Eliminar: "#ff3b30" };
                         return (
-                          <tr key={iIdx} style={{ borderBottom: "1px solid rgba(0,0,0,0.04)" }}>
-                            <td style={{ padding: "3px 6px" }}><input className="celda" value={ins.sku} onChange={e => updateInsumo(recModal._id, iIdx, "sku", e.target.value)} placeholder="Código" style={{ minWidth: 100 }} /></td>
+                          <tr key={iIdx} style={{ borderBottom: "1px solid rgba(0,0,0,0.04)", background: ac === "Eliminar" ? "rgba(255,59,48,0.04)" : ac === "Agregar" ? "rgba(52,199,89,0.04)" : undefined }}>
+                            <td style={{ padding: "3px 6px" }}>
+                              <select className="celda" value={ac} onChange={e => updateInsumo(recModal._id, iIdx, "accion", e.target.value)}
+                                style={{ fontWeight: 600, color: accionColor[ac], borderColor: accionColor[ac] + "55" }}>
+                                <option value="Agregar">Agregar</option>
+                                <option value="Modificar">Modificar</option>
+                                <option value="Eliminar">Eliminar</option>
+                              </select>
+                            </td>
+                            <td style={{ padding: "3px 6px" }}>
+                              <input className="celda" value={ins.sku} onChange={e => updateInsumo(recModal._id, iIdx, "sku", e.target.value)} placeholder="Código" style={{ minWidth: 100, borderColor: esDupl ? "#ff3b30" : undefined }} />
+                              {esDupl && <div style={{ fontSize: 11, color: "#ff3b30", padding: "2px 2px 0" }}>SKU duplicado</div>}
+                            </td>
                             <td style={{ padding: "4px 10px" }}>
                               {skuInfo
                                 ? <span style={{ fontSize: 13, color: "#34c759" }}>{skuInfo.nombre}</span>
@@ -4796,24 +4819,32 @@ function VistaModReceta({ perfil, session, vista, setVista }) {
                             <td style={{ padding: "3px 6px" }}><input className="celda" type="number" min="0" step="1" value={ins.cantidad_numerador} onChange={e => updateInsumo(recModal._id, iIdx, "cantidad_numerador", e.target.value)} placeholder="106" style={{ minWidth: 70 }} /></td>
                             <td style={{ padding: "3px 6px" }}><input className="celda" type="number" min="1" step="1" value={ins.cantidad_denominador} onChange={e => updateInsumo(recModal._id, iIdx, "cantidad_denominador", e.target.value)} placeholder="1000" style={{ minWidth: 70 }} /></td>
                             <td style={{ padding: "4px 10px", fontSize: 13, color: "#636366" }}>{ins.unidad || skuInfo?.unidadVenta || "—"}</td>
-                            <td style={{ textAlign: "center", padding: "4px 6px" }}><button onClick={() => removeInsumo(recModal._id, iIdx)} style={{ background: "none", border: "none", cursor: "pointer", color: "#ff3b30" }}><X size={14} /></button></td>
                           </tr>
                         );
-                      })}
+                        });
+                      })()}
                     </tbody>
                   </table>
                 </div>
                 <button className="btn-addrow" style={{ marginTop: 10 }} onClick={() => addInsumo(recModal._id)}><Plus size={14} /> Agregar insumo</button>
               </div>
-              <div style={{ padding: "14px 22px", borderTop: "1px solid rgba(0,0,0,0.07)", display: "flex", alignItems: "center", gap: 8 }}>
-                <button className="btn-ghost" style={{ fontSize: 13 }} onClick={descargarTemplateInsumos}><Download size={13} /> Plantilla</button>
-                <label style={{ display: "inline-flex" }}>
-                  <span className="btn-ghost" style={{ fontSize: 13, cursor: "pointer" }}><Upload size={13} /> Importar Excel</span>
-                  <input ref={insumoImportRef} type="file" accept=".xlsx,.xls" style={{ display: "none" }} onChange={e => importarInsumos(recModal._id, e)} />
-                </label>
-                <div style={{ flex: 1 }} />
-                <button className="btn-primary" style={{ fontSize: 14, padding: "9px 22px" }} onClick={() => setInsumoModal(null)}>Listo</button>
-              </div>
+              {(() => {
+                const skuCount = {};
+                recModal.insumos.forEach(ins => { if (ins.sku.trim()) skuCount[ins.sku.trim()] = (skuCount[ins.sku.trim()] || 0) + 1; });
+                const hayDupl = Object.values(skuCount).some(n => n > 1);
+                return (
+                  <div style={{ padding: "14px 22px", borderTop: "1px solid rgba(0,0,0,0.07)", display: "flex", alignItems: "center", gap: 8 }}>
+                    <button className="btn-ghost" style={{ fontSize: 13 }} onClick={descargarTemplateInsumos}><Download size={13} /> Plantilla</button>
+                    <label style={{ display: "inline-flex" }}>
+                      <span className="btn-ghost" style={{ fontSize: 13, cursor: "pointer" }}><Upload size={13} /> Importar Excel</span>
+                      <input ref={insumoImportRef} type="file" accept=".xlsx,.xls" style={{ display: "none" }} onChange={e => importarInsumos(recModal._id, e)} />
+                    </label>
+                    <div style={{ flex: 1 }} />
+                    {hayDupl && <span style={{ fontSize: 12, color: "#ff3b30" }}>Hay SKUs duplicados</span>}
+                    <button className="btn-primary" style={{ fontSize: 14, padding: "9px 22px" }} disabled={hayDupl} onClick={() => setInsumoModal(null)}>Listo</button>
+                  </div>
+                );
+              })()}
             </div>
           </div>
         )}
