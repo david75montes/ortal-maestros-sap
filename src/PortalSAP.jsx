@@ -4543,7 +4543,7 @@ function VistaModReceta({ perfil, session, vista, setVista }) {
   const addFila      = () => { if (filas.length >= 80) return; setFilas(s => [...s, emptyModReceta()]); };
   const removeFila   = (id) => setFilas(s => s.filter(x => x._id !== id));
 
-  const addInsumo    = (id)          => setFilas(s => s.map(x => x._id !== id ? x : { ...x, insumos: [...x.insumos, { sku: "", cantidad_numerador: "", cantidad_denominador: "", unidad: "" }] }));
+  const addInsumo    = (id)          => setFilas(s => s.map(x => x._id !== id ? x : { ...x, insumos: [...x.insumos, { sku: "", nombre_sku: "", cantidad_numerador: "", cantidad_denominador: "", unidad: "" }] }));
   const removeInsumo = (id, i)       => setFilas(s => s.map(x => x._id !== id ? x : { ...x, insumos: x.insumos.filter((_, j) => j !== i) }));
   const updateInsumo = (id, i, k, v) => setFilas(s => s.map(x => {
     if (x._id !== id) return x;
@@ -4569,10 +4569,11 @@ function VistaModReceta({ perfil, session, vista, setVista }) {
       ...x,
       nombre: data.nombre,
       insumos: (data.insumos || []).map(ins => ({
-        sku: String(ins.receta_sku ?? ins.sku ?? ""),
+        sku:                  String(ins.receta_sku ?? ins.sku ?? ""),
+        nombre_sku:           String(ins.receta_nombre_sku ?? ins.nombre ?? ""),
         cantidad_numerador:   String(ins.receta_cantidad_base_numerador   ?? ins.cantidad_numerador   ?? ""),
         cantidad_denominador: String(ins.receta_cantidad_base_denominador ?? ins.cantidad_denominador ?? ""),
-        unidad: String(ins.receta_unidad_medida ?? ins.unidad_medida ?? ""),
+        unidad:               String(ins.receta_unidad_medida ?? ins.unidad_medida ?? ""),
       })),
       errores: [],
     }));
@@ -4784,9 +4785,13 @@ function VistaModReceta({ perfil, session, vista, setVista }) {
                           <tr key={iIdx} style={{ borderBottom: "1px solid rgba(0,0,0,0.04)" }}>
                             <td style={{ padding: "3px 6px" }}><input className="celda" value={ins.sku} onChange={e => updateInsumo(recModal._id, iIdx, "sku", e.target.value)} placeholder="Código" style={{ minWidth: 100 }} /></td>
                             <td style={{ padding: "4px 10px" }}>
-                              {skuInfo ? <span style={{ fontSize: 13, color: "#34c759" }}>{skuInfo.nombre}</span>
-                               : ins.sku ? <span style={{ fontSize: 13, color: "#ff3b30" }}>No encontrado</span>
-                               : <span style={{ fontSize: 13, color: "#c7c7cc" }}>—</span>}
+                              {skuInfo
+                                ? <span style={{ fontSize: 13, color: "#34c759" }}>{skuInfo.nombre}</span>
+                                : ins.nombre_sku
+                                  ? <span style={{ fontSize: 13, color: "#3a3a3c" }}>{ins.nombre_sku}</span>
+                                  : ins.sku
+                                    ? <span style={{ fontSize: 13, color: "#ff3b30" }}>No encontrado</span>
+                                    : <span style={{ fontSize: 13, color: "#c7c7cc" }}>—</span>}
                             </td>
                             <td style={{ padding: "3px 6px" }}><input className="celda" type="number" min="0" step="1" value={ins.cantidad_numerador} onChange={e => updateInsumo(recModal._id, iIdx, "cantidad_numerador", e.target.value)} placeholder="106" style={{ minWidth: 70 }} /></td>
                             <td style={{ padding: "3px 6px" }}><input className="celda" type="number" min="1" step="1" value={ins.cantidad_denominador} onChange={e => updateInsumo(recModal._id, iIdx, "cantidad_denominador", e.target.value)} placeholder="1000" style={{ minWidth: 70 }} /></td>
