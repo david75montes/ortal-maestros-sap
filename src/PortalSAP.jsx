@@ -4613,6 +4613,34 @@ function VistaModReceta({ perfil, session, vista, setVista }) {
     reader.readAsArrayBuffer(file); e.target.value = "";
   };
 
+  const descargarExcelModReceta = () => {
+    const headers = ["Código SAP Receta", "Nombre Receta", "Acción Insumo", "SKU Insumo", "Nombre Insumo", "Numerador", "Denominador", "Unidad Medida"];
+    const rows = [];
+    filas.forEach(f => {
+      if (f.insumos.length === 0) {
+        rows.push([f.codigo_sap, f.nombre, "", "", "", "", "", ""]);
+      } else {
+        f.insumos.forEach(ins => {
+          rows.push([
+            f.codigo_sap,
+            f.nombre,
+            ins.accion || "Modificar",
+            ins.sku,
+            ins.nombre_sku || MAESTROS.skus?.[ins.sku]?.nombre || "",
+            ins.cantidad_numerador,
+            ins.cantidad_denominador,
+            ins.unidad,
+          ]);
+        });
+      }
+    });
+    const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+    ws["!cols"] = headers.map(h => ({ wch: Math.max(h.length + 2, 16) }));
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Modificación Receta");
+    XLSX.writeFile(wb, `mod_receta_${new Date().toISOString().slice(0, 10)}.xlsx`);
+  };
+
   const validarTodo = () => {
     let ok = true;
     const updated = filas.map(f => {
@@ -4647,7 +4675,10 @@ function VistaModReceta({ perfil, session, vista, setVista }) {
         <div className="success-check"><CheckCircle2 size={64} strokeWidth={1.3} /></div>
         <h1 className="success-title">Solicitud enviada.</h1>
         <p className="success-sub">Folio <strong>{enviado.folio}</strong> · {enviado.total} receta{enviado.total > 1 ? "s" : ""} a modificar.</p>
-        <button className="btn-primary" style={{ marginTop: 24 }} onClick={() => { setEnviado(null); setFilas([emptyModReceta()]); }}>Nueva solicitud</button>
+        <div style={{ display: "flex", gap: 12, marginTop: 24, justifyContent: "center" }}>
+          <button className="btn-soft" onClick={descargarExcelModReceta}><Download size={14} /> Descargar Excel</button>
+          <button className="btn-primary" onClick={() => { setEnviado(null); setFilas([emptyModReceta()]); }}>Nueva solicitud</button>
+        </div>
       </main>
     </AppShell>
   );
@@ -4681,6 +4712,9 @@ function VistaModReceta({ perfil, session, vista, setVista }) {
         </div>
         <button className="btn-primary" style={{ width: "100%", marginBottom: 8 }} disabled={solicitante.trim().length < 3 || enviando} onClick={handleEnviar}>
           {enviando ? "Enviando…" : "Enviar solicitud"} <ArrowRight size={15} />
+        </button>
+        <button className="btn-soft" style={{ width: "100%" }} onClick={descargarExcelModReceta}>
+          <Download size={14} /> Descargar Excel
         </button>
       </div>
     </div>
