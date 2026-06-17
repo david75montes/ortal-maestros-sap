@@ -4543,7 +4543,7 @@ function VistaModReceta({ perfil, session, vista, setVista }) {
   const addFila      = () => { if (filas.length >= 80) return; setFilas(s => [...s, emptyModReceta()]); };
   const removeFila   = (id) => setFilas(s => s.filter(x => x._id !== id));
 
-  const addInsumo    = (id)          => setFilas(s => s.map(x => x._id !== id ? x : { ...x, insumos: [...x.insumos, { sku: "", cantidad: "", unidad: "" }] }));
+  const addInsumo    = (id)          => setFilas(s => s.map(x => x._id !== id ? x : { ...x, insumos: [...x.insumos, { sku: "", cantidad_numerador: "", cantidad_denominador: "", unidad: "" }] }));
   const removeInsumo = (id, i)       => setFilas(s => s.map(x => x._id !== id ? x : { ...x, insumos: x.insumos.filter((_, j) => j !== i) }));
   const updateInsumo = (id, i, k, v) => setFilas(s => s.map(x => {
     if (x._id !== id) return x;
@@ -4570,7 +4570,8 @@ function VistaModReceta({ perfil, session, vista, setVista }) {
       nombre: data.nombre,
       insumos: (data.insumos || []).map(ins => ({
         sku: String(ins.receta_sku ?? ins.sku ?? ""),
-        cantidad: String(ins.receta_cantidad_base_numerador ?? ins.cantidad_numerador ?? ""),
+        cantidad_numerador:   String(ins.receta_cantidad_base_numerador   ?? ins.cantidad_numerador   ?? ""),
+        cantidad_denominador: String(ins.receta_cantidad_base_denominador ?? ins.cantidad_denominador ?? ""),
         unidad: String(ins.receta_unidad_medida ?? ins.unidad_medida ?? ""),
       })),
       errores: [],
@@ -4578,8 +4579,11 @@ function VistaModReceta({ perfil, session, vista, setVista }) {
   };
 
   const descargarTemplateInsumos = () => {
-    const ws = XLSX.utils.aoa_to_sheet([["Codigo SKU", "Cantidad"], ["10047", "2.5"]]);
-    ws["!cols"] = [{ wch: 16 }, { wch: 12 }];
+    const ws = XLSX.utils.aoa_to_sheet([
+      ["Codigo SKU", "Numerador", "Denominador", "Unidad Medida"],
+      ["10047", "106", "1000", "kilos"],
+    ]);
+    ws["!cols"] = [{ wch: 16 }, { wch: 12 }, { wch: 14 }, { wch: 14 }];
     const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Insumos");
     XLSX.writeFile(wb, "template_insumos_receta.xlsx");
   };
@@ -4591,7 +4595,12 @@ function VistaModReceta({ perfil, session, vista, setVista }) {
       const raw = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, defval: "" });
       const nuevos = raw.slice(1).filter(r => r[0]).map(r => {
         const skuCod = String(r[0]).trim();
-        return { sku: skuCod, cantidad: String(r[1] ?? "").trim(), unidad: MAESTROS.skus?.[skuCod]?.unidadVenta || "" };
+        return {
+          sku: skuCod,
+          cantidad_numerador:   String(r[1] ?? "").trim(),
+          cantidad_denominador: String(r[2] ?? "").trim(),
+          unidad: String(r[3] ?? "").trim() || MAESTROS.skus?.[skuCod]?.unidadVenta || "",
+        };
       });
       if (nuevos.length) setFilas(s => s.map(x => x._id !== id ? x : { ...x, insumos: nuevos }));
     };
@@ -4759,14 +4768,15 @@ function VistaModReceta({ perfil, session, vista, setVista }) {
                       <tr>
                         <th style={thSt}>Código SKU</th>
                         <th style={thSt}>Nombre</th>
-                        <th style={{ ...thSt, width: 110 }}>Cantidad</th>
+                        <th style={{ ...thSt, width: 90 }}>Numerador</th>
+                        <th style={{ ...thSt, width: 90 }}>Denominador</th>
                         <th style={{ ...thSt, width: 80 }}>Unidad</th>
                         <th style={{ ...thSt, width: 36 }}></th>
                       </tr>
                     </thead>
                     <tbody>
                       {recModal.insumos.length === 0 && (
-                        <tr><td colSpan={5} style={{ textAlign: "center", color: "#aeaeb2", padding: "22px 10px", fontSize: 13 }}>Sin insumos. Agrega el primero abajo.</td></tr>
+                        <tr><td colSpan={6} style={{ textAlign: "center", color: "#aeaeb2", padding: "22px 10px", fontSize: 13 }}>Sin insumos. Agrega el primero abajo.</td></tr>
                       )}
                       {recModal.insumos.map((ins, iIdx) => {
                         const skuInfo = MAESTROS.skus?.[ins.sku];
@@ -4778,7 +4788,8 @@ function VistaModReceta({ perfil, session, vista, setVista }) {
                                : ins.sku ? <span style={{ fontSize: 13, color: "#ff3b30" }}>No encontrado</span>
                                : <span style={{ fontSize: 13, color: "#c7c7cc" }}>—</span>}
                             </td>
-                            <td style={{ padding: "3px 6px" }}><input className="celda" type="number" min="0" step="0.001" value={ins.cantidad} onChange={e => updateInsumo(recModal._id, iIdx, "cantidad", e.target.value)} placeholder="0" style={{ minWidth: 80 }} /></td>
+                            <td style={{ padding: "3px 6px" }}><input className="celda" type="number" min="0" step="1" value={ins.cantidad_numerador} onChange={e => updateInsumo(recModal._id, iIdx, "cantidad_numerador", e.target.value)} placeholder="106" style={{ minWidth: 70 }} /></td>
+                            <td style={{ padding: "3px 6px" }}><input className="celda" type="number" min="1" step="1" value={ins.cantidad_denominador} onChange={e => updateInsumo(recModal._id, iIdx, "cantidad_denominador", e.target.value)} placeholder="1000" style={{ minWidth: 70 }} /></td>
                             <td style={{ padding: "4px 10px", fontSize: 13, color: "#636366" }}>{ins.unidad || skuInfo?.unidadVenta || "—"}</td>
                             <td style={{ textAlign: "center", padding: "4px 6px" }}><button onClick={() => removeInsumo(recModal._id, iIdx)} style={{ background: "none", border: "none", cursor: "pointer", color: "#ff3b30" }}><X size={14} /></button></td>
                           </tr>
