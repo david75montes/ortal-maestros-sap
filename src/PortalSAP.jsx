@@ -2638,6 +2638,126 @@ const TABLAS_CONFIG = [
     ],
     templateEjemplo: [["FAB001", "Nestlé Chile S.A."], ["FAB002", "Coca-Cola Andina"]],
   },
+  {
+    id: "recetas",
+    nombre: "Recetas",
+    tipo: "nested",
+    desc: "Estructuras de receta desde el Excel de producción. Columnas: sku_id, sku, nombre_sku, receta_sku_id, receta_sku, receta_nombre_sku, receta_unidad_medida, receta_cantidad_base_denominador, receta_cantidad_base_numerador, organizacion_id, date.",
+    icon: Utensils,
+    tabla: "maestro_recetas",
+    conflicto: "codigo_sap",
+    columnas: [
+      { key: "codigo_sap", label: "Código SAP" },
+      { key: "nombre",     label: "Nombre" },
+      { key: "_insumos",   label: "# Insumos" },
+    ],
+    parser: (rawRows) => {
+      const map = {}; const order = [];
+      for (let i = 1; i < rawRows.length; i++) {
+        const r = rawRows[i];
+        const cod = String(r[1] || "").trim();
+        if (!cod) continue;
+        if (!map[cod]) {
+          map[cod] = {
+            codigo_sap: cod,
+            nombre: String(r[2] || "").trim(),
+            organizacion_id: String(r[9] || "").trim(),
+            insumos: [],
+            updated_at: new Date().toISOString(),
+          };
+          order.push(cod);
+        }
+        const insumo_sku = String(r[4] || "").trim();
+        if (insumo_sku) {
+          map[cod].insumos.push({
+            sku: insumo_sku,
+            nombre: String(r[5] || "").trim(),
+            unidad_medida: String(r[6] || "").trim(),
+            cantidad_numerador: Number(r[8]) || 0,
+            cantidad_denominador: Number(r[7]) || 0,
+          });
+        }
+      }
+      return order.map(cod => {
+        const rec = map[cod];
+        const errs = [
+          ...(!rec.nombre ? ["Nombre vacío"] : []),
+          ...(rec.insumos.length === 0 ? ["Sin insumos"] : []),
+        ];
+        return {
+          data: rec,
+          display: { codigo_sap: rec.codigo_sap, nombre: rec.nombre, _insumos: rec.insumos.length },
+          errores: errs,
+          ok: errs.length === 0,
+        };
+      });
+    },
+    templateEjemplo: [],
+  },
+  {
+    id: "combos",
+    nombre: "Combos",
+    tipo: "nested",
+    desc: "Estructuras de combo desde el Excel de producción. Columnas: subcategoria_id, combo_id, sku_combo, nombre_combo, nombre_grupo, porcentaje_beneficio_grupo, sku_id, sku, nombre_sku, delta_precio, es_opcional, organizacion_id, date.",
+    icon: Gift,
+    tabla: "maestro_combos",
+    conflicto: "codigo_sap",
+    columnas: [
+      { key: "codigo_sap", label: "Código SAP" },
+      { key: "nombre",     label: "Nombre" },
+      { key: "_pasos",     label: "# Pasos" },
+    ],
+    parser: (rawRows) => {
+      const map = {}; const order = [];
+      for (let i = 1; i < rawRows.length; i++) {
+        const r = rawRows[i];
+        const cod = String(r[2] || "").trim();
+        if (!cod) continue;
+        if (!map[cod]) {
+          map[cod] = {
+            codigo_sap: cod,
+            nombre: String(r[3] || "").trim(),
+            organizacion_id: String(r[11] || "").trim(),
+            pasos: [],
+            updated_at: new Date().toISOString(),
+          };
+          order.push(cod);
+        }
+        const paso_nombre = String(r[4] || "").trim();
+        const sku = String(r[7] || "").trim();
+        if (!paso_nombre || !sku) continue;
+        let paso = map[cod].pasos.find(p => p.nombre === paso_nombre);
+        if (!paso) {
+          paso = {
+            nombre: paso_nombre,
+            pct_beneficio: String(r[5] || "").trim(),
+            obligatorio: String(r[10]).trim() === "False" ? "Si" : "No",
+            productos: [],
+          };
+          map[cod].pasos.push(paso);
+        }
+        paso.productos.push({
+          sku,
+          nombre: String(r[8] || "").trim(),
+          delta_precio: String(r[9] || "").trim(),
+        });
+      }
+      return order.map(cod => {
+        const rec = map[cod];
+        const errs = [
+          ...(!rec.nombre ? ["Nombre vacío"] : []),
+          ...(rec.pasos.length === 0 ? ["Sin pasos"] : []),
+        ];
+        return {
+          data: rec,
+          display: { codigo_sap: rec.codigo_sap, nombre: rec.nombre, _pasos: rec.pasos.length },
+          errores: errs,
+          ok: errs.length === 0,
+        };
+      });
+    },
+    templateEjemplo: [],
+  },
 ];
 
 function VistaMaestros() {
@@ -2659,12 +2779,17 @@ function VistaMaestros() {
           setPreviews(p => ({ ...p, [cfg.id]: { error: "El archivo no contiene datos.", fileName: file.name } }));
           return;
         }
+        if (cfg.tipo === "nested") {
+          const rows = cfg.parser(rawRows);
+          setPreviews(p => ({ ...p, [cfg.id]: { rows, fileName: file.name, nested: true } }));
+          setResultado(r => ({ ...r, [cfg.id]: null }));
+          return;
+        }
         const rows = [];
         for (let i = 1; i < rawRows.length; i++) {
           const raw = rawRows[i];
           const r = {};
           cfg.columnas.forEach(c => { r[c.key] = norm(raw[c.col]) || c.def || ""; });
-          // ignorar filas completamente vacías
           if (cfg.columnas.filter(c => c.req).every(c => !r[c.key])) continue;
           const errs = cfg.columnas.filter(c => c.req && !r[c.key]).map(c => `${c.label} vacío`);
           rows.push({ data: r, errores: errs, ok: errs.length === 0 });
@@ -2742,9 +2867,11 @@ function VistaMaestros() {
 
         {/* Acciones */}
         <div className="mto-actions">
-          <button className="btn-soft" onClick={() => descargarPlantilla(cfg)}>
-            <Download size={15} /> Descargar plantilla
-          </button>
+          {cfg.tipo !== "nested" && (
+            <button className="btn-soft" onClick={() => descargarPlantilla(cfg)}>
+              <Download size={15} /> Descargar plantilla
+            </button>
+          )}
           <input type="file" accept=".xlsx,.xls" hidden ref={fileRefs[cfg.id]}
             onChange={e => { leerExcel(cfg, e.target.files[0]); e.target.value = ""; }} />
           <button className="btn-validar" onClick={() => fileRefs[cfg.id].current?.click()}>
@@ -2776,13 +2903,16 @@ function VistaMaestros() {
                   </tr>
                 </thead>
                 <tbody>
-                  {prev.rows.slice(0, 50).map((r, i) => (
-                    <tr key={i} className={r.ok ? "" : "fila-err"}>
-                      <td>{r.ok ? <CheckCircle2 size={14} color="#248a3d" /> : <XCircle size={14} color="#c2271c" />}</td>
-                      {cfg.columnas.map(c => <td key={c.key}>{r.data[c.key] || <span className="mto-vacio">—</span>}</td>)}
-                      <td>{r.errores.join(", ") || ""}</td>
-                    </tr>
-                  ))}
+                  {prev.rows.slice(0, 50).map((r, i) => {
+                    const rowDisplay = prev.nested ? r.display : r.data;
+                    return (
+                      <tr key={i} className={r.ok ? "" : "fila-err"}>
+                        <td>{r.ok ? <CheckCircle2 size={14} color="#248a3d" /> : <XCircle size={14} color="#c2271c" />}</td>
+                        {cfg.columnas.map(c => <td key={c.key}>{rowDisplay[c.key] ?? <span className="mto-vacio">—</span>}</td>)}
+                        <td>{r.errores.join(", ") || ""}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
               {prev.rows.length > 50 && (
@@ -4397,6 +4527,7 @@ const emptyModCombo  = () => ({ _id: Math.random().toString(36).slice(2), codigo
 function VistaModReceta({ perfil, session, vista, setVista }) {
   const [filas, setFilas]       = useState([emptyModReceta()]);
   const [insumoModal, setInsumoModal] = useState(null);
+  const [buscando, setBuscando] = useState({});
   const solicitante             = perfil?.nombre || "";
   const [enviando, setEnviando] = useState(false);
   const [enviado, setEnviado]   = useState(null);
@@ -4418,6 +4549,27 @@ function VistaModReceta({ perfil, session, vista, setVista }) {
     });
     return { ...x, insumos: ins };
   }));
+
+  const buscarReceta = async (id, codigo_sap) => {
+    if (!codigo_sap.trim()) return;
+    setBuscando(s => ({ ...s, [id]: true }));
+    const { data, error } = await supabase.from("maestro_recetas").select("*").eq("codigo_sap", codigo_sap.trim()).single();
+    setBuscando(s => ({ ...s, [id]: false }));
+    if (error || !data) {
+      setFilas(s => s.map(x => x._id !== id ? x : { ...x, errores: [`Código SAP ${codigo_sap.trim()} no encontrado en el maestro de recetas`] }));
+      return;
+    }
+    setFilas(s => s.map(x => x._id !== id ? x : {
+      ...x,
+      nombre: data.nombre,
+      insumos: (data.insumos || []).map(ins => ({
+        sku: String(ins.sku),
+        cantidad: ins.cantidad_numerador + (ins.cantidad_denominador && ins.cantidad_denominador !== 1 ? "/" + ins.cantidad_denominador : ""),
+        unidad: ins.unidad_medida || "",
+      })),
+      errores: [],
+    }));
+  };
 
   const descargarTemplateInsumos = () => {
     const ws = XLSX.utils.aoa_to_sheet([["Codigo SKU", "Cantidad"], ["10047", "2.5"]]);
@@ -4543,7 +4695,12 @@ function VistaModReceta({ perfil, session, vista, setVista }) {
                     <React.Fragment key={fila._id}>
                       <tr className={hayError ? "g-err" : ""}>
                         <td className="td-n">{hayError ? <AlertTriangle size={13} className="ic-err" /> : <Pencil size={12} className="ic-dim" />}</td>
-                        <td><input className="celda" value={fila.codigo_sap} onChange={e => updateFila(fila._id, "codigo_sap", e.target.value)} placeholder="Ej: 132132" style={{ fontFamily: "monospace" }} /></td>
+                        <td style={{ whiteSpace: "nowrap" }}>
+                          <input className="celda" value={fila.codigo_sap} onChange={e => updateFila(fila._id, "codigo_sap", e.target.value)} placeholder="Ej: 132132" style={{ fontFamily: "monospace", width: 100 }} />
+                          <button className="dz-clear dup" style={{ padding: "4px 8px", fontSize: 11, marginLeft: 4, whiteSpace: "nowrap" }} disabled={buscando[fila._id]} onClick={() => buscarReceta(fila._id, fila.codigo_sap)} title="Pre-cargar desde maestro de recetas">
+                            {buscando[fila._id] ? "…" : <><Sparkles size={11} /> Buscar</>}
+                          </button>
+                        </td>
                         <td><input className="celda" value={fila.nombre} onChange={e => updateFila(fila._id, "nombre", e.target.value)} placeholder="Nombre de la receta" /></td>
                         <td>
                           <button className="dz-clear dup" style={{ padding: "4px 8px", fontSize: 12, whiteSpace: "nowrap" }} onClick={() => setInsumoModal(fila._id)}>
@@ -4647,6 +4804,7 @@ function VistaModCombo({ perfil, session, vista, setVista }) {
   const [filas, setFilas]         = useState([emptyModCombo()]);
   const [comboModal, setComboModal] = useState(null);
   const [comboError, setComboError] = useState("");
+  const [buscando, setBuscando]   = useState({});
   const solicitante               = perfil?.nombre || "";
   const [enviando, setEnviando]   = useState(false);
   const [enviado, setEnviado]     = useState(null);
@@ -4662,6 +4820,29 @@ function VistaModCombo({ perfil, session, vista, setVista }) {
   const addProd         = (skuId, pid)         => setFilas(s => s.map(x => x._id !== skuId ? x : { ...x, pasos: x.pasos.map(p => p._id !== pid ? p : { ...p, productos: [...p.productos, emptyProductoCombo()] }) }));
   const removeProd      = (skuId, pid, prodId) => setFilas(s => s.map(x => x._id !== skuId ? x : { ...x, pasos: x.pasos.map(p => p._id !== pid ? p : { ...p, productos: p.productos.filter(pr => pr._id !== prodId) }) }));
   const updateProd      = (skuId, pid, prodId, k, v) => setFilas(s => s.map(x => x._id !== skuId ? x : { ...x, pasos: x.pasos.map(p => p._id !== pid ? p : { ...p, productos: p.productos.map(pr => pr._id !== prodId ? pr : { ...pr, [k]: v }) }) }));
+
+  const buscarCombo = async (id, codigo_sap) => {
+    if (!codigo_sap.trim()) return;
+    setBuscando(s => ({ ...s, [id]: true }));
+    const { data, error } = await supabase.from("maestro_combos").select("*").eq("codigo_sap", codigo_sap.trim()).single();
+    setBuscando(s => ({ ...s, [id]: false }));
+    if (error || !data) {
+      setFilas(s => s.map(x => x._id !== id ? x : { ...x, errores: [`Código SAP ${codigo_sap.trim()} no encontrado en el maestro de combos`] }));
+      return;
+    }
+    const pasos = (data.pasos || []).map(p => ({
+      _id: Math.random().toString(36).slice(2),
+      nombre: p.nombre || "",
+      obligatorio: p.obligatorio || "Si",
+      pct_beneficio: String(p.pct_beneficio || ""),
+      productos: (p.productos || []).map(pr => ({
+        _id: Math.random().toString(36).slice(2),
+        sku: String(pr.sku || ""),
+        delta_precio: String(pr.delta_precio || ""),
+      })),
+    }));
+    setFilas(s => s.map(x => x._id !== id ? x : { ...x, nombre: data.nombre, pasos, errores: [] }));
+  };
 
   const descargarTemplateCombo = () => {
     const ws = XLSX.utils.aoa_to_sheet([
@@ -4795,7 +4976,12 @@ function VistaModCombo({ perfil, session, vista, setVista }) {
                     <React.Fragment key={fila._id}>
                       <tr className={hayError ? "g-err" : ""}>
                         <td className="td-n">{hayError ? <AlertTriangle size={13} className="ic-err" /> : <Pencil size={12} className="ic-dim" />}</td>
-                        <td><input className="celda" value={fila.codigo_sap} onChange={e => updateFila(fila._id, "codigo_sap", e.target.value)} placeholder="Ej: 132132" style={{ fontFamily: "monospace" }} /></td>
+                        <td style={{ whiteSpace: "nowrap" }}>
+                          <input className="celda" value={fila.codigo_sap} onChange={e => updateFila(fila._id, "codigo_sap", e.target.value)} placeholder="Ej: 132132" style={{ fontFamily: "monospace", width: 100 }} />
+                          <button className="dz-clear dup" style={{ padding: "4px 8px", fontSize: 11, marginLeft: 4, whiteSpace: "nowrap" }} disabled={buscando[fila._id]} onClick={() => buscarCombo(fila._id, fila.codigo_sap)} title="Pre-cargar desde maestro de combos">
+                            {buscando[fila._id] ? "…" : <><Sparkles size={11} /> Buscar</>}
+                          </button>
+                        </td>
                         <td><input className="celda" value={fila.nombre} onChange={e => updateFila(fila._id, "nombre", e.target.value)} placeholder="Nombre del combo" /></td>
                         <td>
                           <button className="dz-clear dup" style={{ padding: "4px 8px", fontSize: 12, whiteSpace: "nowrap", borderColor: "rgba(175,82,222,0.35)", color: "#af52de" }}
