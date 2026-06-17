@@ -2563,7 +2563,7 @@ const TABLAS_CONFIG = [
   {
     id: "skus",
     nombre: "SKUs",
-    desc: "Materiales con unidad de venta y condición. Columnas esperadas: Codigo, Nombre, Unidad Venta, Unidad Condicion.",
+    desc: "Materiales con unidades y grupo de artículo. Columnas esperadas: Codigo, Nombre, Unidad Venta, Unidad Condicion, Unidad Base, Unidad Pedido, Grupo Articulo.",
     icon: Boxes,
     tabla: "skus",
     conflicto: "codigo",
@@ -2572,8 +2572,11 @@ const TABLAS_CONFIG = [
       { key: "nombre",           label: "Nombre",          col: 1, req: true },
       { key: "unidad_venta",     label: "Unidad Venta",    col: 2, req: false, def: "UN" },
       { key: "unidad_condicion", label: "Unidad Condicion",col: 3, req: false, def: "UN" },
+      { key: "unidad_base",      label: "Unidad Base",     col: 4, req: false, def: "UN" },
+      { key: "unidad_pedido",    label: "Unidad Pedido",   col: 5, req: false, def: "UN" },
+      { key: "grupo_articulo",   label: "Grupo Articulo",  col: 6, req: false, def: "" },
     ],
-    templateEjemplo: [["32", "COCA-COLA ZERO 250C", "UN", "UN"], ["145873", "MATERIAL EJEMPLO", "CJ", "UN"]],
+    templateEjemplo: [["32", "COCA-COLA ZERO 250C", "UN", "UN", "UN", "UN", "BEBE"], ["145873", "MATERIAL EJEMPLO", "CJ", "UN", "UN", "CJ", "ALIM"]],
   },
   {
     id: "proveedores",
