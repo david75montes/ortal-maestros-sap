@@ -189,18 +189,21 @@ const PLANILLAS = [
     desc: "Habilita uno o más SKU en uno o más centros.",
     icon: Boxes,
     userCols: [
-      { key: "centro", label: "Centro", hint: "2003,2549 o cluster", w: 150, multi: true, centro: true },
-      { key: "sku", label: "SKU", hint: "32", w: 100, sku: true },
-      { key: "fechaInicio", label: "Fecha inicio", hint: "DD-MM-AAAA", w: 120, fecha: true, def: hoy() },
-      { key: "fechaFinal", label: "Fecha final", hint: "31-12-9999", w: 120, fecha: true, def: "31-12-9999" },
+      { key: "centro",        label: "Centro",        hint: "2003,2549 o cluster", w: 150, multi: true, centro: true },
+      { key: "sku",           label: "SKU",           hint: "32", w: 100, sku: true },
+      { key: "unidadBase",    label: "Unidad Base",   hint: "UN", w: 90, def: "UN" },
+      { key: "unidadPedido",  label: "Unidad Pedido", hint: "UN", w: 100, def: "UN" },
+      { key: "grupoArticulo", label: "Grupo Artículo",hint: "ALIM", w: 110 },
+      { key: "fechaInicio",   label: "Fecha inicio",  hint: "DD-MM-AAAA", w: 120, fecha: true, def: hoy() },
+      { key: "fechaFinal",    label: "Fecha final",   hint: "31-12-9999", w: 120, fecha: true, def: "31-12-9999" },
     ],
     autoCols: [
       { key: "nombreCentro", label: "Nombre centro", src: "centro_nombre" },
-      { key: "descSku", label: "Descripcion SKU", src: "sku_desc" },
+      { key: "descSku",      label: "Descripcion SKU", src: "sku_desc" },
     ],
-    salida: ["centro", "sku", "fechaInicio", "fechaFinal"],
-    salidaLabels: ["Centro", "SKU", "Fecha inicio", "Fecha final"],
-    ejemplo: { centro: "2003,2549", sku: "32", fechaInicio: "01-07-2026", fechaFinal: "31-12-9999" },
+    salida: ["centro", "sku", "unidadBase", "unidadPedido", "grupoArticulo", "fechaInicio", "fechaFinal"],
+    salidaLabels: ["Centro", "SKU", "Unidad Base", "Unidad Pedido", "Grupo Artículo", "Fecha inicio", "Fecha final"],
+    ejemplo: { centro: "2003,2549", sku: "32", unidadBase: "UN", unidadPedido: "UN", grupoArticulo: "ALIM", fechaInicio: "01-07-2026", fechaFinal: "31-12-9999" },
   },
   {
     id: "precio",
@@ -635,7 +638,6 @@ const emptySkuRow = () => ({
   _id: Math.random().toString(36).slice(2),
   id_creacion: "CSKU-" + new Date().toISOString().slice(0, 10).replace(/-/g, "") + "-" + Math.random().toString(36).slice(2, 6).toUpperCase(),
   nombre: "", descripcion: "", tipo: "",
-  unidad_base: "", unidad_pedido: "",
   grupo_articulo: "", material_modelo: "",
   marca: "", fabricante: "",
   flag_planograma: false, flag_navegacion: false,
@@ -2959,27 +2961,25 @@ const SKU_EXCEL_COLS = [
   { key: "nombre",            label: "Nombre",              col: 0 },
   { key: "descripcion",       label: "Descripcion",         col: 1 },
   { key: "tipo",              label: "Tipo",                col: 2 },
-  { key: "unidad_base",       label: "Unidad Base",         col: 3 },
-  { key: "unidad_pedido",     label: "Unidad Pedido",       col: 4 },
-  { key: "grupo_articulo",    label: "Grupo Articulo",      col: 5 },
-  { key: "material_modelo",   label: "Material Modelo",     col: 6 },
-  { key: "marca",             label: "Marca",               col: 7 },
-  { key: "fabricante",        label: "Fabricante",          col: 8 },
-  { key: "flag_planograma",   label: "Flag Planograma",     col: 9 },
-  { key: "flag_navegacion",   label: "Flag Navegacion",     col: 10 },
-  { key: "_p_unidad",         label: "Primaria Unidad",     col: 11 },
-  { key: "_p_alto",           label: "Primaria Alto",       col: 12 },
-  { key: "_p_largo",          label: "Primaria Largo",      col: 13 },
-  { key: "_p_ancho",          label: "Primaria Ancho",      col: 14 },
-  { key: "_p_peso_neto",      label: "Primaria Peso Neto",  col: 15 },
-  { key: "_p_peso_bruto",     label: "Primaria Peso Bruto", col: 16 },
-  { key: "factor_conversion", label: "Factor Conversion",   col: 17 },
-  { key: "_s_unidad",         label: "Secundaria Unidad",   col: 18 },
-  { key: "_s_alto",           label: "Secundaria Alto",     col: 19 },
-  { key: "_s_largo",          label: "Secundaria Largo",    col: 20 },
-  { key: "_s_ancho",          label: "Secundaria Ancho",    col: 21 },
-  { key: "_s_peso_neto",      label: "Secundaria Peso Neto",col: 22 },
-  { key: "_s_peso_bruto",     label: "Secundaria Peso Bruto",col: 23 },
+  { key: "grupo_articulo",    label: "Grupo Articulo",      col: 3 },
+  { key: "material_modelo",   label: "Material Modelo",     col: 4 },
+  { key: "marca",             label: "Marca",               col: 5 },
+  { key: "fabricante",        label: "Fabricante",          col: 6 },
+  { key: "flag_planograma",   label: "Flag Planograma",     col: 7 },
+  { key: "flag_navegacion",   label: "Flag Navegacion",     col: 8 },
+  { key: "_p_unidad",         label: "Primaria Unidad",     col: 9 },
+  { key: "_p_alto",           label: "Primaria Alto",       col: 10 },
+  { key: "_p_largo",          label: "Primaria Largo",      col: 11 },
+  { key: "_p_ancho",          label: "Primaria Ancho",      col: 12 },
+  { key: "_p_peso_neto",      label: "Primaria Peso Neto",  col: 13 },
+  { key: "_p_peso_bruto",     label: "Primaria Peso Bruto", col: 14 },
+  { key: "factor_conversion", label: "Factor Conversion",   col: 15 },
+  { key: "_s_unidad",         label: "Secundaria Unidad",   col: 16 },
+  { key: "_s_alto",           label: "Secundaria Alto",     col: 17 },
+  { key: "_s_largo",          label: "Secundaria Largo",    col: 18 },
+  { key: "_s_ancho",          label: "Secundaria Ancho",    col: 19 },
+  { key: "_s_peso_neto",      label: "Secundaria Peso Neto",col: 20 },
+  { key: "_s_peso_bruto",     label: "Secundaria Peso Bruto",col: 21 },
 ];
 
 function VistaCreacionSKU({ perfil, session, vista, setVista }) {
@@ -3033,7 +3033,7 @@ function VistaCreacionSKU({ perfil, session, vista, setVista }) {
 
   const descargarTemplate = () => {
     const headers = SKU_EXCEL_COLS.map(c => c.label);
-    const ejemplo = ["Agua Mineral 500ml", "Agua mineral sin gas botella PET", "Retail", "UN", "UN", "BEB", "MAT001", "NESTLE", "FAB001", "SI", "SI", "22", "7", "7", "0.5", "0.55", "24", "8", "8", "12", "13.2"];
+    const ejemplo = ["Agua Mineral 500ml", "Agua mineral sin gas botella PET", "Retail", "BEB", "MAT001", "NESTLE", "FAB001", "SI", "SI", "22", "7", "7", "0.5", "0.55", "24", "8", "8", "12", "13.2"];
     const ws = XLSX.utils.aoa_to_sheet([headers, ejemplo]);
     ws["!cols"] = headers.map(h => ({ wch: Math.max(h.length + 2, 14) }));
     const wb = XLSX.utils.book_new();
@@ -3217,8 +3217,6 @@ function VistaCreacionSKU({ perfil, session, vista, setVista }) {
                     <th style={{ minWidth: 175 }}>Nombre</th>
                     <th style={{ minWidth: 185 }}>Descripción</th>
                     <th style={{ minWidth: 120 }}>Tipo</th>
-                    <th style={{ minWidth: 90 }}>Unid. Base</th>
-                    <th style={{ minWidth: 90 }}>Unid. Pedido</th>
                   </>}
 
                   {colGroup === "marcas" && <>
@@ -3259,7 +3257,7 @@ function VistaCreacionSKU({ perfil, session, vista, setVista }) {
                   const sinFoto  = TIPOS_SIN_FOTO.has(sku.tipo);
                   const hayError = sku.errores.length > 0;
                   const expanded = expandedRow === sku._id;
-                  const NCOLS_NOW = colGroup === "basicos" ? 8 : colGroup === "marcas" ? 7 : colGroup === "dimensiones" ? 16 : 6;
+                  const NCOLS_NOW = colGroup === "basicos" ? 6 : colGroup === "marcas" ? 7 : colGroup === "dimensiones" ? 16 : 6;
 
                   return (
                     <React.Fragment key={sku._id}>
@@ -3282,16 +3280,14 @@ function VistaCreacionSKU({ perfil, session, vista, setVista }) {
                               {TIPOS_SKU_BASE.map(t => <option key={t}>{t}</option>)}
                             </select>
                           </td>
-                          <td><input className="celda" value={sku.unidad_base} onChange={e => updateSku(sku._id, "unidad_base", e.target.value)} placeholder="UN" style={{ width: 60, textTransform: "uppercase" }} /></td>
-                          <td><input className="celda" value={sku.unidad_pedido} onChange={e => updateSku(sku._id, "unidad_pedido", e.target.value)} placeholder="UN" style={{ width: 60, textTransform: "uppercase" }} /></td>
                         </>}
 
                         {colGroup === "marcas" && <>
                           <td>
-                            <input className="celda" list={`ga-list-${sku._id}`} value={sku.grupo_articulo} onChange={e => updateSku(sku._id, "grupo_articulo", e.target.value)} placeholder="Ej: ALIM" style={{ width: 110 }} />
-                            <datalist id={`ga-list-${sku._id}`}>
+                            <select className="celda" value={sku.grupo_articulo} onChange={e => updateSku(sku._id, "grupo_articulo", e.target.value)}>
+                              <option value="">—</option>
                               {cat.grupos.map(g => <option key={g.codigo} value={g.codigo}>{g.codigo} — {g.nombre}</option>)}
-                            </datalist>
+                            </select>
                           </td>
                           <td>
                             <select className="celda" value={sku.material_modelo} onChange={e => updateSku(sku._id, "material_modelo", e.target.value)}>
